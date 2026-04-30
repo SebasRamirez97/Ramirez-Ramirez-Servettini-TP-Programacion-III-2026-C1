@@ -1,0 +1,97 @@
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 50px 0px 50px;
+    background-color: #333;
+    color: #fff;
+    height: 10vh;
+}
+
+footer{
+    height: auto;
+}
+
+.index{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+    height: 80vh;
+}
+
+.productos{
+    display: flex;
+    min-height: 80vh;
+    height: auto;
+}
+
+.menu-lateral{
+    width: 20%;
+    height: 100%;
+    background-color: #333;
+    color: #fff;
+}
+
+.categoria-productos{
+    width: 80%;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 100px;
+}
+
+.btn-categoria{
+    width: 100%;
+    height: 30vh; /* Cada botón ocupa el 30% de la altura de la pantalla */
+    font-size: 2rem;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    border: 1px solid #5f1616;
+    transition: background-color 0.3s;
+}
+
+.btn-categoria:hover{
+    background-color: #d1b01d;
+}
+
+.categoria-contenido {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out, padding 0.3s ease; /* Transición combinada */
+    background-color: white;
+    padding: 0 10px; /* Padding lateral fijo, pero 0 arriba/abajo */
+}
+
+.categoria-item{
+    scroll-margin-top: 15vh;
+}
+
+.categoria-item.activo .categoria-contenido{
+    max-height: 1000px; /* Abierto al hacer clic */
+    padding: 20px 10px;
+}
+
+.menu-lateral{
+    height: auto;
+    display: flex;
+    padding-left: 10px;
+    
+}
+
+.menu-lateral ul {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    padding: 20px;
+    gap: 20px;
+}
+
+.menu-lateral a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    width: 100%;
+}
