@@ -27,3 +27,19 @@ linksMenu.forEach(link => {
         }
     });
 });
+const botonesAgregar = document.querySelectorAll(".btn-agregar");
+
+botonesAgregar.forEach(boton => {
+  boton.addEventListener("click", function() {
+    
+    const card = boton.closest(".producto-card");
+    const btnSonido = card.querySelector(".arma-btn");
+
+    if (btnSonido && btnSonido.dataset.sonido) {
+      const audio = new Audio(btnSonido.dataset.sonido);
+      audio.volume = 1;
+      audio.play();
+    }
+
+  });
+});

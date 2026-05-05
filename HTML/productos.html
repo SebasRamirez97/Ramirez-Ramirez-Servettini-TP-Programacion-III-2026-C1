@@ -4,14 +4,14 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Document</title>
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="/Tenkiu/CSS/style.css" />
     </head>
     <body>
         <header>
-            <h1>Header</h1>
+            <h1>Tenkiu!</h1>
             <div>
                 <button>
-                    <a href="carrito.html">Carrito</a>
+                    <a href="/Tenkiu/HTML/carrito.html">Carrito</a>
                 </button>
                 <button>Cla/Osc</button>
             </div>
@@ -24,7 +24,7 @@
                     <ul>
                         <a href="#item-powerups"><li>Power Ups</li></a>
                         <a href="#item-vehiculos"><li>Vehiculos</li></a>
-                        <a href="index.html"><li>Volver</li></a>
+                        <a href="/Tenkiu/HTML/index.html"><li>Volver</li></a>
                     </ul>
             </aside>
             <section class="categoria-productos">
@@ -34,7 +34,23 @@
                             <div class="productos-grid">
                                 <!-- Tarjeta de Producto 1 -->
                                 <article class="producto-card">
-                                    <img src="./h.jpg" alt="Producto" class="producto-img">
+                                    <button class="arma-btn" data-sonido="/Tenkiu/SONIDOS/h.mp3"></button>
+                                    <img src="/Tenkiu/IMAGENES/h.jpg" alt="Producto" class="producto-img">
+                                    <p class="producto-precio">$1500</p>
+
+                                    <div class="selector-cantidad">
+                                        <button class="btn-cantidad">-</button>
+                                        <span class="cantidad-numero">0</span>
+                                        <button class="btn-cantidad">+</button>
+                                    </div>
+                                    
+                                    <button class="btn-agregar">Agregar al carrito</button>
+                                </article>
+
+                                <!-- Repetir el article para más productos -->
+                                 <!-- Tarjeta de Producto 1 -->
+                                <article class="producto-card">
+                                    <img src="/Tenkiu/IMAGENES/r.jpg" alt="Producto" class="producto-img">
                                     <p class="producto-precio">$1500</p>
                                     
                                     <div class="selector-cantidad">
@@ -49,22 +65,7 @@
                                 <!-- Repetir el article para más productos -->
                                  <!-- Tarjeta de Producto 1 -->
                                 <article class="producto-card">
-                                    <img src="./r.jpg" alt="Producto" class="producto-img">
-                                    <p class="producto-precio">$1500</p>
-                                    
-                                    <div class="selector-cantidad">
-                                        <button class="btn-cantidad">-</button>
-                                        <span class="cantidad-numero">0</span>
-                                        <button class="btn-cantidad">+</button>
-                                    </div>
-                                    
-                                    <button class="btn-agregar">Agregar al carrito</button>
-                                </article>
-
-                                <!-- Repetir el article para más productos -->
-                                 <!-- Tarjeta de Producto 1 -->
-                                <article class="producto-card">
-                                    <img src="./l.png" alt="Producto" class="producto-img">
+                                    <img src="/Tenkiu/IMAGENES/l.png" alt="Producto" class="producto-img">
                                     <p class="producto-precio">$1500</p>
                                     
                                     <div class="selector-cantidad">
@@ -83,7 +84,17 @@
                 <div id="item-vehiculos" class="categoria-item">
                     <button  class="btn-categoria">Vehiculos</button>
                         <div class="categoria-contenido">
-                            <p>Aquí va toda la info de tus vehiculos...</p>
+                            <article class="producto-card">
+                                <img src="/Tenkiu/IMAGENES/tanque-removebg-preview.png" width="300"  height="50" alt="Producto" class="producto-img">
+                                <p class="producto-precio">$2500</p>
+                                <div class="selector-cantidad">
+                                    <button class="btn-cantidad">-</button>
+                                    <span class="cantidad-numero">0</span>
+                                    <button class="btn-cantidad">+</button>
+                                </div>
+                                <button class="btn-agregar">Agregar al carrito</button>
+                            </article>
+
                         </div>
                 </div>
             </section>
@@ -92,8 +103,8 @@
 
         <hr>
         <footer>
-            <h3>Todos los derechos reservados</h3>
+            <p>&copy; 2026 Tenkiu! - Proyecto Programación 3</p>
         </footer>
-        <script src="script.js"></script>
+        <script src="/Tenkiu/JAVASCRIPT/script.js"></script>
     </body>
 </html>
