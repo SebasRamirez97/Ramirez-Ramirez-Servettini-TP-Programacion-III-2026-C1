@@ -135,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-cat-powerups').addEventListener('click', () => {
         mostrarCategoria('powerups', 'Power Ups');
     });
+<<<<<<< HEAD:script.js
     document.getElementById('btn-cat-vehiculos').addEventListener('click', () => {
         mostrarCategoria('vehiculos', 'Vehículos');
     });
@@ -149,4 +150,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+=======
+});
+const botonesAgregar = document.querySelectorAll(".btn-agregar");
+
+botonesAgregar.forEach(boton => {
+  boton.addEventListener("click", function() {
+    
+    const card = boton.closest(".producto-card");
+    const btnSonido = card.querySelector(".arma-btn");
+
+    if (btnSonido && btnSonido.dataset.sonido) {
+      const audio = new Audio(btnSonido.dataset.sonido);
+      audio.volume = 1;
+      audio.play();
+    }
+
+  });
+>>>>>>> 402cd125833f4936aab599cab28a69969335d627:JAVASCRIPT/script.js
 });
