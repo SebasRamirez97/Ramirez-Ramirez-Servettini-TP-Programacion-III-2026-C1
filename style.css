@@ -76,15 +76,9 @@
         /* =========================================
            3. SISTEMA DE APAGADO Y ENCENDIDO DE PANTALLAS
            ========================================= */
-        .pantalla {
-            display: none !important; /* Apaga y oculta las pantallas inactivas por completo */
-        }
-
-        .pantalla.activa {
-            display: flex !important; /* Muestra solo la activa en formato flex */
-            flex-grow: 1;             /* Se estira a lo largo de todo el main */
-        }
-
+        
+        
+        
         /* =========================================
            4. MENÚ LATERAL PEGADO (STICKY ASIDE)
            ========================================= */

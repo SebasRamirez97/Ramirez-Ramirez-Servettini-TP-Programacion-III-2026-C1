@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-
+    
+    const contenedorProductos = document.getElementById('contenedor-productos');
+    const tituloCatalogo = document.getElementById('titulo-catalogo');
     let articulos = [];
 
     fetch('./articulos.json')
@@ -7,13 +9,18 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             articulos = data;
             console.log("¡JSON cargado correctamente!", articulos);
+
+            // Detectar categoría desde la URL (solo en catalogo.html)
+            if (tituloCatalogo && contenedorProductos) {
+                const params = new URLSearchParams(window.location.search);
+                const categoria = params.get("categoria");
+                if (categoria) {
+                    const titulo = categoria === "powerups" ? "Power Ups" : "Vehículos";
+                    mostrarCategoria(categoria, titulo);
+                }
+            }
         })
         .catch(error => console.error("Error cargando el archivo JSON:", error));
-
-
-    const pBienvenida = document.getElementById('pantalla-bienvenida');
-    const pCategorias = document.getElementById('pantalla-categorias');
-    const pCatalogo = document.getElementById('pantalla-catalogo');
 
     const btnCarrito = document.getElementById('btn-carrito');
     const btnTema = document.getElementById('btn-tema');
@@ -32,121 +39,125 @@ document.addEventListener('DOMContentLoaded', () => {
             btnTema.classList.add('btn-dark');
         }
     });
-
-    function cambiarPantalla(pantallaOcultar, pantallaMostrar) {
-        pantallaOcultar.classList.remove('activa');
-        pantallaMostrar.classList.add('activa');
-
-
-        if (pantallaMostrar === pCatalogo) {
-            btnCarrito.classList.remove('d-none');
-        } else {
-            // Si volvemos atrás o al inicio, lo apagamos
-            btnCarrito.classList.add('d-none');
-        }
-    }
    
+    // Logica de los botones para cambiar de pantalla
+    const btnComprar = document.getElementById('btn-comprar');
+    if (btnComprar) {
+        btnComprar.addEventListener('click', () => {
+            location.href = "categorias.html";
+        });
+    }
 
-    document.getElementById('btn-comprar').addEventListener('click', () => {
-        cambiarPantalla(pBienvenida, pCategorias);
-    });
+    const btnVolverInicio = document.getElementById('btn-volver-inicio');
+    if (btnVolverInicio) {
+        btnVolverInicio.addEventListener('click', () => {
+            location.href = "bienvenida.html";
+        });
+    }
 
-    document.getElementById('btn-volver-inicio').addEventListener('click', () => {
-        cambiarPantalla(pCategorias, pBienvenida);
-    });
+    const btnVolverCategorias = document.getElementById('btn-volver-categorias');
+    if (btnVolverCategorias) {
+        btnVolverCategorias.addEventListener('click', () => {
+            location.href = "categorias.html";
+        });
+    }
 
-    document.getElementById('btn-volver-categorias').addEventListener('click', () => {
-        cambiarPantalla(pCatalogo, pBienvenida);
-    });
 
-
-    const contenedorProductos = document.getElementById('contenedor-productos');
-    const tituloCatalogo = document.getElementById('titulo-catalogo');
-
+    
+    
+    //Logica segun categoria
     function mostrarCategoria(categoriaFiltro, textoTitulo) {
 
-        cambiarPantalla(pCategorias, pCatalogo);
-        
+        if (!contenedorProductos || !tituloCatalogo) return;
+
         tituloCatalogo.textContent = textoTitulo;
-        
-        while (contenedorProductos.firstChild) {
-            contenedorProductos.removeChild(contenedorProductos.firstChild);
-        }
-        
+
+        // Limpiar productos previos
+        contenedorProductos.innerHTML = "";
         const productosFiltrados = articulos.filter(item => item.categoria === categoriaFiltro);
 
         productosFiltrados.forEach(producto => {
         
-        const article = document.createElement('article');
-        article.classList.add('producto-card');
+            const article = document.createElement('article');
+            article.classList.add('producto-card');
     
-        const img = document.createElement('img');
-        img.src = producto.imagen;            
-        img.alt = producto.nombre;             
-        img.classList.add('producto-img');
-        article.appendChild(img);               
+            const img = document.createElement('img');
+            img.src = producto.imagen || "https://via.placeholder.com/200x150?text=Sin+Imagen";          
+            img.alt = producto.nombre;             
+            img.classList.add('producto-img');
+            article.appendChild(img);               
             
 
-        const h4 = document.createElement('h4');
-        h4.textContent = producto.nombre;       
-        article.appendChild(h4);
+            const h4 = document.createElement('h4');
+            h4.textContent = producto.nombre;       
+            article.appendChild(h4);
             
-        const pDesc = document.createElement('p');
-        pDesc.textContent = producto.descripcion;
-        pDesc.classList.add('text-muted', 'small');
-        article.appendChild(pDesc);
+            const pDesc = document.createElement('p');
+            pDesc.textContent = producto.descripcion;
+            pDesc.classList.add('text-muted', 'small');
+            article.appendChild(pDesc);
             
-        const pPrecio = document.createElement('p');
-        pPrecio.textContent = `$${producto.precio}`;
-        pPrecio.classList.add('fs-4', 'fw-bold', 'text-success');
-        article.appendChild(pPrecio);
+            const pPrecio = document.createElement('p');
+            pPrecio.textContent = `$${producto.precio}`;
+            pPrecio.classList.add('fs-4', 'fw-bold', 'text-success');
+            article.appendChild(pPrecio);
             
-        const selectorCantidad = document.createElement('div');
-        selectorCantidad.classList.add('selector-cantidad');
+            const selectorCantidad = document.createElement('div');
+            selectorCantidad.classList.add('selector-cantidad');
             
-        const btnMenos = document.createElement('button');
-        btnMenos.textContent = '-';
-        btnMenos.classList.add('btn-cantidad');
-        selectorCantidad.appendChild(btnMenos);
+            const btnMenos = document.createElement('button');
+            btnMenos.textContent = '-';
+            btnMenos.classList.add('btn-cantidad');
+            selectorCantidad.appendChild(btnMenos);
             
-        const spanCantidad = document.createElement('span');
-        spanCantidad.textContent = '0';
-        spanCantidad.classList.add('cantidad-numero');
-        selectorCantidad.appendChild(spanCantidad);
+            const spanCantidad = document.createElement('span');
+            spanCantidad.textContent = '0';
+            spanCantidad.classList.add('cantidad-numero');
+            selectorCantidad.appendChild(spanCantidad);
             
-        const btnMas = document.createElement('button');
-        btnMas.textContent = '+';
-        btnMas.classList.add('btn-cantidad');
-        selectorCantidad.appendChild(btnMas);
+            const btnMas = document.createElement('button');
+            btnMas.textContent = '+';
+            btnMas.classList.add('btn-cantidad');
+            selectorCantidad.appendChild(btnMas);
             
-        article.appendChild(selectorCantidad);
+            article.appendChild(selectorCantidad);
             
-        const btnAgregar = document.createElement('button');
-        btnAgregar.textContent = 'Agregar al carrito';
-        btnAgregar.classList.add('btn', 'btn-danger', 'w-100');
-        article.appendChild(btnAgregar);
+            const btnAgregar = document.createElement('button');
+            btnAgregar.textContent = 'Agregar al carrito';
+            btnAgregar.classList.add('btn', 'btn-danger', 'w-100');
+            article.appendChild(btnAgregar);
             
 
-        contenedorProductos.appendChild(article);
+            contenedorProductos.appendChild(article);
         });
     }
 
 
-    document.getElementById('btn-cat-powerups').addEventListener('click', () => {
-        mostrarCategoria('powerups', 'Power Ups');
-    });
-    document.getElementById('btn-cat-vehiculos').addEventListener('click', () => {
-        mostrarCategoria('vehiculos', 'Vehículos');
-    });
+    // Botones de categorías
+    const btnCatPowerups = document.getElementById('btn-cat-powerups');
+    if (btnCatPowerups) {
+        btnCatPowerups.addEventListener('click', () => {
+            location.href = "catalogo.html?categoria=powerups";
+            
+        });
+    }
 
+    const btnCatVehiculos = document.getElementById('btn-cat-vehiculos');
+    if (btnCatVehiculos) {
+        btnCatVehiculos.addEventListener('click', () => {
+            location.href = "catalogo.html?categoria=vehiculos";
+        });
+    }
+
+    
 
     const botonesNavLateral = document.querySelectorAll('.nav-categoria');
-    botonesNavLateral.forEach(boton => {
-        boton.addEventListener('click', (e) => {
-            const categoria = e.target.getAttribute('data-categoria');
-            const titulo = e.target.textContent;
-            mostrarCategoria(categoria, titulo);
+    if (botonesNavLateral.length > 0) {
+        botonesNavLateral.forEach(boton => {
+            boton.addEventListener('click', (e) => {
+                const categoria = e.target.getAttribute('data-categoria');
+                location.href = `catalogo.html?categoria=${categoria}`;
+            });
         });
-    });
-
+    }
 });
