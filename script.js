@@ -77,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const productosFiltrados = articulos.filter(item => item.categoria === categoriaFiltro);
 
         productosFiltrados.forEach(producto => {
-        
             const article = document.createElement('article');
             article.classList.add('producto-card');
     
