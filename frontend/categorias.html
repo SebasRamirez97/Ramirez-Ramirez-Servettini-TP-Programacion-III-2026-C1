@@ -11,11 +11,11 @@
         <header>
             <h1>Tenkiu</h1>
             <div class="d-flex gap-2 align-items-center">
-             
+                <!-- Botón Carrito: Rojo (btn-danger) y oculto por defecto -->
                 <button id="btn-carrito" type="button" class="btn btn-danger d-none">
                     Carrito
                 </button>
-       
+                <!-- Botón Cla/Osc: Se inicia como btn-dark por defecto -->
                 <button id="btn-tema" type="button" class="btn btn-dark">
                     Modo Oscuro
                 </button>
@@ -24,35 +24,13 @@
 
 
         <main>
-           <section id="pantalla-bienvenida" class="pantalla activa flex-column align-items-center justify-content-center" style="min-height: 80vh;">
-                <h1>Bienvenido</h1>
-                <input type="text" id="input-nombre" class="form-control w-25 mb-3" placeholder="Ingrese su nombre">
-                <button id="btn-comprar" type="button" class="btn btn-danger btn-lg">Ir a comprar</button>
-           </section>
-
-           <section id="pantalla-categorias" class="pantalla flex-column align-items-center justify-content-center gap-4" style="min-height: 80vh;">
+           <section id="pantalla-categorias" class="d-flex flex-column align-items-center justify-content-center gap-4" style="min-height: 80vh;">
                 <div class="d-flex gap-5">
                     <button id="btn-cat-powerups" type="button" class="btn btn-warning" style="width: 250px; height: 150px; font-size: 2rem;">Power Ups</button>
                     <button id="btn-cat-vehiculos" type="button" class="btn btn-primary" style="width: 250px; height: 150px; font-size: 2rem;">Vehículos</button>
                 </div>
                 <button id="btn-volver-inicio" type="button" class="btn btn-secondary mt-5">Volver al Inicio</button>
             </section>
-
-            <section id="pantalla-catalogo" class="pantalla flex-row w-100 align-items-stretch">
-                <aside class="bg-dark p-4 d-flex flex-column gap-3 flex-shrink-0" style="width: 250px;">
-                    <button class="btn btn-outline-warning w-100 text-start nav-categoria" data-categoria="powerups">Power Ups</button>
-                    <button class="btn btn-outline-primary w-100 text-start nav-categoria" data-categoria="vehiculos">Vehículos</button>
-                    
-                    <div> <button id="btn-volver-categorias" class="btn btn-outline-light w-100 text-start">Volver</button>
-                    </div>
-                </aside>
-
-                <div class="flex-grow-1 p-5">
-                    <h2 id="titulo-catalogo" class="mb-4">Productos</h2>
-                    <div id="contenedor-productos" class="productos-grid"></div>
-                </div>
-            </section>
-
         </main>
 
         <footer>
