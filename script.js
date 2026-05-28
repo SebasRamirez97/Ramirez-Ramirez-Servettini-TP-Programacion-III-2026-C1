@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCarrito = document.getElementById('btn-carrito');
     const btnTema = document.getElementById('btn-tema');
 
-    // 4. Lógica de Cambio de Tema (Claro / Oscuro)
+    // Logica de Cambio de Tema (Claro / Oscuro)
     btnTema.addEventListener('click', () => {
         const modoOscuroActivo = document.body.classList.toggle('dark-mode');
 
@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pantallaMostrar === pCatalogo) {
             btnCarrito.classList.remove('d-none');
         } else {
-            // Si volvemos atrás o al inicio, lo apagamos
             btnCarrito.classList.add('d-none');
         }
     }
