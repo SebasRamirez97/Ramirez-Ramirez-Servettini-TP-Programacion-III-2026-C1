@@ -4,14 +4,14 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Document</title>
-        <link rel="stylesheet" href="/Tenkiu/CSS/style.css" />
+        <link rel="stylesheet" href="/Ramirez-Ramirez-Servettini-TP-Programacion-III-2026-C1/CSS/style.css" />
     </head>
     <body>
         <header>
             <h1>Tenkiu!</h1>
             <div>
                 <button>
-                    <a href="/Tenkiu/HTML/carrito.html">Carrito</a>
+                    <a href="/Ramirez-Ramirez-Servettini-TP-Programacion-III-2026-C1/HTML/carrito.html">Carrito</a>
                 </button>
                 <button>Cla/Osc</button>
             </div>
@@ -24,18 +24,18 @@
                     <ul>
                         <a href="#item-powerups"><li>Power Ups</li></a>
                         <a href="#item-vehiculos"><li>Vehiculos</li></a>
-                        <a href="/Tenkiu/HTML/index.html"><li>Volver</li></a>
+                        <a href="/Ramirez-Ramirez-Servettini-TP-Programacion-III-2026-C1/HTML/index.html"><li>Volver</li></a>
                     </ul>
+                </nav>
             </aside>
             <section class="categoria-productos">
                 <div id="item-powerups"  class="categoria-item">
                     <button class="btn-categoria">Power Ups</button>
                         <div class="categoria-contenido">
                             <div class="productos-grid">
-                                <!-- Tarjeta de Producto 1 -->
                                 <article class="producto-card">
-                                    <button class="arma-btn" data-sonido="/Tenkiu/SONIDOS/h.mp3"></button>
-                                    <img src="/Tenkiu/IMAGENES/h.jpg" alt="Producto" class="producto-img">
+                                    <button class="arma-btn" data-sonido="/Ramirez-Ramirez-Servettini-TP-Programacion-III-2026-C1/SONIDOS/h.mp3"></button>
+                                    <img src="/Ramirez-Ramirez-Servettini-TP-Programacion-III-2026-C1/IMAGENES/h.jpg" alt="Producto" class="producto-img">
                                     <p class="producto-precio">$1500</p>
 
                                     <div class="selector-cantidad">
@@ -44,13 +44,11 @@
                                         <button class="btn-cantidad">+</button>
                                     </div>
                                     
-                                    <button class="btn-agregar">Agregar al carrito</button>
+                                    <button class="btn-agregar" data-producto="Heavy Machine Gun" data-precio="1500">Agregar al carrito</button>
                                 </article>
 
-                                <!-- Repetir el article para más productos -->
-                                 <!-- Tarjeta de Producto 1 -->
                                 <article class="producto-card">
-                                    <img src="/Tenkiu/IMAGENES/r.jpg" alt="Producto" class="producto-img">
+                                    <img src="/Ramirez-Ramirez-Servettini-TP-Programacion-III-2026-C1/IMAGENES/r.jpg" alt="Producto" class="producto-img">
                                     <p class="producto-precio">$1500</p>
                                     
                                     <div class="selector-cantidad">
@@ -59,13 +57,11 @@
                                         <button class="btn-cantidad">+</button>
                                     </div>
                                     
-                                    <button class="btn-agregar">Agregar al carrito</button>
+                                    <button class="btn-agregar" data-producto="Rocket Launcher" data-precio="1500">Agregar al carrito</button>
                                 </article>
 
-                                <!-- Repetir el article para más productos -->
-                                 <!-- Tarjeta de Producto 1 -->
                                 <article class="producto-card">
-                                    <img src="/Tenkiu/IMAGENES/l.png" alt="Producto" class="producto-img">
+                                    <img src="/Ramirez-Ramirez-Servettini-TP-Programacion-III-2026-C1/IMAGENES/l.png" alt="Producto" class="producto-img">
                                     <p class="producto-precio">$1500</p>
                                     
                                     <div class="selector-cantidad">
@@ -74,10 +70,8 @@
                                         <button class="btn-cantidad">+</button>
                                     </div>
                                     
-                                    <button class="btn-agregar">Agregar al carrito</button>
+                                    <button class="btn-agregar" data-producto="Laser Gun" data-precio="1500">Agregar al carrito</button>
                                 </article>
-
-                                <!-- Repetir el article para más productos -->
                             </div>
                         </div>
                 </div>
@@ -85,52 +79,46 @@
                     <button  class="btn-categoria">Vehiculos</button>
                         <div class="categoria-contenido">
                             <article class="producto-card">
-                                <img src="/Tenkiu/IMAGENES/tanque.png" alt="Producto" class="producto-img">
+                                <img src="/Ramirez-Ramirez-Servettini-TP-Programacion-III-2026-C1/IMAGENES/tanque.png" alt="Producto" class="producto-img">
                                 <p class="producto-precio">$2500</p>
                                 <div class="selector-cantidad">
                                     <button class="btn-cantidad">-</button>
                                     <span class="cantidad-numero">0</span>
                                     <button class="btn-cantidad">+</button>
                                 </div>
-                                <button class="btn-agregar">Agregar al carrito</button>
+                                <button class="btn-agregar" data-producto="Tanque" data-precio="2500">Agregar al carrito</button>
                             </article>
 
-
-
                             <article class="producto-card">
-                                <img src="/Tenkiu/IMAGENES/robot.png" alt="Producto" class="producto-img">
+                                <img src="/Ramirez-Ramirez-Servettini-TP-Programacion-III-2026-C1/IMAGENES/robot.png" alt="Producto" class="producto-img">
                                 <p class="producto-precio">$2500</p>
                                 <div class="selector-cantidad">
                                     <button class="btn-cantidad">-</button>
                                     <span class="cantidad-numero">0</span>
                                     <button class="btn-cantidad">+</button>
                                 </div>
-                                <button class="btn-agregar">Agregar al carrito</button>
+                                <button class="btn-agregar" data-producto="Robot" data-precio="2500">Agregar al carrito</button>
                             </article>
 
-
-
                             <article class="producto-card">
-                                <img src="/Tenkiu/IMAGENES/helicoptero.png" alt="Producto" class="producto-img">
+                                <img src="/Ramirez-Ramirez-Servettini-TP-Programacion-III-2026-C1/IMAGENES/helicoptero.png" alt="Producto" class="producto-img">
                                 <p class="producto-precio">$2500</p>
                                 <div class="selector-cantidad">
                                     <button class="btn-cantidad">-</button>
                                     <span class="cantidad-numero">0</span>
                                     <button class="btn-cantidad">+</button>
                                 </div>
-                                <button class="btn-agregar">Agregar al carrito</button>
+                                <button class="btn-agregar" data-producto="Helicóptero" data-precio="2500">Agregar al carrito</button>
                             </article>
                         </div>
-                        
                 </div>
             </section>
-        </main>
         </main>
 
         <hr>
         <footer>
             <p>&copy; 2026 Tenkiu! - Proyecto Programación 3</p>
         </footer>
-        <script src="/Tenkiu/JAVASCRIPT/script.js"></script>
+        <script src="/Ramirez-Ramirez-Servettini-TP-Programacion-III-2026-C1/JAVASCRIPT/script.js"></script>
     </body>
 </html>
