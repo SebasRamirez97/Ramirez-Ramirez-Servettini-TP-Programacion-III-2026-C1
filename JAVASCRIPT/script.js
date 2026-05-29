@@ -1,171 +1,188 @@
-document.addEventListener('DOMContentLoaded', () => {
+// ===============================
+// CATEGORIAS
+// ===============================
 
-    let articulos = [];
+const botones = document.querySelectorAll('.btn-categoria');
 
-    fetch('./articulos.json')
-        .then(response => response.json())
-        .then(data => {
-            articulos = data;
-            console.log("¡JSON cargado correctamente!", articulos);
-        })
-        .catch(error => console.error("Error cargando el archivo JSON:", error));
+botones.forEach(boton => {
 
+    boton.addEventListener('click', function () {
 
-    const pBienvenida = document.getElementById('pantalla-bienvenida');
-    const pCategorias = document.getElementById('pantalla-categorias');
-    const pCatalogo = document.getElementById('pantalla-catalogo');
+        const item = this.parentNode;
 
-    const btnCarrito = document.getElementById('btn-carrito');
-    const btnTema = document.getElementById('btn-tema');
+        item.classList.toggle('activo');
 
-    // 4. Lógica de Cambio de Tema (Claro / Oscuro)
-    btnTema.addEventListener('click', () => {
-        const modoOscuroActivo = document.body.classList.toggle('dark-mode');
+        if (item.classList.contains('activo')) {
 
-        if (modoOscuroActivo) {
-            btnTema.textContent = 'Modo Claro';
-            btnTema.classList.remove('btn-dark');
-            btnTema.classList.add('btn-light');
-        } else {
-            btnTema.textContent = 'Modo Oscuro';
-            btnTema.classList.remove('btn-light');
-            btnTema.classList.add('btn-dark');
+            setTimeout(() => {
+
+                item.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest'
+                });
+
+            }, 300);
         }
     });
-
-    function cambiarPantalla(pantallaOcultar, pantallaMostrar) {
-        pantallaOcultar.classList.remove('activa');
-        pantallaMostrar.classList.add('activa');
-
-
-        if (pantallaMostrar === pCatalogo) {
-            btnCarrito.classList.remove('d-none');
-        } else {
-            // Si volvemos atrás o al inicio, lo apagamos
-            btnCarrito.classList.add('d-none');
-        }
-    }
-   
-
-    document.getElementById('btn-comprar').addEventListener('click', () => {
-        cambiarPantalla(pBienvenida, pCategorias);
-    });
-
-    document.getElementById('btn-volver-inicio').addEventListener('click', () => {
-        cambiarPantalla(pCategorias, pBienvenida);
-    });
-
-    document.getElementById('btn-volver-categorias').addEventListener('click', () => {
-        cambiarPantalla(pCatalogo, pBienvenida);
-    });
-
-
-    const contenedorProductos = document.getElementById('contenedor-productos');
-    const tituloCatalogo = document.getElementById('titulo-catalogo');
-
-    function mostrarCategoria(categoriaFiltro, textoTitulo) {
-
-        cambiarPantalla(pCategorias, pCatalogo);
-        
-        tituloCatalogo.textContent = textoTitulo;
-        
-        while (contenedorProductos.firstChild) {
-            contenedorProductos.removeChild(contenedorProductos.firstChild);
-        }
-        
-        const productosFiltrados = articulos.filter(item => item.categoria === categoriaFiltro);
-
-        productosFiltrados.forEach(producto => {
-        
-        const article = document.createElement('article');
-        article.classList.add('producto-card');
-    
-        const img = document.createElement('img');
-        img.src = producto.imagen;            
-        img.alt = producto.nombre;             
-        img.classList.add('producto-img');
-        article.appendChild(img);               
-            
-
-        const h4 = document.createElement('h4');
-        h4.textContent = producto.nombre;       
-        article.appendChild(h4);
-            
-        const pDesc = document.createElement('p');
-        pDesc.textContent = producto.descripcion;
-        pDesc.classList.add('text-muted', 'small');
-        article.appendChild(pDesc);
-            
-        const pPrecio = document.createElement('p');
-        pPrecio.textContent = `$${producto.precio}`;
-        pPrecio.classList.add('fs-4', 'fw-bold', 'text-success');
-        article.appendChild(pPrecio);
-            
-        const selectorCantidad = document.createElement('div');
-        selectorCantidad.classList.add('selector-cantidad');
-            
-        const btnMenos = document.createElement('button');
-        btnMenos.textContent = '-';
-        btnMenos.classList.add('btn-cantidad');
-        selectorCantidad.appendChild(btnMenos);
-            
-        const spanCantidad = document.createElement('span');
-        spanCantidad.textContent = '0';
-        spanCantidad.classList.add('cantidad-numero');
-        selectorCantidad.appendChild(spanCantidad);
-            
-        const btnMas = document.createElement('button');
-        btnMas.textContent = '+';
-        btnMas.classList.add('btn-cantidad');
-        selectorCantidad.appendChild(btnMas);
-            
-        article.appendChild(selectorCantidad);
-            
-        const btnAgregar = document.createElement('button');
-        btnAgregar.textContent = 'Agregar al carrito';
-        btnAgregar.classList.add('btn', 'btn-danger', 'w-100');
-        article.appendChild(btnAgregar);
-            
-
-        contenedorProductos.appendChild(article);
-        });
-    }
-
-
-    document.getElementById('btn-cat-powerups').addEventListener('click', () => {
-        mostrarCategoria('powerups', 'Power Ups');
-    });
-<<<<<<< HEAD:script.js
-    document.getElementById('btn-cat-vehiculos').addEventListener('click', () => {
-        mostrarCategoria('vehiculos', 'Vehículos');
-    });
-
-
-    const botonesNavLateral = document.querySelectorAll('.nav-categoria');
-    botonesNavLateral.forEach(boton => {
-        boton.addEventListener('click', (e) => {
-            const categoria = e.target.getAttribute('data-categoria');
-            const titulo = e.target.textContent;
-            mostrarCategoria(categoria, titulo);
-        });
-    });
-
-=======
 });
-const botonesAgregar = document.querySelectorAll(".btn-agregar");
+
+// ===============================
+// MENU LATERAL
+// ===============================
+
+const linksMenu = document.querySelectorAll('.menu-lateral a');
+
+linksMenu.forEach(link => {
+
+    link.addEventListener('click', function () {
+
+        const idDestino = this.getAttribute('href');
+
+        if (idDestino.startsWith('#')) {
+
+            const seccion = document.querySelector(idDestino);
+
+            if (seccion) {
+
+                seccion.classList.add('activo');
+            }
+        }
+    });
+});
+
+// ===============================
+// BOTONES + Y -
+// ===============================
+
+const selectoresCantidad =
+document.querySelectorAll(".selector-cantidad");
+
+selectoresCantidad.forEach(selector => {
+
+    const botones =
+    selector.querySelectorAll(".btn-cantidad");
+
+    const btnMenos = botones[0];
+    const btnMas = botones[1];
+
+    const numero =
+    selector.querySelector(".cantidad-numero");
+
+    btnMas.addEventListener("click", () => {
+
+        let cantidad =
+        Number(numero.textContent);
+
+        cantidad++; // <-- CORREGIDO: Ahora usa 'cantidad' en lugar de 'amount'
+
+        numero.textContent = cantidad;
+    });
+
+    btnMenos.addEventListener("click", () => {
+
+        let cantidad =
+        Number(numero.textContent);
+
+        if (cantidad > 0) {
+
+            cantidad--;
+
+            numero.textContent = cantidad;
+        }
+    });
+
+});
+
+// ===============================
+// AGREGAR AL CARRITO
+// ===============================
+
+const botonesAgregar =
+document.querySelectorAll(".btn-agregar");
 
 botonesAgregar.forEach(boton => {
-  boton.addEventListener("click", function() {
-    
-    const card = boton.closest(".producto-card");
-    const btnSonido = card.querySelector(".arma-btn");
 
-    if (btnSonido && btnSonido.dataset.sonido) {
-      const audio = new Audio(btnSonido.dataset.sonido);
-      audio.volume = 1;
-      audio.play();
-    }
+    boton.addEventListener("click", function () {
 
-  });
->>>>>>> 402cd125833f4936aab599cab28a69969335d627:JAVASCRIPT/script.js
+        const card =
+        boton.closest(".producto-card");
+
+        const nombre =
+        boton.dataset.producto;
+
+        const precio =
+        Number(boton.dataset.precio);
+
+        const cantidad =
+        Number(
+            card.querySelector(".cantidad-numero")
+            .textContent
+        );
+
+        if (cantidad <= 0) {
+
+            alert("Seleccione una cantidad");
+
+            return;
+        }
+
+        let carrito =
+        JSON.parse(
+            localStorage.getItem("carrito")
+        ) || [];
+
+        const productoExistente =
+        carrito.find(
+            producto => producto.nombre === nombre
+        );
+
+        if (productoExistente) {
+
+            productoExistente.cantidad += cantidad;
+
+        } else {
+
+            carrito.push({
+
+                nombre: nombre,
+                precio: precio,
+                cantidad: cantidad
+            });
+        }
+
+        localStorage.setItem(
+            "carrito",
+            JSON.stringify(carrito)
+        );
+
+        // Reinicia contador
+
+        card.querySelector(
+            ".cantidad-numero"
+        ).textContent = 0;
+
+        // Sonido
+
+        const btnSonido =
+        card.querySelector(".arma-btn");
+
+        if (
+            btnSonido &&
+            btnSonido.dataset.sonido
+        ) {
+
+            const audio =
+            new Audio(
+                btnSonido.dataset.sonido
+            );
+
+            audio.volume = 1;
+
+            audio.play();
+        }
+
+        alert(`"${nombre}" (x${cantidad}) agregado al carrito.`);
+
+    });
+
 });
