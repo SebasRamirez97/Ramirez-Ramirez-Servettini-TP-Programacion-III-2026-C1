@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error("Error cargando el archivo JSON:", error));
 
-    const btnCarrito = document.getElementById('btn-carrito');
+    
     const btnTema = document.getElementById('btn-tema');
 
     // 4. Lógica de Cambio de Tema (Claro / Oscuro)
@@ -61,6 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
             location.href = "categorias.html";
         });
     }
+    const btnCarrito = document.getElementById('btn-carrito');
+    if(btnCarrito){
+        btnCarrito.addEventListener('click', () => {
+            location.href = "carrito.html";
+        })
+    }
+
 
 
     
