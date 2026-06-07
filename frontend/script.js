@@ -1,17 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
     
+    // 1. CAPTURA DE ELEMENTOS DEL DOM (Siempre arriba de todo)
     const contenedorProductos = document.getElementById('contenedor-productos');
     const tituloCatalogo = document.getElementById('titulo-catalogo');
+    const btnCarrito = document.getElementById('btn-carrito'); // 🟢 Movido aquí arriba
+    const btnTema = document.getElementById('btn-tema');       // 🟢 Movido aquí arriba
+    
     let articulos = [];
 
+    // 2. CARGA DEL ARCHIVO JSON Y DETECCIÓN DE PANTALLA
     fetch('./articulos.json')
         .then(response => response.json())
         .then(data => {
             articulos = data;
             console.log("¡JSON cargado correctamente!", articulos);
 
-            // Detectar categoría desde la URL (solo en catalogo.html)
+            // Detectar si estamos parados en catalogo.html
             if (tituloCatalogo && contenedorProductos) {
+                
+                // Si el botón existe en este HTML, le quitamos el oculto
+                if (btnCarrito) {
+                    btnCarrito.classList.remove('d-none');
+                }
+
                 const params = new URLSearchParams(window.location.search);
                 const categoria = params.get("categoria");
                 if (categoria) {
@@ -22,10 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error("Error cargando el archivo JSON:", error));
 
-    
-    const btnTema = document.getElementById('btn-tema');
-
-    // 4. Lógica de Cambio de Tema (Claro / Oscuro)
+    // 3. LÓGICA DE CAMBIO DE TEMA (CLARO / OSCURO)
     btnTema.addEventListener('click', () => {
         const modoOscuroActivo = document.body.classList.toggle('dark-mode');
 
@@ -39,8 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btnTema.classList.add('btn-dark');
         }
     });
-   
-    // Logica de los botones para cambiar de pantalla
+  
+    // 4. LÓGICA DE NAVEGACIÓN ENTRE PÁGINAS HTML
     const btnComprar = document.getElementById('btn-comprar');
     if (btnComprar) {
         btnComprar.addEventListener('click', () => {
@@ -51,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnVolverInicio = document.getElementById('btn-volver-inicio');
     if (btnVolverInicio) {
         btnVolverInicio.addEventListener('click', () => {
-            location.href = "bienvenida.html";
+            location.href = "index.html";
         });
     }
 
@@ -69,10 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-
-    
-    
-    //Logica segun categoria
+    // 5. RENDERIZADO DINÁMICO DE PRODUCTOS
     function mostrarCategoria(categoriaFiltro, textoTitulo) {
 
         if (!contenedorProductos || !tituloCatalogo) return;
@@ -93,7 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
             img.classList.add('producto-img');
             article.appendChild(img);               
             
-
             const h4 = document.createElement('h4');
             h4.textContent = producto.nombre;       
             article.appendChild(h4);
@@ -132,19 +136,16 @@ document.addEventListener('DOMContentLoaded', () => {
             btnAgregar.textContent = 'Agregar al carrito';
             btnAgregar.classList.add('btn', 'btn-danger', 'w-100');
             article.appendChild(btnAgregar);
-            
 
             contenedorProductos.appendChild(article);
         });
     }
 
-
-    // Botones de categorías
+    // 6. CONTROLADORES DE FILTROS DE CATEGORÍAS
     const btnCatPowerups = document.getElementById('btn-cat-powerups');
     if (btnCatPowerups) {
         btnCatPowerups.addEventListener('click', () => {
             location.href = "catalogo.html?categoria=powerups";
-            
         });
     }
 
@@ -154,8 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
             location.href = "catalogo.html?categoria=vehiculos";
         });
     }
-
-    
 
     const botonesNavLateral = document.querySelectorAll('.nav-categoria');
     if (botonesNavLateral.length > 0) {
