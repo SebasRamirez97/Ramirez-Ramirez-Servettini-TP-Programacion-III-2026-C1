@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
-    "seed": "node src/seeders/productos.js"
+    "start": "node --env-file=.env main.js",
+    "dev": "nodemon --env-file=.env main.js",
+    "seed": "node --env-file=.env src/seeders/productos.js"
   },
   "keywords": [],
   "author": "",

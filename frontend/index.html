@@ -12,11 +12,9 @@
         <header>
             <h1>Tenkiu</h1>
             <div class="d-flex gap-2 align-items-center">
-                <!-- Botón Carrito: Rojo (btn-danger) y oculto por defecto -->
                 <button id="btn-carrito" type="button" class="btn btn-danger d-none">
                     Carrito
                 </button>
-                <!-- Botón Cla/Osc: Se inicia como btn-dark por defecto -->
                 <button id="btn-tema" type="button" class="btn btn-dark">
                     Modo Oscuro
                 </button>
@@ -34,6 +32,24 @@
         <footer>
             <h3>Todos los derechos reservados</h3>
         </footer>
+
+        <div class="modal fade" id="modalNombre" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Atención</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        Por favor ingresá tu nombre para continuar.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
         <script src="script.js"></script>
     </body>
