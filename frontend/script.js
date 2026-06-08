@@ -1,14 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. CAPTURA DE ELEMENTOS DEL DOM (Siempre arriba de todo)
     const contenedorProductos = document.getElementById('contenedor-productos');
     const tituloCatalogo = document.getElementById('titulo-catalogo');
-    const btnCarrito = document.getElementById('btn-carrito'); // 🟢 Movido aquí arriba
-    const btnTema = document.getElementById('btn-tema');       // 🟢 Movido aquí arriba
+    const btnCarrito = document.getElementById('btn-carrito'); 
+    const btnTema = document.getElementById('btn-tema');       
     
     let articulos = [];
 
-    // 2. CARGA DEL ARCHIVO JSON Y DETECCIÓN DE PANTALLA
+  
     fetch('./articulos.json')
         .then(response => response.json())
         .then(data => {
@@ -18,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Detectar si estamos parados en catalogo.html
             if (tituloCatalogo && contenedorProductos) {
                 
-                // Si el botón existe en este HTML, le quitamos el oculto
+
                 if (btnCarrito) {
                     btnCarrito.classList.remove('d-none');
                 }
@@ -33,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error("Error cargando el archivo JSON:", error));
 
-    // 3. LÓGICA DE CAMBIO DE TEMA (CLARO / OSCURO)
+   
     btnTema.addEventListener('click', () => {
         const modoOscuroActivo = document.body.classList.toggle('dark-mode');
 
@@ -48,10 +47,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
   
-    // 4. LÓGICA DE NAVEGACIÓN ENTRE PÁGINAS HTML
+    const nombreCliente = document.getElementById('input-nombre');
     const btnComprar = document.getElementById('btn-comprar');
+
     if (btnComprar) {
         btnComprar.addEventListener('click', () => {
+            if (nombreCliente.value.trim() === '') {
+                const modal = new bootstrap.Modal(document.getElementById('modalNombre'));
+                modal.show();
+                return;
+            }
+            localStorage.setItem('nombreCliente', nombreCliente.value.trim());
             location.href = "categorias.html";
         });
     }
