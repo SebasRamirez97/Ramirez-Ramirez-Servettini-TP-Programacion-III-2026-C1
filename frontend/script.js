@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
             location.href = "categorias.html";
         });
     }
-    const btnCarrito = document.getElementById('btn-carrito');
     if(btnCarrito){
         btnCarrito.addEventListener('click', () => {
             location.href = "carrito.html";
