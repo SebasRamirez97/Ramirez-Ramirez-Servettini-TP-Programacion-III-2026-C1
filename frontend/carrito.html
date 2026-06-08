@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>Carrito de Compras</h1>
+
+    <button>
+        <a href="articulos.json">
+            Seguir comprando
+        </a>
+    </button>
+</header>
+
+<hr>
+
+<main>
+
+    <table border="1" width="100%">
+
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+
+        <tbody id="tabla-carrito"></tbody>
+
+    </table>
+
+    <br>
+
+    <h2>Total: $<span id="total">0</span></h2>
+
+    <button id="comprar">
+        Finalizar Compra
+    </button>
+
+</main>
+
+<script src="carrito.js"></script>
+
+</body>
+</html>
