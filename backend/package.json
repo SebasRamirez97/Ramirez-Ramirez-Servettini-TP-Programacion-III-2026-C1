@@ -1,0 +1,23 @@
+{
+  "name": "mike",
+  "version": "1.0.0",
+  "description": "admin, imágenes y productos",
+  "license": "MIT",
+  "author": "Mike",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "seed": "node src/seeders/productos.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mysql2": "^3.22.5",
+    "sequelize": "^6.37.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
