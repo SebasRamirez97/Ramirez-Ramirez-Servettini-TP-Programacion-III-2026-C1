@@ -1,13 +1,48 @@
 document.addEventListener('DOMContentLoaded', () => {
     
+    // 1. CAPTURA DE ELEMENTOS DEL DOM
     const contenedorProductos = document.getElementById('contenedor-productos');
     const tituloCatalogo = document.getElementById('titulo-catalogo');
     const btnCarrito = document.getElementById('btn-carrito'); 
-    const btnTema = document.getElementById('btn-tema');       
+    const btnTema = document.getElementById('btn-tema');      
+    const nombreCliente = document.getElementById('input-nombre');
+    const btnComprar = document.getElementById('btn-comprar');
+    const btnVolverInicio = document.getElementById('btn-volver-inicio');
+    const btnVolverCategorias = document.getElementById('btn-volver-categorias');
     
     let articulos = [];
 
-  
+    // 2. APLICAR EL TEMA GUARDADO APENAS CARGA LA PÁGINA
+    const temaGuardado = localStorage.getItem('tema');
+
+    if (temaGuardado === 'oscuro') {
+        if (btnTema) {
+            btnTema.textContent = 'Modo Claro';
+            btnTema.classList.remove('btn-dark');
+            btnTema.classList.add('btn-light');
+        }
+    }
+
+    // 3. EVENTO PARA CAMBIAR EL TEMA (BOTÓN)
+    if (btnTema) {
+        btnTema.addEventListener('click', () => {
+            const modoOscuroActivo = document.body.classList.toggle('dark-mode');
+
+            if (modoOscuroActivo) {
+                btnTema.textContent = 'Modo Claro';
+                btnTema.classList.remove('btn-dark');
+                btnTema.classList.add('btn-light');
+                localStorage.setItem('tema', 'oscuro');
+            } else {
+                btnTema.textContent = 'Modo Oscuro';
+                btnTema.classList.remove('btn-light');
+                btnTema.classList.add('btn-dark');
+                localStorage.setItem('tema', 'claro');
+            }
+        });
+    }
+
+    // 4. CARGA DEL JSON Y FILTRADO
     fetch('./articulos.json')
         .then(response => response.json())
         .then(data => {
@@ -16,8 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Detectar si estamos parados en catalogo.html
             if (tituloCatalogo && contenedorProductos) {
-                
-
                 if (btnCarrito) {
                     btnCarrito.classList.remove('d-none');
                 }
@@ -32,24 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error("Error cargando el archivo JSON:", error));
 
-   
-    btnTema.addEventListener('click', () => {
-        const modoOscuroActivo = document.body.classList.toggle('dark-mode');
-
-        if (modoOscuroActivo) {
-            btnTema.textContent = 'Modo Claro';
-            btnTema.classList.remove('btn-dark');
-            btnTema.classList.add('btn-light');
-        } else {
-            btnTema.textContent = 'Modo Oscuro';
-            btnTema.classList.remove('btn-light');
-            btnTema.classList.add('btn-dark');
-        }
-    });
-  
-    const nombreCliente = document.getElementById('input-nombre');
-    const btnComprar = document.getElementById('btn-comprar');
-
+    // 5. NAVEGACIÓN Y VALIDACIÓN DEL CLIENTE
     if (btnComprar) {
         btnComprar.addEventListener('click', () => {
             if (nombreCliente.value.trim() === '') {
@@ -62,29 +78,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const btnVolverInicio = document.getElementById('btn-volver-inicio');
     if (btnVolverInicio) {
         btnVolverInicio.addEventListener('click', () => {
             location.href = "index.html";
         });
     }
 
-    const btnVolverCategorias = document.getElementById('btn-volver-categorias');
     if (btnVolverCategorias) {
         btnVolverCategorias.addEventListener('click', () => {
             location.href = "categorias.html";
         });
     }
 
-    // 5. RENDERIZADO DINÁMICO DE PRODUCTOS
+    // 6. RENDERIZADO DINÁMICO DE PRODUCTOS
     function mostrarCategoria(categoriaFiltro, textoTitulo) {
-
         if (!contenedorProductos || !tituloCatalogo) return;
 
         tituloCatalogo.textContent = textoTitulo;
-
-        // Limpiar productos previos
         contenedorProductos.innerHTML = "";
+        
         const productosFiltrados = articulos.filter(item => item.categoria === categoriaFiltro);
 
         productosFiltrados.forEach(producto => {
@@ -140,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 6. CONTROLADORES DE FILTROS DE CATEGORÍAS
+    // 7. CONTROLADORES DE FILTROS DE CATEGORÍAS
     const btnCatPowerups = document.getElementById('btn-cat-powerups');
     if (btnCatPowerups) {
         btnCatPowerups.addEventListener('click', () => {
@@ -164,4 +176,4 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-});
+}); 

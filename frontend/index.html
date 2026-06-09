@@ -9,6 +9,11 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
+        <script>
+        if (localStorage.getItem('tema') === 'oscuro') {
+            document.body.classList.add('dark-mode');
+        }
+        </script>
         <header>
             <h1>Tenkiu</h1>
             <div class="d-flex gap-2 align-items-center">
