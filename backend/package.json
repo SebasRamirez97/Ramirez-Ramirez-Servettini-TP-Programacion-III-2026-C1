@@ -1,17 +1,17 @@
 {
-  "name": "backend",
+  "name": "mike",
   "version": "1.0.0",
   "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "start": "node --env-file=.env main.js",
     "dev": "nodemon --env-file=.env main.js",
     "seed": "node --env-file=.env src/seeders/productos.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
