@@ -1,30 +1,29 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sequelize');
+let productos = [];
 
-const Producto = sequelize.define('Producto', {
-    nombre: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    categoria: {
-        type: DataTypes.ENUM('powerups', 'vehiculos'),
-        allowNull: false
-    },
-    precio: {
-        type: DataTypes.FLOAT,
-        allowNull: false
-    },
-    imagen: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    descripcion: {
-        type: DataTypes.TEXT
-    },
-    activo: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true
-    }
-});
+// GET
+const getProductos = (req, res) => {
+    res.json(productos);
+};
 
-module.exports = Producto;
+// POST
+const crearProducto = (req, res) => {
+    const nuevo = {
+        id: productos.length + 1,
+        ...req.body
+    };
+    productos.push(nuevo);
+    res.json(nuevo);
+};
+
+// DELETE
+const eliminarProducto = (req, res) => {
+    const id = parseInt(req.params.id);
+    productos = productos.filter(p => p.id !== id);
+    res.json({ mensaje: "Producto eliminado" });
+};
+
+module.exports = {
+    getProductos,
+    crearProducto,
+    eliminarProducto
+};
