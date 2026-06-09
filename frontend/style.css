@@ -59,11 +59,18 @@ footer {
     height: 10vh;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between; /* CAMBIADO: Distribuye los 3 bloques equitativamente a lo ancho */
+    padding: 0 50px;                 /* AGREGADO: Mismo padding que tu header para que todo quede perfectamente alineado */
     background-color: var(--bg-footer);
     color: var(--text-footer);
     z-index: 1020;       
     transition: background-color 0.3s;
+}
+
+/* Evita que los márgenes por defecto del h3 rompan el centrado vertical del footer */
+footer h3 {
+    margin: 0;
+    font-size: 1rem; /* Ajusta el tamaño para que sea sutil y deje el protagonismo al contenido principal */
 }
 
 body.dark-mode input.form-control {
@@ -150,6 +157,62 @@ body.dark-mode .btn-cantidad {
     color: #ffffff;
 }
 
+
+/* Estilos específicos para aislar el ticket y que siempre sea blanco */
+.ticket-contenedor {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    max-width: 450px;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    position: relative;
+}
+
+/* Simulación de cortes circulares de ticket físico de la imagen de referencia */
+.ticket-contenedor::before, .ticket-contenedor::after {
+    content: '';
+    position: absolute;
+    left: -10px;
+    width: 20px;
+    height: 20px;
+    background-color: var(--bg-body);
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+.ticket-contenedor::before { top: 35%; }
+.ticket-contenedor::after { bottom: 20%; }
+
+.linea-punteada {
+    border-top: 2px dashed #cccccc;
+    margin: 20px 0;
+}
+
+/* Código de barras simulado con CSS interactivo */
+.codigo-barras-simulado {
+    height: 45px;
+    background: linear-gradient(90deg, 
+        #000 0%, #000 8%, transparent 8%, transparent 12%,
+        #000 12%, #000 22%, transparent 22%, transparent 26%,
+        #000 26%, #000 30%, transparent 30%, transparent 36%,
+        #000 36%, #000 48%, transparent 48%, transparent 52%,
+        #000 52%, #000 56%, transparent 56%, transparent 64%,
+        #000 64%, #000 76%, transparent 76%, transparent 80%,
+        #000 80%, #000 90%, transparent 90%, transparent 94%,
+        #000 94%, #000 100%);
+    opacity: 0.85;
+}
+
+/* Forzar colores de texto internos del ticket para que no se alteren con el dark-mode global */
+.ticket-contenedor h2, 
+.ticket-contenedor p, 
+.ticket-contenedor td, 
+.ticket-contenedor th,
+.ticket-contenedor span {
+    color: #212529 !important;
+}
+
 /* =========================================
    6. RESPONSIVE (Celulares)
    ========================================= */
@@ -164,5 +227,9 @@ body.dark-mode .btn-cantidad {
         position: static;  
         width: 100% !important;
         height: auto;
+    }
+    footer {
+        justify-content: center; /* En móviles vuelve al centro porque los laterales se ocultan con d-none */
+        padding: 0 20px;
     }
 }

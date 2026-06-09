@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. CAPTURA DE ELEMENTOS DEL DOM
+
     const contenedorProductos = document.getElementById('contenedor-productos');
     const tituloCatalogo = document.getElementById('titulo-catalogo');
     const btnCarrito = document.getElementById('btn-carrito'); 
@@ -9,10 +9,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnComprar = document.getElementById('btn-comprar');
     const btnVolverInicio = document.getElementById('btn-volver-inicio');
     const btnVolverCategorias = document.getElementById('btn-volver-categorias');
+    const nombreGuardado = localStorage.getItem('nombreCliente');
+    const elementoCliente = document.getElementById('ticket-cliente');
+            if (nombreGuardado && elementoCliente) {
+                elementoCliente.textContent = nombreGuardado;
+            }
     
+    const fechaElemento = document.getElementById('ticket-fecha');
+            if (fechaElemento) {
+                const ahora = new Date();
+                const opcionesFecha = { day: '2-digit', month: 'short', year: 'numeric' };
+                const opcionesHora = { hour: '2-digit', minute: '2-digit' };
+                fechaElemento.textContent = `${ahora.toLocaleDateString('es-AR', opcionesFecha)} • ${ahora.toLocaleTimeString('es-AR', opcionesHora)}`;
+            }
+
+    const btnVolver = document.getElementById('btn-volver-inicio');
+            if (btnVolver) {
+                btnVolver.addEventListener('click', () => {
+                    // Mantenemos el tema pero reiniciamos el nombre para el próximo cliente si se desea
+                    localStorage.removeItem('nombreCliente'); 
+                    window.location.href = "index.html";
+                });
+            }
+
     let articulos = [];
 
-    // 2. APLICAR EL TEMA GUARDADO APENAS CARGA LA PÁGINA
+
     const temaGuardado = localStorage.getItem('tema');
 
     if (temaGuardado === 'oscuro') {
