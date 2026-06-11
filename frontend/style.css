@@ -1,6 +1,16 @@
+
+/* Registro de tu fuente descargada */
+@font-face {
+    font-family: 'Metal-Slug-Latino-Regular'; /* El nombre que vos elijas para usarla */
+    src: url('fuentes/Metal-Slug-Latino-Regular.otf') format('opentype'); /* Ruta exacta al archivo */
+    font-weight: normal;
+    font-style: normal;
+}
+
 /* =========================================
    1. VARIABLES DE TEMA (CLARO / OSCURO)
    ========================================= */
+
 :root {
     --bg-body: #ffffff;
     --text-body: #212529;
@@ -20,6 +30,21 @@ body.dark-mode {
     --border-card: #373b3e;
     --bg-header: #1a1a1a;
     --bg-footer: #0d0d0d;
+}
+
+.fuente-marca {
+    font-family: 'Metal-Slug-Latino-Regular', sans-serif;
+    display: inline-block;
+    padding: 0 5px;
+    
+    /* RELLENO DEGRADADO */
+    background: linear-gradient(to bottom, #ffaa00 20%, #ff0000 80%);
+    -webkit-background-clip: text;       
+    -webkit-text-fill-color: transparent; 
+
+    /* CONTORNO VECTORIAL UNIFORME */
+    -webkit-text-stroke: 1px #000; /* Dibuja una línea perfecta de 1.5px alrededor de cada letra */
+ 
 }
 
 /* =========================================

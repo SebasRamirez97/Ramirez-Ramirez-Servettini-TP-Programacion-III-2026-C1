@@ -38,30 +38,32 @@ document.addEventListener('DOMContentLoaded', () => {
     let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
     // =========================================================================
-    // 2. SISTEMA DE TEMAS (Claro / Oscuro) - Persistente en todo el flujo
+    // 2. SISTEMA DE TEMAS (Claro / Oscuro) - Con íconos de Sol y Luna
     // =========================================================================
     const temaGuardado = localStorage.getItem('tema');
 
+    // Si el usuario tenía el modo oscuro guardado al cargar la página
     if (temaGuardado === 'oscuro') {
         document.body.classList.add('dark-mode');
         if (btnTema) {
-            btnTema.textContent = 'Modo Claro';
+            btnTema.innerHTML = '☀️'; // Muestra el Sol (para volver al modo claro)
             btnTema.classList.remove('btn-dark');
             btnTema.classList.add('btn-light');
         }
     }
 
+    // Evento de clic para alternar entre Sol y Luna
     if (btnTema) {
         btnTema.addEventListener('click', () => {
             const modoOscuroActivo = document.body.classList.toggle('dark-mode');
 
             if (modoOscuroActivo) {
-                btnTema.textContent = 'Modo Claro';
+                btnTema.innerHTML = '☀️'; // Si se oscureció, el botón muestra el Sol
                 btnTema.classList.remove('btn-dark');
                 btnTema.classList.add('btn-light');
                 localStorage.setItem('tema', 'oscuro');
             } else {
-                btnTema.textContent = 'Modo Oscuro';
+                btnTema.innerHTML = '🌙'; // Si se aclaró, el botón muestra la Luna
                 btnTema.classList.remove('btn-light');
                 btnTema.classList.add('btn-dark');
                 localStorage.setItem('tema', 'claro');
@@ -101,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnVolverInicio) {
         btnVolverInicio.addEventListener('click', () => {
-            // Al regresar al inicio desde cualquier pantalla limpiamos los datos de sesión del cliente
+            // Al regresar al inicio desde cualquier pantalla limpiamos los datos de sesión del cliente [cite: 90, 142]
             localStorage.removeItem('nombreCliente');
             localStorage.removeItem('ticketFinal');
             location.href = "index.html";
@@ -123,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
     // 5. LÓGICA DE PANTALLA: CATÁLOGO (Fetch y Menú Lateral)
     // =========================================================================
-    // Solo hace el fetch si estamos parados físicamente en la pantalla de catálogo
     if (tituloCatalogo && contenedorProductos) {
         fetch('./articulos.json')
             .then(response => response.json())
@@ -369,5 +370,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 </tr>`;
             });
         }
+
+        // --- Descarga de PDF espejo SIN CORTES ---
+        const btnDescargarPDF = document.getElementById('btn-descargar-pdf');
+        if (btnDescargarPDF) {
+            btnDescargarPDF.addEventListener('click', () => {
+                const elementoTicket = document.querySelector('.ticket-contenedor');
+                
+                const opcionesConfig = {
+                    margin:       10,
+                    filename:     `ticket-${datosTicket ? datosTicket.nroOperacion : 'compra'}.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { 
+                        scale: 2,             // Alta resolución para textos claros
+                        useCORS: true,        
+                        backgroundColor: '#ffffff',
+                        // SCROLL FIX: Estas dos líneas solucionan el corte del PDF de raíz
+                        scrollX: 0,
+                        scrollY: 0
+                    },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    // Evita que las filas de la tabla se rompan de forma extraña entre páginas
+                    pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+
+                // Ejecuta la conversión limpia
+                html2pdf().set(opcionesConfig).from(elementoTicket).save();
+            });
+        }
+    
     }
 });
