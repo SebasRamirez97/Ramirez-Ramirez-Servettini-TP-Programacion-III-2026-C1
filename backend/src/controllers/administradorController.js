@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const {Administrador} = requiere("../models/index");
+const {Administrador} = require("../models/index");
 
 const verificarLogin = async(req, res) => {
     const {email, password} = req.body;
