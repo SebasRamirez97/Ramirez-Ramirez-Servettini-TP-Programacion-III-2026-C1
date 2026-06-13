@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const {Administrador} = requiere("..models/index");
+const {Administrador} = requiere("../models/index");
 
 const verificarLogin = async(req, res) => {
     const {email, password} = req.body;
@@ -14,5 +14,7 @@ const verificarLogin = async(req, res) => {
         return res.status(401).json({error: "Contraseña incorrecta"});
     }
 
-    res.json({mensaje: "Login exitoso" , admin:{emali: admin.email}});
+    res.json({mensaje: "Login exitoso" , admin:{email: admin.email}});
 }
+
+module.exports = verificarLogin;

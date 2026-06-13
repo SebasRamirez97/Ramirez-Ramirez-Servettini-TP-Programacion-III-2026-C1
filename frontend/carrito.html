@@ -3,43 +3,71 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Document</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+        <title>Tenkiu - Autoservicio</title>
+        
+        <link rel="icon" href="../resources/logo.png" type="image/png" />
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
+        <script>
+            if (localStorage.getItem('tema') === 'oscuro') {
+                document.body.classList.add('dark-mode');
+            }
+        </script>
+
         <header>
-            <h1>Tenkiu</h1>
-            <div class="d-flex gap-2 align-items-center">
-                <!-- Botón Carrito: Rojo (btn-danger) y oculto por defecto -->
-                <button id="btn-carrito" type="button" class="btn btn-danger">
-                    Carrito
-                </button>
-                <!-- Botón Cla/Osc: Se inicia como btn-dark por defecto -->
-                <button id="btn-tema" type="button" class="btn btn-dark">
-                    Modo Oscuro
+                <div class="d-flex align-items-center gap-3">
+                    <img src="../resources/logo.png" alt="Logo Tenkiu" style="width: 45px; height: 45px; object-fit: contain;">
+                <div>
+                    <h1 class="m-0 fuente-marca gap-2">Tenkiu</h1>
+                </div>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                    <button id="btn-tema" type="button" class="btn btn-dark" style="font-size: 1.2rem; padding: 6px 12px;">
+                        🌙
+                    </button>
+                </div>   
+            </header>
+
+        <main class="container py-5">
+            <h2 class="mb-4">Tu Carrito</h2>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th class="text-center" style="width: 150px;">Cantidad</th>
+                            <th>Subtotal</th>
+                            <th class="text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-carrito">
+                        </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex flex-column align-items-end mt-4 gap-3">
+                <h3 class="fw-bold">Total: $<span id="total">0</span></h3>
+                <button id="comprar" type="button" class="btn btn-danger btn-lg px-5">
+                    Finalizar Compra
                 </button>
             </div>
-        </header>
-
-
-        <main>
-            <section id="pantalla-carrito" class="d-flex flex-row w-100 align-items-stretch">
-                <aside class="bg-dark p-4 d-flex flex-column gap-3 flex-shrink-0" style="width: 250px;">
-                    <div> <button id="btn-volver-categorias" class="btn btn-outline-light w-100 text-start">Volver</button>
-                    </div>
-                </aside>
-
-                <div class="flex-grow-1 p-5">
-                    <div id="contenedor-productos-carrito" class="productos-grid"></div>
-                </div>
-            </section>
-
         </main>
 
         <footer>
             <h3>Todos los derechos reservados</h3>
+            <small class="text-secondary d-none d-sm-inline">UTN Avellaneda - Programación III</small>
+            <div class="d-flex align-items-center gap-4">
+                <span class="text-white-50 small d-none d-md-inline">
+                    <strong>Alumnos:</strong> Ramirez - Ramirez - Servettini
+                </span>
+            </div>
         </footer>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
         <script src="script.js"></script>
     </body>
