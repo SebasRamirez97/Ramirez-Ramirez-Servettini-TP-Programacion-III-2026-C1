@@ -13,13 +13,20 @@ app.use(cors({
   origin: 'http://127.0.0.1:5500' // o '*' para permitir todos
 }));
 
+//MUESTRA PRODUCTOS
 app.use('/api/productos', productoRoutes);
+
+//MUESTRA VENTAS
 //app.use('/api/ventas', ventaRoutes);
+
+
+
+//MUESTRA ADMINISTRADORES
 app.use('/api/administradores', administradorRoutes);
 
 
 
-// 👇 servir la carpeta resources/img como estática
+//servir la carpeta resources/img como estática
 app.use('/img-powerups', express.static(path.join(__dirname, '../resources/img-powerups')));
 
 sequelize.sync({ force: false })
