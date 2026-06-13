@@ -132,11 +132,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. LÓGICA DE PANTALLA: CATÁLOGO (Fetch y Menú Lateral)
     // =========================================================================
     if (tituloCatalogo && contenedorProductos) {
-        fetch('./articulos.json')
+        fetch("http://localhost:3000/api/productos?limit=100")
             .then(response => response.json())
             .then(data => {
-                articulos = data;
-                console.log("¡JSON cargado correctamente!", articulos);
+                articulos = data.productos;
+                console.log("¡Productos cargados desde la base!", articulos);
 
                 if (btnCarrito) btnCarrito.classList.remove('d-none');
 
@@ -162,7 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
             article.classList.add('producto-card');
     
             const img = document.createElement('img');
-            img.src = producto.imagen || "https://via.placeholder.com/200x150?text=Sin+Imagen";          
+            img.src = producto.imagen
+                ?`http://localhost:3000/img-powerups/${producto.imagen}`  
+                :"https://via.placeholder.com/200x150?text=Sin+Imagen";          
             img.alt = producto.nombre;             
             img.classList.add('producto-img');
             article.appendChild(img);               
