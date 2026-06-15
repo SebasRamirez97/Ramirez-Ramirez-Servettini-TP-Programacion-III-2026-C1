@@ -1,19 +1,18 @@
 const express = require('express');
+const { sequelize } = require('./src/models/index');
 const productoRoutes = require('./src/routes/producto.routes');
+//const ventaRoutes = require('./src/routes/venta.routes');
+//const administradorRoutes = require('./src/routes/administrador.routes');
 
 const app = express();
-const port = 3000;
-
 app.use(express.json());
 
-// rutas
 app.use('/api/productos', productoRoutes);
+//app.use('/api/ventas', ventaRoutes);
+//app.use('/api/administradores', administradorRoutes);
 
-// prueba
-app.get('/', (req, res) => {
-    res.send('Servidor funcionando sin base de datos');
-});
+sequelize.sync({ force: false })
+    .then(() => console.log('Tablas sincronizadas'))
+    .catch(err => console.error('Error al sincronizar:', err));
 
-app.listen(port, () => {
-    console.log(`Servidor corriendo en http://localhost:${port}`);
-});
+app.listen(3000, () => console.log('Servidor corriendo en puerto 3000'));

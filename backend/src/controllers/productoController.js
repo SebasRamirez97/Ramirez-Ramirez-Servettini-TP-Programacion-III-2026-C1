@@ -1,34 +1,106 @@
-// “Base de datos falsa” en memoria
-let productos = [];
+const { Producto } = require('../models/index');
 
-// GET /api/productos
-const getProductos = (req, res) => {
-    res.json(productos);
+const getProductos = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 6;
+        const offset = (page - 1) * limit;
+        const soloActivos = req.query.admin !== 'true';
+
+        const { count, rows } = await Producto.findAndCountAll({
+            where: soloActivos ? { activo: true } : {},
+            limit,
+            offset
+        });
+
+        res.json({
+            total: count,
+            paginas: Math.ceil(count / limit),
+            paginaActual: page,
+            productos: rows
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener productos' });
+    }
 };
 
-// POST /api/productos
-const crearProducto = (req, res) => {
-    const nuevoProducto = {
-        id: productos.length + 1,
-        ...req.body
-    };
+const getProductoById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const producto = await Producto.findByPk(id);
+        if (!producto) {
+            return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+        res.json(producto);
 
-    productos.push(nuevoProducto);
-    res.json(nuevoProducto);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener el producto' });
+    }
 };
 
-// DELETE /api/productos/:id
-const eliminarProducto = (req, res) => {
-    const id = parseInt(req.params.id);
+const crearProducto = async (req, res) => {
+    try {
+        const { nombre, precio, tipo } = req.body;
+        
+        const imagen = req.file ? req.file.filename : 'default.jpg'; 
 
-    productos = productos.filter(p => p.id !== id);
+        const nuevoProducto = await Producto.create({
+            nombre,
+            precio,
+            tipo,
+            imagen,
+            activo: true
+        });
 
-    res.json({ mensaje: "Producto eliminado" });
+        res.status(201).json(nuevoProducto);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al crear el producto' });
+    }
 };
 
-// EXPORTACIÓN CORRECTA
-module.exports = {
-    getProductos,
-    crearProducto,
-    eliminarProducto
+const actualizarProducto = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nombre, precio, tipo } = req.body;
+        
+        const producto = await Producto.findByPk(id);
+        if (!producto) {
+            return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+
+        const imagen = req.file ? req.file.filename : producto.imagen;
+
+        await producto.update({ nombre, precio, tipo, imagen });
+
+        res.json({ mensaje: 'Producto modificado con éxito', producto });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar el producto' });
+    }
 };
+
+const cambiarEstadoProducto = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { activo } = req.body;
+
+        const producto = await Producto.findByPk(id);
+        if (!producto) {
+            return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+
+        await producto.update({ activo });
+
+        res.json({ 
+            mensaje: `Producto ${activo ? 'activado' : 'desactivado'} correctamente`, 
+            producto 
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al cambiar el estado del producto' });
+    }
+};
+
+module.exports = { 
+    getProductos, getProductoById, crearProducto, actualizarProducto, cambiarEstadoProducto 
+};
+

@@ -1,20 +1,22 @@
 {
-  "name": "mike",
+  "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "keywords": [],
-  "license": "MIT",
-  "author": "",
-  "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "start": "node main.js",
+    "start": "node --env-file=.env main.js",
     "dev": "nodemon --env-file=.env main.js",
     "seed": "node --env-file=.env src/seeders/productos.js"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
   "dependencies": {
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mysql2": "^3.22.4",
+    "sequelize": "^6.37.8"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

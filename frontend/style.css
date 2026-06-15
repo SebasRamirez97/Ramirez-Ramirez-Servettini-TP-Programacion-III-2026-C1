@@ -1,5 +1,16 @@
+/* Importación de Google Fonts: Orbitron (Arcade/Futurista) e Inter (Limpia/Moderna) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;600;800;900&display=swap');
+
+/* Registro de tu fuente Arcade original */
+@font-face {
+    font-family: 'Metal-Slug-Latino-Regular'; 
+    src: url('fuentes/Metal-Slug-Latino-Regular.otf') format('opentype'); 
+    font-weight: normal;
+    font-style: normal;
+}
+
 /* =========================================
-   1. VARIABLES DE TEMA (CLARO / OSCURO)
+   1. VARIABLES DE TEMA Y CALIGRAFÍA
    ========================================= */
 :root {
     --bg-body: #ffffff;
@@ -10,9 +21,12 @@
     --text-header: #ffffff;
     --bg-footer: #222222;
     --text-footer: #ffffff;
+    
+    /* Variables de Fuentes */
+    --fuente-titulos: 'Orbitron', sans-serif;
+    --fuente-textos: 'Inter', sans-serif;
 }
 
-/* Variables que se activan al aplicar la clase dark-mode al body */
 body.dark-mode {
     --bg-body: #121212;
     --text-body: #f8f9fa;
@@ -20,6 +34,26 @@ body.dark-mode {
     --border-card: #373b3e;
     --bg-header: #1a1a1a;
     --bg-footer: #0d0d0d;
+}
+
+/* APLICACIÓN DE CALIGRAFÍA GENERAL */
+body, input, textarea, select, table {
+    font-family: var(--fuente-textos);
+}
+
+h1, h2, h3, h4, h5, h6, .btn, .nav-categoria {
+    font-family: var(--fuente-titulos);
+    letter-spacing: 0.5px;
+}
+
+.fuente-marca {
+    font-family: 'Metal-Slug-Latino-Regular', var(--fuente-titulos);
+    display: inline-block;
+    padding: 0 5px;
+    background: linear-gradient(to bottom, #ffaa00 20%, #ff0000 80%);
+    -webkit-background-clip: text;       
+    -webkit-text-fill-color: transparent; 
+    -webkit-text-stroke: 1px #000; 
 }
 
 /* =========================================
@@ -59,11 +93,17 @@ footer {
     height: 10vh;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between; 
+    padding: 0 50px;                 
     background-color: var(--bg-footer);
     color: var(--text-footer);
     z-index: 1020;       
     transition: background-color 0.3s;
+}
+
+footer h3 {
+    margin: 0;
+    font-size: 1rem; 
 }
 
 body.dark-mode input.form-control {
@@ -76,19 +116,7 @@ body.dark-mode input.form-control::placeholder {
 }
 
 /* =========================================
-   3. SISTEMA DE APAGADO Y ENCENDIDO DE PANTALLAS
-   ========================================= */
-.pantalla {
-    display: none !important; 
-}
-
-.pantalla.activa {
-    display: flex !important; 
-    flex-grow: 1;             
-}
-
-/* =========================================
-   4. MENÚ LATERAL PEGADO (STICKY ASIDE)
+   3. MENÚ LATERAL PEGADO (STICKY ASIDE)
    ========================================= */
 aside {
     position: sticky;         
@@ -99,7 +127,7 @@ aside {
 }
 
 /* =========================================
-   5. GRILLA Y TARJETAS DE PRODUCTOS
+   4. GRILLA Y TARJETAS DE PRODUCTOS
    ========================================= */
 .productos-grid {
     display: grid;
@@ -143,6 +171,7 @@ aside {
     background-color: #eee;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-family: var(--fuente-titulos);
 }
 body.dark-mode .btn-cantidad {
     background-color: #495057;
@@ -150,19 +179,164 @@ body.dark-mode .btn-cantidad {
     color: #ffffff;
 }
 
+/* Estilos específicos para aislar el ticket */
+.ticket-contenedor {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    max-width: 450px;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    position: relative;
+}
+
+.ticket-contenedor::before, .ticket-contenedor::after {
+    content: '';
+    position: absolute;
+    left: -10px;
+    width: 20px;
+    height: 20px;
+    background-color: var(--bg-body);
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+.ticket-contenedor::before { top: 35%; }
+.ticket-contenedor::after { bottom: 20%; }
+
+.linea-punteada {
+    border-top: 2px dashed #cccccc;
+    margin: 20px 0;
+}
+
+.codigo-barras-simulado {
+    height: 45px;
+    background: linear-gradient(90deg, 
+        #000 0%, #000 8%, transparent 8%, transparent 12%,\r
+        #000 12%, #000 22%, transparent 22%, transparent 26%,\r
+        #000 26%, #000 30%, transparent 30%, transparent 36%,\r
+        #000 36%, #000 48%, transparent 48%, transparent 52%,\r
+        #000 52%, #000 56%, transparent 56%, transparent 64%,\r
+        #000 64%, #000 76%, transparent 76%, transparent 80%,\r
+        #000 80%, #000 90%, transparent 90%, transparent 94%,\r
+        #000 94%, #000 100%);
+    opacity: 0.85;
+}
+
+.ticket-contenedor h2, 
+.ticket-contenedor p, 
+.ticket-contenedor td, 
+.ticket-contenedor th,
+.ticket-contenedor span {
+    color: #212529 !important;
+}
+
 /* =========================================
-   6. RESPONSIVE (Celulares)
+   5. GLOBO FLOTANTE (POPUP DE PRODUCTO AGREGADO)
+   ========================================= */
+.contenedor-carrito-popup {
+    position: relative;
+    display: inline-block;
+}
+
+.globo-agregado {
+    position: absolute;
+    top: 120%; 
+    right: 0;
+    background-color: #28a745; 
+    color: #ffffff !important;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border-radius: 6px;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 1040;
+    animation: bounceIn 0.3s ease forwards;
+    font-family: var(--fuente-textos);
+}
+
+.globo-agregado::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    right: 15px;
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent transparent #28a745 transparent;
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.9);
+    }
+    70% {
+        transform: translateY(2px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* =========================================
+   6. MEJORAS VISUALES PARA LA TABLA DEL CARRITO
+   ========================================= */
+.btn-cantidad-tabla {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    font-size: 0.9rem;
+    font-weight: bold;
+    line-height: 26px;
+    text-align: center;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-cantidad-tabla:hover {
+    background-color: #dc3545 !important; 
+    border-color: #dc3545 !important;
+    color: #ffffff !important;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+/* =========================================
+   7. ADAPTACIÓN DE MODALES (MODO OSCURO)
+   ========================================= */
+body.dark-mode .modal-content {
+    background-color: #1a1a1a;
+    color: #f8f9fa;
+    border: 1px solid #373b3e;
+}
+body.dark-mode .modal-body {
+    color: #f8f9fa !important;
+}
+
+/* =========================================
+   8. RESPONSIVE
    ========================================= */
 @media (max-width: 768px) {
     .productos-grid {
         grid-template-columns: 1fr;
     }
-    #pantalla-catalogo {
+    #pantalla-catalogo, #pantalla-carrito-layout {
         flex-direction: column !important; 
     }
     aside {
         position: static;  
         width: 100% !important;
         height: auto;
+    }
+    footer {
+        justify-content: center; 
+        padding: 0 20px;
     }
 }
