@@ -1,54 +1,102 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrito</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tenkiu - Autoservicio</title>
+        <link rel="icon" href="../resources/logo.png" type="image/png" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <script>
+            if (localStorage.getItem('tema') === 'oscuro') {
+                document.body.classList.add('dark-mode');
+            }
+        </script>
 
-<header>
-    <h1>Carrito de Compras</h1>
+        <header>
+            <div class="d-flex align-items-center gap-3">
+                <img src="../resources/logo.png" alt="Logo Tenkiu" style="width: 45px; height: 45px; object-fit: contain;">
+                <div>
+                    <h1 class="m-0 fuente-marca gap-2">Tenkiu</h1>
+                </div>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+                <button id="btn-tema" type="button" class="btn btn-dark" style="font-size: 1.2rem; padding: 6px 12px;">
+                    🌙
+                </button>
+            </div>   
+        </header>
 
-    <button>
-        <a href="articulos.json">
-            Seguir comprando
-        </a>
-    </button>
-</header>
+        <main>
+            <section id="pantalla-carrito-layout" class="d-flex flex-row w-100 align-items-stretch">
+                <aside class="bg-dark p-4 d-flex flex-column gap-3 flex-shrink-0" style="width: 250px;">
+                    <button class="btn btn-warning w-100 text-start nav-categoria" data-categoria="powerups">Power Ups</button>
+                    <button class="btn btn-primary w-100 text-start nav-categoria" data-categoria="vehiculos">Vehículos</button>
+                    <div> 
+                        <button id="btn-volver-categorias" class="btn btn-outline-light w-100 text-start">Volver</button>
+                    </div>
+                </aside>
 
-<hr>
+                <div class="flex-grow-1 p-5">
+                    <h2 class="mb-4">Tu Carrito</h2>
+                    <div class="table-responsive bg-body p-4 rounded shadow-sm">
+                        <table class="table table-hover align-middle m-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Precio</th>
+                                    <th class="text-center" style="width: 150px;">Cantidad</th>
+                                    <th>Subtotal</th>
+                                    <th class="text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-carrito">
+                                <!-- JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex flex-column align-items-end mt-4 gap-3">
+                        <h3 class="fw-bold">Total: $<span id="total">0</span></h3>
+                        <button id="comprar" type="button" class="btn btn-danger btn-lg px-5">
+                            Finalizar Compra
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
 
-<main>
+        <footer>
+            <h3>Todos los derechos reservados</h3>
+            <small class="text-secondary d-none d-sm-inline">UTN Avellaneda - Programación III</small>
+            <div class="d-flex align-items-center gap-4">
+                <span class="text-white-50 small d-none d-md-inline">
+                    <strong>Alumnos:</strong> Ramirez - Ramirez - Servettini
+                </span>
+            </div>
+        </footer>
 
-    <table border="1" width="100%">
+        <!-- NUEVO: Modal estilizado que elimina por completo el aviso gris del navegador de la imagen "image_a8e817.png" -->
+        <div class="modal fade" id="modalCarritoAviso" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title fw-bold">⚠️ Aviso del Sistema</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body fs-5 py-4 text-center animate-text" id="modalCarritoMensaje">
+                        <!-- Mensaje Dinámico -->
+                    </div>
+                    <div class="modal-footer border-0 justify-content-center">
+                        <button type="button" class="btn btn-secondary px-4" id="btnModalCancelar" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-danger px-4 d-none" id="btnModalConfirmar">Confirmar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Precio</th>
-                <th>Cantidad</th>
-                <th>Subtotal</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-
-        <tbody id="tabla-carrito"></tbody>
-
-    </table>
-
-    <br>
-
-    <h2>Total: $<span id="total">0</span></h2>
-
-    <button id="comprar">
-        Finalizar Compra
-    </button>
-
-</main>
-
-<script src="carrito.js"></script>
-
-</body>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="script.js"></script>
+    </body>
 </html>
