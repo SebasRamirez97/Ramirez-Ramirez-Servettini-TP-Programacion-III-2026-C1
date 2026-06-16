@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // =========================================================================
-    // 1. CAPTURA DE ELEMENTOS DEL DOM (Todas las pantallas unificadas)
+    // 1. CAPTURA DE ELEMENTOS DEL DOM
     // =========================================================================
     // Elementos de Index (Bienvenida)
     const nombreCliente = document.getElementById('input-nombre');
@@ -19,7 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Elementos de Carrito
     const tablaCarrito = document.getElementById('tabla-carrito');
     const totalHTML = document.getElementById('total');
+
     const btnFinalizarCompra = document.getElementById('comprar');
+    const btnSeguirComprando = document.getElementById('btn-seguir-comprando');
 
     // Elementos de Ticket
     const ticketOperacion = document.getElementById('ticket-operacion');
@@ -38,32 +40,29 @@ document.addEventListener('DOMContentLoaded', () => {
     let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
     // =========================================================================
-    // 2. SISTEMA DE TEMAS (Claro / Oscuro) - Con íconos de Sol y Luna
+    // 2. SISTEMA DE TEMAS (Claro / Oscuro)
     // =========================================================================
     const temaGuardado = localStorage.getItem('tema');
 
-    // Si el usuario tenía el modo oscuro guardado al cargar la página
     if (temaGuardado === 'oscuro') {
         document.body.classList.add('dark-mode');
         if (btnTema) {
-            btnTema.innerHTML = '☀️'; // Muestra el Sol (para volver al modo claro)
+            btnTema.textContent = '☀️'; // textContent es seguro
             btnTema.classList.remove('btn-dark');
             btnTema.classList.add('btn-light');
         }
     }
 
-    // Evento de clic para alternar entre Sol y Luna
     if (btnTema) {
         btnTema.addEventListener('click', () => {
             const modoOscuroActivo = document.body.classList.toggle('dark-mode');
-
             if (modoOscuroActivo) {
-                btnTema.innerHTML = '☀️'; // Si se oscureció, el botón muestra el Sol
+                btnTema.textContent = '☀️';
                 btnTema.classList.remove('btn-dark');
                 btnTema.classList.add('btn-light');
                 localStorage.setItem('tema', 'oscuro');
             } else {
-                btnTema.innerHTML = '🌙'; // Si se aclaró, el botón muestra la Luna
+                btnTema.textContent = '🌙';
                 btnTema.classList.remove('btn-light');
                 btnTema.classList.add('btn-dark');
                 localStorage.setItem('tema', 'claro');
@@ -72,23 +71,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // 3. CONTROLADORES DE LA PANTALLA: CATEGORIAS.HTML
+    // 3. CONTROLADORES DE NAVEGACIÓN Y FLUJOS GENERALES
     // =========================================================================
     if (btnCatPowerups) {
-        btnCatPowerups.addEventListener('click', () => {
-            location.href = "catalogo.html?categoria=powerups";
-        });
+        btnCatPowerups.addEventListener('click', () => { location.href = "catalogo.html?categoria=powerups&page=1"; });
     }
 
     if (btnCatVehiculos) {
-        btnCatVehiculos.addEventListener('click', () => {
-            location.href = "catalogo.html?categoria=vehiculos";
-        });
+        btnCatVehiculos.addEventListener('click', () => { location.href = "catalogo.html?categoria=vehiculos&page=1"; });
     }
 
-    // =========================================================================
-    // 4. NAVEGACIÓN GENERAL Y VALIDACIONES DE FLUJO
-    // =========================================================================
     if (btnComprar) {
         btnComprar.addEventListener('click', () => {
             if (nombreCliente.value.trim() === '') {
@@ -103,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnVolverInicio) {
         btnVolverInicio.addEventListener('click', () => {
-            // Al regresar al inicio desde cualquier pantalla limpiamos los datos de sesión del cliente [cite: 90, 142]
             localStorage.removeItem('nombreCliente');
             localStorage.removeItem('ticketFinal');
             location.href = "index.html";
@@ -111,114 +102,103 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (btnVolverCategorias) {
-        btnVolverCategorias.addEventListener('click', () => {
-            location.href = "categorias.html";
-        });
+        btnVolverCategorias.addEventListener('click', () => { location.href = "categorias.html"; });
     }
-    if(btnCarrito){
-        btnCarrito.addEventListener('click', () => {
-            location.href = "carrito.html";
-        })
-    }
-
 
     if (btnCarrito) {
-        btnCarrito.addEventListener('click', () => {
-            location.href = "carrito.html";
-        });
+        btnCarrito.addEventListener('click', () => { location.href = "carrito.html"; });
     }
 
     // =========================================================================
-    // 5. LÓGICA DE PANTALLA: CATÁLOGO (Fetch y Menú Lateral)
+    // 4. LÓGICA DE PANTALLA: CATÁLOGO (Nodos Seguros)
     // =========================================================================
     if (tituloCatalogo && contenedorProductos) {
-        fetch("http://localhost:3000/api/productos/").then(response => response.json()).then(data => {
-                articulos = data.productos;
-                console.log("¡Productos cargados desde la base!", articulos);
+        const params = new URLSearchParams(window.location.search);
+        const categoria = params.get("categoria") || "powerups";
+        const pagina = params.get("page") || "1";
 
+        localStorage.setItem('ultimaCategoria', categoria);
+
+        tituloCatalogo.textContent = categoria === "powerups" ? "Power Ups" : "Vehículos";
+
+        fetch(`http://localhost:3000/api/productos?categoria=${categoria}&page=${pagina}`)
+            .then(response => response.json())
+            .then(data => {
+                articulos = data.productos;
                 if (btnCarrito) btnCarrito.classList.remove('d-none');
 
-                const params = new URLSearchParams(window.location.search);
-                const categoria = params.get("categoria");
-                if (categoria) {
-                    const titulo = categoria === "powerups" ? "Power Ups" : "Vehículos";
-                    mostrarCategoria    (categoria, titulo);
-                }
+                renderizarProductosCatálogo(articulos);
+                construirControlesPaginacion(data.paginas, parseInt(pagina), categoria);
             })
-            .catch(error => console.error("Error cargando el archivo JSON:", error));
+            .catch(error => console.error("Error conectando con la API del Backend:", error));
     }
 
-    function mostrarCategoria(categoriaFiltro, textoTitulo) {
-        tituloCatalogo.textContent = textoTitulo;
-        contenedorProductos.innerHTML = "";
+    function renderizarProductosCatálogo(listaProductos) {
+        contenedorProductos.textContent = ""; // Limpieza segura sin innerHTML
         
-        // Renderizamos solo los productos de la categoría seleccionada que estén activos [cite: 127]
-        const productosFiltrados = articulos.filter(item => item.categoria === categoriaFiltro && item.activo !== false);
+        if (listaProductos.length === 0) {
+            const pNoProd = document.createElement('p');
+            pNoProd.className = "text-center text-muted col-12";
+            pNoProd.textContent = "No hay productos disponibles en esta sección.";
+            contenedorProductos.appendChild(pNoProd);
+            return;
+        }
 
-        productosFiltrados.forEach(producto => {
+        listaProductos.forEach(producto => {
             const article = document.createElement('article');
             article.classList.add('producto-card');
     
             const img = document.createElement('img');
-            img.src = producto.imagen
-                ?`http://localhost:3000/img-powerups/${producto.imagen}`  
-                :"https://via.placeholder.com/200x150?text=Sin+Imagen";          
-            img.alt = producto.nombre;             
+            img.src = producto.imagen 
+                ? `http://localhost:3000/img-powerups/${producto.imagen}`  
+                : "https://via.placeholder.com/200x150?text=Sin+Imagen";          
+            img.alt = producto.nombre;
             img.classList.add('producto-img');
-            article.appendChild(img);               
-            
+
             const h4 = document.createElement('h4');
-            h4.textContent = producto.nombre;       
-            article.appendChild(h4);
-            
+            h4.textContent = producto.nombre;
+
             const pDesc = document.createElement('p');
+            pDesc.className = "text-muted small";
             pDesc.textContent = producto.descripcion;
-            pDesc.classList.add('text-muted', 'small');
-            article.appendChild(pDesc);
-            
+
             const pPrecio = document.createElement('p');
+            pPrecio.className = "fs-4 fw-bold text-success";
             pPrecio.textContent = `$${producto.precio}`;
-            pPrecio.classList.add('fs-4', 'fw-bold', 'text-success');
-            article.appendChild(pPrecio);
-            
-            // Selector de Cantidades por Tarjeta [cite: 58, 134]
+
+            // Contenedor de cantidad
             const selectorCantidad = document.createElement('div');
-            selectorCantidad.classList.add('selector-cantidad');
-            
+            selectorCantidad.className = "selector-cantidad";
+
             const btnMenos = document.createElement('button');
-            btnMenos.textContent = '-';
-            btnMenos.classList.add('btn-cantidad');
-            selectorCantidad.appendChild(btnMenos);
-            
-            const spanCantidad = document.createElement('span');
-            spanCantidad.textContent = '1'; 
-            spanCantidad.classList.add('cantidad-numero', 'fw-bold', 'px-2');
-            selectorCantidad.appendChild(spanCantidad);
-            
+            btnMenos.className = "btn-cantidad menos";
+            btnMenos.textContent = "-";
+
+            const spanCant = document.createElement('span');
+            spanCant.className = "cantidad-numero fw-bold px-2";
+            spanCant.textContent = "1";
+
             const btnMas = document.createElement('button');
-            btnMas.textContent = '+';
-            btnMas.classList.add('btn-cantidad');
+            btnMas.className = "btn-cantidad mas";
+            btnMas.textContent = "+";
+
+            selectorCantidad.appendChild(btnMenos);
+            selectorCantidad.appendChild(spanCant);
             selectorCantidad.appendChild(btnMas);
-            
-            article.appendChild(selectorCantidad);
 
-            btnMas.addEventListener('click', () => {
-                spanCantidad.textContent = parseInt(spanCantidad.textContent) + 1;
-            });
-
-            btnMenos.addEventListener('click', () => {
-                let actual = parseInt(spanCantidad.textContent);
-                if (actual > 1) spanCantidad.textContent = actual - 1;
-            });
-            
             const btnAgregar = document.createElement('button');
-            btnAgregar.textContent = 'Agregar al carrito';
-            btnAgregar.classList.add('btn', 'btn-danger', 'w-100', 'mt-2');
-            article.appendChild(btnAgregar);
+            btnAgregar.className = "btn btn-danger w-100 mt-2 btn-agregar";
+            btnAgregar.textContent = "Agregar al carrito";
 
-            // Guardado acumulativo en LocalStorage [cite: 58]
+            // Eventos locales nativos
+            btnMas.addEventListener('click', () => { spanCant.textContent = parseInt(spanCant.textContent) + 1; });
+            btnMenos.addEventListener('click', () => {
+                let actual = parseInt(spanCant.textContent);
+                if (actual > 1) spanCant.textContent = actual - 1;
+            });
+            
             btnAgregar.addEventListener('click', () => {
-                const cantidadAAgregar = parseInt(spanCantidad.textContent);
+                const cantidadAAgregar = parseInt(spanCant.textContent);
                 const itemExistente = carrito.find(item => item.id === producto.id);
 
                 if (itemExistente) {
@@ -233,33 +213,92 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 localStorage.setItem('carrito', JSON.stringify(carrito));
-                
+                mostrarGloboFlotante(`+${cantidadAAgregar} ${producto.nombre} agregado`);
+
                 btnAgregar.textContent = '¡Agregado!';
                 btnAgregar.classList.replace('btn-danger', 'btn-success');
                 setTimeout(() => {
                     btnAgregar.textContent = 'Agregar al carrito';
                     btnAgregar.classList.replace('btn-success', 'btn-danger');
-                    spanCantidad.textContent = '1';
+                    spanCant.textContent = '1';
                 }, 1000);
             });
+
+            // Ensamblamos la tarjeta de forma segura
+            article.appendChild(img);
+            article.appendChild(h4);
+            article.appendChild(pDesc);
+            article.appendChild(pPrecio);
+            article.appendChild(selectorCantidad);
+            article.appendChild(btnAgregar);
 
             contenedorProductos.appendChild(article);
         });
     }
 
-    // Controladores de los botones de navegación lateral en catálogo [cite: 42-43]
+    function construirControlesPaginacion(totalPaginas, paginaActual, categoriaActual) {
+        let contenedorPaginacion = document.getElementById('paginacion-controles');
+        if (!contenedorPaginacion) {
+            contenedorPaginacion = document.createElement('div');
+            contenedorPaginacion.id = 'paginacion-controles';
+            contenedorPaginacion.className = "d-flex justify-content-center gap-2 w-100 mt-4";
+            contenedorProductos.parentNode.insertBefore(contenedorPaginacion, contenedorProductos.nextSibling);
+        }
+        contenedorPaginacion.textContent = "";
+
+        if (totalPaginas <= 1) return;
+
+        for (let i = 1; i <= totalPaginas; i++) {
+            const btnPagina = document.createElement('button');
+            btnPagina.textContent = i;
+            btnPagina.className = `btn ${i === paginaActual ? 'btn-danger' : 'btn-outline-secondary'}`;
+            
+            btnPagina.addEventListener('click', () => {
+                location.href = `catalogo.html?categoria=${categoriaActual}&page=${i}`;
+            });
+            contenedorPaginacion.appendChild(btnPagina);
+        }
+    }
+
+    function mostrarGloboFlotante(mensaje) {
+    // 1. Estructura: Buscamos o creamos el contenedor con su clase correspondiente
+        let contenedor = document.querySelector('.contenedor-carrito-popup');
+        if (!contenedor) {
+            contenedor = document.createElement('div');
+            contenedor.className = 'contenedor-carrito-popup';
+            document.body.appendChild(contenedor);
+        }
+
+        // 2. Lógica de control: Evitamos duplicados
+        const viejo = contenedor.querySelector('.globo-agregado');
+        if (viejo) viejo.remove();
+
+        // 3. Estructura: Creamos el globo y le inyectamos el texto seguro
+        const globo = document.createElement('div');
+        globo.className = 'globo-agregado';
+        globo.textContent = mensaje;
+
+        contenedor.appendChild(globo);
+
+        // 4. Lógica de tiempos: Agregamos la clase de salida y luego removemos el nodo
+        setTimeout(() => {
+            globo.classList.add('oculto'); 
+            setTimeout(() => globo.remove(), 400); // Espera a que termine la transición CSS
+        }, 2000);
+    }
+
     const botonesNavLateral = document.querySelectorAll('.nav-categoria');
     if (botonesNavLateral.length > 0) {
         botonesNavLateral.forEach(boton => {
             boton.addEventListener('click', (e) => {
                 const cat = e.target.getAttribute('data-categoria');
-                location.href = `catalogo.html?categoria=${cat}`;
+                location.href = `catalogo.html?categoria=${cat}&page=1`;
             });
         });
     }
 
     // =========================================================================
-    // 6. LÓGICA DE PANTALLA: CARRITO (Operaciones integradas de la tabla)
+    // 5. LÓGICA DE PANTALLA: CARRITO (Estructura de Tabla Segura)
     // =========================================================================
     function guardarCarritoYRenderizar() {
         localStorage.setItem("carrito", JSON.stringify(carrito));
@@ -269,11 +308,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function mostrarCarrito() {
         if (!tablaCarrito || !totalHTML) return;
 
-        tablaCarrito.innerHTML = "";
+        tablaCarrito.textContent = ""; // Limpieza limpia sin inyectar string vacío
         let total = 0;
 
         if (carrito.length === 0) {
-            tablaCarrito.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">El carrito está vacío</td></tr>`;
+            const trVacio = document.createElement('tr');
+            const tdVacio = document.createElement('td');
+            tdVacio.colSpan = 5;
+            tdVacio.className = "text-center text-muted py-4";
+            tdVacio.textContent = "El carrito está vacío";
+            trVacio.appendChild(tdVacio);
+            tablaCarrito.appendChild(trVacio);
             totalHTML.textContent = "0";
             return;
         }
@@ -282,70 +327,121 @@ document.addEventListener('DOMContentLoaded', () => {
             const subtotal = producto.precio * producto.cantidad;
             total += subtotal;
 
-            tablaCarrito.innerHTML += `
-            <tr>
-                <td class="fw-medium">${producto.nombre}</td>
-                <td>$${producto.precio}</td>
-                <td class="text-center">
-                    <button class="btn btn-sm btn-secondary btn-cantidad-tabla me-2" onclick="restarCantidad(${index})">-</button>
-                    <span class="fw-bold">${producto.cantidad}</span>
-                    <button class="btn btn-sm btn-secondary btn-cantidad-tabla ms-2" onclick="sumarCantidad(${index})">+</button>
-                </td>
-                <td class="fw-semibold text-success">$${subtotal}</td>
-                <td class="text-center">
-                    <button class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(${index})">Eliminar</button>
-                </td>
-            </tr>`;
+            const tr = document.createElement('tr');
+
+            const tdNombre = document.createElement('td');
+            tdNombre.className = "fw-medium";
+            tdNombre.textContent = producto.nombre;
+
+            const tdPrecio = document.createElement('td');
+            tdPrecio.textContent = `$${producto.precio}`;
+
+            // Celda de controles de cantidad inline
+            const tdCantidad = document.createElement('td');
+            tdCantidad.className = "text-center";
+
+            const btnRestar = document.createElement('button');
+            btnRestar.className = "btn btn-sm btn-dark btn-cantidad-tabla me-2";
+            btnRestar.textContent = "-";
+            btnRestar.addEventListener('click', () => {
+                carrito[index].cantidad--;
+                if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
+                guardarCarritoYRenderizar();
+            });
+
+            const spanCantidad = document.createElement('span');
+            spanCantidad.className = "fw-bold";
+            spanCantidad.textContent = producto.cantidad;
+
+            const btnSumar = document.createElement('button');
+            btnSumar.className = "btn btn-sm btn-dark btn-cantidad-tabla ms-2";
+            btnSumar.textContent = "+";
+            btnSumar.addEventListener('click', () => {
+                carrito[index].cantidad++;
+                guardarCarritoYRenderizar();
+            });
+
+            tdCantidad.appendChild(btnRestar);
+            tdCantidad.appendChild(spanCantidad);
+            tdCantidad.appendChild(btnSumar);
+
+            const tdSubtotal = document.createElement('td');
+            tdSubtotal.className = "fw-semibold text-success";
+            tdSubtotal.textContent = `$${subtotal}`;
+
+            const tdAccion = document.createElement('td');
+            tdAccion.className = "text-center";
+
+            const btnEliminar = document.createElement('button');
+            btnEliminar.className = "btn btn-sm btn-outline-danger px-3";
+            btnEliminar.textContent = "Eliminar";
+            btnEliminar.addEventListener('click', () => {
+                carrito.splice(index, 1);
+                guardarCarritoYRenderizar();
+            });
+            tdAccion.appendChild(btnEliminar);
+
+            // Montamos la fila de la tabla
+            tr.appendChild(tdNombre);
+            tr.appendChild(tdPrecio);
+            tr.appendChild(tdCantidad);
+            tr.appendChild(tdSubtotal);
+            tr.appendChild(tdAccion);
+
+            tablaCarrito.appendChild(tr);
         });
 
         totalHTML.textContent = total;
     }
 
-    // Exposición de funciones al entorno global para los clics en la tabla inline [cite: 59, 133]
-    window.sumarCantidad = function(index) {
-        carrito[index].cantidad++;
-        guardarCarritoYRenderizar();
-    };
-
-    window.restarCantidad = function(index) {
-        carrito[index].cantidad--;
-        if (carrito[index].cantidad <= 0) {
-            carrito.splice(index, 1);
-        }
-        guardarCarritoYRenderizar();
-    };
-
-    window.eliminarProducto = function(index) {
-        carrito.splice(index, 1);
-        guardarCarritoYRenderizar();
-    };
+    if (btnSeguirComprando) {
+        btnSeguirComprando.addEventListener('click', () => {
+            // Leemos la última categoría visitada. Si no hay ninguna, usamos 'powerups' por defecto.
+            const ultimaCat = localStorage.getItem('ultimaCategoria') || 'powerups';
+            location.href = `catalogo.html?categoria=${ultimaCat}&page=1`;
+        });
+    }
 
     if (btnFinalizarCompra) {
         btnFinalizarCompra.addEventListener("click", () => {
+            const modalEl = document.getElementById('modalCarritoAviso');
+            const modalMsg = document.getElementById('modalCarritoMensaje');
+            const btnCanc = document.getElementById('btnModalCancelar');
+            const btnConf = document.getElementById('btnModalConfirmar');
+            
+            if (!modalEl || !modalMsg) return;
+            const bModal = new bootstrap.Modal(modalEl);
+
             if (carrito.length === 0) {
-                alert("El carrito está vacío");
+                modalMsg.textContent = "El carrito está vacío. ¡Agregá artículos antes de confirmar!";
+                if (btnCanc) btnCanc.textContent = "Entendido";
+                if (btnConf) btnConf.classList.add('d-none'); 
+                bModal.show();
                 return;
             }
 
-            // Modal de confirmación exigido por pauta de evaluación [cite: 140]
-            const confirmar = confirm("¿Está seguro de que desea confirmar la compra en este autoservicio?");
-            if (!confirmar) return;
+            modalMsg.textContent = "¿Está seguro de que desea confirmar la compra en este autoservicio?";
+            if (btnCanc) btnCanc.textContent = "Cancelar";
+            if (btnConf) btnConf.classList.remove('d-none');
 
-            const nroOperacionAleatorio = Math.floor(1000000000000 + Math.random() * 9000000000000);
+            btnConf.onclick = () => {
+                bModal.hide();
+                const nroOperacionAleatorio = Math.floor(1000000000000 + Math.random() * 9000000000000);
 
-            const ticketFinal = {
-                nroOperacion: nroOperacionAleatorio,
-                cliente: localStorage.getItem('nombreCliente') || 'Cliente Anónimo',
-                fecha: new Date().toLocaleString('es-AR'),
-                productos: carrito,
-                total: carrito.reduce((acc, p) => acc + (p.precio * p.cantidad), 0)
+                const ticketFinal = {
+                    nroOperacion: nroOperacionAleatorio,
+                    cliente: localStorage.getItem('nombreCliente') || 'Cliente Anónimo',
+                    fecha: new Date().toLocaleString('es-AR'),
+                    productos: carrito,
+                    total: carrito.reduce((acc, p) => acc + (p.precio * p.cantidad), 0)
+                };
+
+                localStorage.setItem("ticketFinal", JSON.stringify(ticketFinal));
+                localStorage.removeItem("carrito"); 
+                carrito = [];
+                window.location.href = "ticket.html";
             };
-
-            localStorage.setItem("ticketFinal", JSON.stringify(ticketFinal));
-            localStorage.removeItem("carrito"); 
-            carrito = [];
-
-            window.location.href = "ticket.html";
+            bModal.show();
         });
     }
 
@@ -354,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // 7. LÓGICA DE PANTALLA: TICKET DINÁMICO
+    // 6. LÓGICA DE PANTALLA: TICKET DINÁMICO
     // =========================================================================
     if (ticketProductosBody) {
         const datosTicket = JSON.parse(localStorage.getItem('ticketFinal'));
@@ -365,19 +461,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if (ticketFecha) ticketFecha.textContent = datosTicket.fecha;
             if (ticketTotal) ticketTotal.textContent = `$${datosTicket.total}`;
 
-            ticketProductosBody.innerHTML = "";
+            ticketProductosBody.textContent = "";
             datosTicket.productos.forEach(p => {
-                const sub = p.precio * p.cantidad;
-                ticketProductosBody.innerHTML += `
-                <tr>
-                    <td>${p.nombre}</td>
-                    <td class="text-center">${p.cantidad} x $${p.precio}</td>
-                    <td class="text-end fw-medium">$${sub}</td>
-                </tr>`;
+                const tr = document.createElement('tr');
+
+                const tdNom = document.createElement('td');
+                tdNom.textContent = p.nombre;
+
+                const tdDetalle = document.createElement('td');
+                tdDetalle.className = "text-center";
+                tdDetalle.textContent = `${p.cantidad} x $${p.precio}`;
+
+                const tdSub = document.createElement('td');
+                tdSub.className = "text-end fw-medium";
+                tdSub.textContent = `$${p.precio * p.cantidad}`;
+
+                tr.appendChild(tdNom);
+                tr.appendChild(tdDetalle);
+                tr.appendChild(tdSub);
+                ticketProductosBody.appendChild(tr);
             });
         }
 
-        // --- Descarga de PDF espejo SIN CORTES ---
         const btnDescargarPDF = document.getElementById('btn-descargar-pdf');
         if (btnDescargarPDF) {
             btnDescargarPDF.addEventListener('click', () => {
@@ -388,22 +493,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     filename:     `ticket-${datosTicket ? datosTicket.nroOperacion : 'compra'}.pdf`,
                     image:        { type: 'jpeg', quality: 0.98 },
                     html2canvas:  { 
-                        scale: 2,             // Alta resolución para textos claros
+                        scale: 2,             
                         useCORS: true,        
-                        backgroundColor: '#ffffff',
-                        // SCROLL FIX: Estas dos líneas solucionan el corte del PDF de raíz
-                        scrollX: 0,
-                        scrollY: 0
+                        backgroundColor: '#ffffff'
                     },
-                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    // Evita que las filas de la tabla se rompan de forma extraña entre páginas
-                    pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
 
-                // Ejecuta la conversión limpia
                 html2pdf().set(opcionesConfig).from(elementoTicket).save();
             });
         }
-    
     }
 });

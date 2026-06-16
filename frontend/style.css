@@ -238,6 +238,37 @@ body.dark-mode .btn-cantidad {
     color: #212529 !important;
 }
 
+/* =========================================================================
+   NOTIFICACIONES FLOTANTES DEL CARRITO
+   ========================================================================= */
+
+/* Ubicación del contenedor en la pantalla */
+.contenedor-carrito-popup {
+    position: fixed;
+    top: 60px;
+    right: 100px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Diseño base del globo */
+.globo-agregado {
+    background-color: #30cf58; /* Verde Bootstrap */
+    color: #1f1e1e;
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+    font-size: 0.95rem;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    animation: fadeInUp 0.3s ease;
+}
+
+
+
 /* =========================================
    6. RESPONSIVE (Celulares)
    ========================================= */
