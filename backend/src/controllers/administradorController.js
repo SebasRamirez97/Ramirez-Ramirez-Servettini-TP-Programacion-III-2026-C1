@@ -17,10 +17,11 @@ const mostrarProductos = async (req, res) => {
 
 const filtrarProductos = async (req, res) => {
     const {tipo} = req.params;
-    console.log("Este es mi tipo: " , this.tipo);
+    let producto = await tipo;
+    console.log("Este es mi tipo: " , producto);
     try{
         const { count, rows } = await Producto.findAndCountAll({
-            where: Producto.tipo = tipo ? {tipo} : {}
+            where: {categoria : tipo }
         });
 
             res.json({

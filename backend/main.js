@@ -9,9 +9,10 @@ const administradorRoutes = require('./src/routes/administrador.routes');
 const app = express();
 app.use(express.json());
 
-app.use('/api/productos', productoRoutes);
+
 //app.use('/api/ventas', ventaRoutes);
 app.use('/api/administradores', administradorRoutes);
+app.use('/api/productos', productoRoutes);
 
 sequelize.sync({ force: false })
     .then(() => console.log('Tablas sincronizadas'))
