@@ -1,11 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const { sequelize } = require('./src/models/index');
+const path = require('path');
 
 const productoRoutes = require('./src/routes/producto.routes');
 const administradorRoutes = require('./src/routes/administrador.routes');
 //const ventaRoutes = require('./src/routes/venta.routes');
-const path = require('path');
+
 
 const app = express();
 app.use(cors({
