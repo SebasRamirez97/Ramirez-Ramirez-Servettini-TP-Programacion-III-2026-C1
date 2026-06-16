@@ -16,10 +16,11 @@ const mostrarProductos = async (req, res) => {
 };
 
 const filtrarProductos = async (req, res) => {
+    const {tipo} = req.params;
+    console.log("Este es mi tipo: " , this.tipo);
     try{
-        const tipo = req.query.categoria;
         const { count, rows } = await Producto.findAndCountAll({
-            where: Producto.categoria = tipo ? {categoria} : {}
+            where: Producto.tipo = tipo ? {tipo} : {}
         });
 
             res.json({
