@@ -5,12 +5,28 @@ const getProductos = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 6;
         const offset = (page - 1) * limit;
-        const soloActivos = req.query.admin !== 'true';
+        
+        // Capturamos los parámetros de la request
+        const esAdministrador = (req.query.admin === 'true');
+        const categoria = req.query.categoria;
+
+        // Definimos el objeto 'where' dinámicamente
+        let filtro = {};
+
+        // 1. Lógica con if/else para los productos activos
+        if (!esAdministrador) {
+            filtro.activo = true;
+        }
+
+        // 2. Lógica con if/else para la categoría
+        if (categoria) {
+            filtro.categoria = categoria;
+        }
 
         const { count, rows } = await Producto.findAndCountAll({
-            where: soloActivos ? { activo: true } : {},
-            limit,
-            offset
+            where: filtro,
+            limit: limit,
+            offset: offset
         });
 
         res.json({
@@ -21,6 +37,7 @@ const getProductos = async (req, res) => {
         });
 
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error al obtener productos' });
     }
 };

@@ -132,9 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. LÓGICA DE PANTALLA: CATÁLOGO (Fetch y Menú Lateral)
     // =========================================================================
     if (tituloCatalogo && contenedorProductos) {
-        fetch("http://localhost:3000/api/productos?limit=100")
-            .then(response => response.json())
-            .then(data => {
+        fetch("http://localhost:3000/api/productos/").then(response => response.json()).then(data => {
                 articulos = data.productos;
                 console.log("¡Productos cargados desde la base!", articulos);
 
@@ -144,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const categoria = params.get("categoria");
                 if (categoria) {
                     const titulo = categoria === "powerups" ? "Power Ups" : "Vehículos";
-                    mostrarCategoria(categoria, titulo);
+                    mostrarCategoria    (categoria, titulo);
                 }
             })
             .catch(error => console.error("Error cargando el archivo JSON:", error));

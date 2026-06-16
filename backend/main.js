@@ -1,28 +1,23 @@
 const express = require('express');
 const cors = require('cors');
 const { sequelize } = require('./src/models/index');
-const productoRoutes = require('./src/routes/producto.routes');
-//const ventaRoutes = require('./src/routes/venta.routes');
-const administradorRoutes = require('./src/routes/administrador.routes');
 const path = require('path');
 
-const app = express();
-app.use(express.json());
+const productoRoutes = require('./src/routes/producto.routes');
+const administradorRoutes = require('./src/routes/administrador.routes');
+//const ventaRoutes = require('./src/routes/venta.routes');
 
+
+const app = express();
 app.use(cors({
   origin: 'http://127.0.0.1:5500' // o '*' para permitir todos
 }));
+app.use(express.json());
 
-//MUESTRA PRODUCTOS
-app.use('/api/productos', productoRoutes);
 
-//MUESTRA VENTAS
 //app.use('/api/ventas', ventaRoutes);
-
-
-
-//MUESTRA ADMINISTRADORES
 app.use('/api/administradores', administradorRoutes);
+app.use('/api/productos/', productoRoutes);
 
 
 
