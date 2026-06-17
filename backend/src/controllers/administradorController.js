@@ -1,39 +1,6 @@
 const { where } = require('sequelize');
 const bcrypt = require("bcrypt");
-const {Administrador , Producto} = require('../models/index');
-
-const mostrarProductos = async (req, res) => {
-    try{
-        const { count, rows } = await Producto.findAndCountAll();
-
-            res.json({
-                total: count,
-                productos: rows
-            });
-
-        } catch (error) {
-            res.status(500).json({ error: 'Error al obtener productos' });
-    }
-};
-
-const filtrarProductos = async (req, res) => {
-    
-    try{
-        const {tipo} = req.params;
-        let producto = tipo;
-        const { count, rows } = await Producto.findAndCountAll({
-            where: {categoria : tipo }
-        });
-
-            res.json({
-                total: count,
-                productos: rows
-            });
-
-        } catch (error) {
-            res.status(500).json({ error: 'Error al obtener productos' });
-        }
-    };
+const {Administrador } = require('../models/index');
 
 
 const crearAdministrador = async  (req, res) => {
@@ -93,4 +60,4 @@ const verificarLogin = async(req, res) => {
     res.json({mensaje: "Login exitoso" , admin:{email: admin.email}});
 }
 
-module.exports = {crearAdministrador,getAdministradores, verificarLogin, mostrarProductos, filtrarProductos}
+module.exports = {crearAdministrador,getAdministradores, verificarLogin}
