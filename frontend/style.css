@@ -289,3 +289,24 @@ body.dark-mode .btn-cantidad {
         padding: 0 20px;
     }
 }
+
+/* Corregir colores del modal en modo claro y oscuro */
+.modal-content {
+    background-color: var(--bg-body); /* Usa el fondo definido en tu :root */
+    color: var(--text-body);          /* Usa el color de texto definido en tu :root */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Forzar que el mensaje dentro del body también use las variables */
+.modal-body {
+    color: var(--text-body);
+}
+
+/* Opcional: Ajustar el botón de cerrar si se ve mal */
+.btn-close {
+    filter: var(--btn-close-filter, none);
+}
+
+body.dark-mode .btn-close {
+    --btn-close-filter: invert(1) grayscale(100%) brightness(200%);
+}

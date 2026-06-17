@@ -209,12 +209,12 @@ document.addEventListener('DOMContentLoaded', () => {
         listaProductos.forEach(producto => {
             const article = document.createElement('article');
             article.classList.add('producto-card');
-    
+
+            const nombreCarpeta = 'img-productos';
+
+            const urlImagen = `http://localhost:3000/resources/${nombreCarpeta}/${producto.imagen}`;
             const img = document.createElement('img');
-            img.src = producto.imagen 
-                ? `http://localhost:3000/img-powerups/${producto.imagen}`  
-                : "https://via.placeholder.com/200x150?text=Sin+Imagen";          
-            img.alt = producto.nombre;
+            img.src = urlImagen;
             img.classList.add('producto-img');
 
             const h4 = document.createElement('h4');
