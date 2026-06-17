@@ -148,13 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const article = document.createElement('article');
             article.classList.add('producto-card');
 
-            let nombreCarpeta;
+            const nombreCarpeta = 'img-productos';
 
-            if (producto.categoria === 'vehiculos') {
-                nombreCarpeta = 'img-vehiculos';
-            } else {
-                nombreCarpeta = 'img-powerups';
-            }
             const urlImagen = `http://localhost:3000/resources/${nombreCarpeta}/${producto.imagen}`;
             const img = document.createElement('img');
             img.src = urlImagen;

@@ -20,15 +20,9 @@ const imgMiddlewares = multer({
 
   storage: multer.diskStorage({
     destination: (req, file, callback) => {
-      let carpeta;
-      
-      // Lógica simple con if/else
-      if (req.body.categoria === 'vehiculos') {
-        carpeta = 'img-vehiculos';
-      } else {
-        carpeta = 'img-powerups';
-      }
 
+      const carpeta = "img-productos";
+      
       // Construimos la ruta absoluta
       const rutaDestino = path.join(__dirname, "../../resources", carpeta);
 
