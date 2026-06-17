@@ -7,6 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const nombreCliente = document.getElementById('input-nombre');
     const btnComprar = document.getElementById('btn-comprar');
 
+    // Elementos de loginAdmin (Bienvenida)
+    const emailAdmin = document.getElementById('input-email');
+    const contraseñaAdmin = document.getElementById('input-contraseña');
+    const btnIngresarAdmin = document.getElementById('btn-ingresar-admin');
+
     // Elementos de Categorías (Pantalla Intermedia)
     const btnCatPowerups = document.getElementById('btn-cat-powerups');
     const btnCatVehiculos = document.getElementById('btn-cat-vehiculos');
@@ -34,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnTema = document.getElementById('btn-tema');      
     const btnVolverInicio = document.getElementById('btn-volver-inicio');
     const btnVolverCategorias = document.getElementById('btn-volver-categorias');
+    const btnCerrarSesion =document.getElementById('btn-cerrar-sesion');
     
     // Estado Global Local
     let articulos = [];
@@ -93,6 +99,56 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (btnIngresarAdmin) {
+        btnIngresarAdmin.addEventListener('click',  async ()=> {
+            const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
+        const modalBody = document.querySelector("#modalLogin .modal-body");
+
+        if (emailAdmin.value.trim() === '') {
+            modalBody.textContent = "Por favor ingresá un email para continuar.";
+            modalLogin.show();
+            return;
+        }
+
+        if (contraseñaAdmin.value.trim() === '') {
+            modalBody.textContent = "Por favor ingresá una contraseña para continuar.";
+            modalLogin.show();
+            return;
+        }
+         try {
+            const response = await fetch("http://localhost:3000/api/administradores/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: emailAdmin.value.trim(),
+                    password: contraseñaAdmin.value.trim()
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Si el backend devolvió error (404 o 401)
+                const modal = new bootstrap.Modal(document.getElementById('modalLogin'));
+                document.querySelector("#modalLogin .modal-body").textContent = data.error;
+                modal.show();
+                return;
+            }
+
+            localStorage.setItem("adminEmail", data.admin.email);
+            location.href = "dashboard.html";
+
+        } catch (error) {
+            console.error("Error conectando con el backend:", error);
+        }
+    });
+
+
+           
+
+    }
+
+
     if (btnVolverInicio) {
         btnVolverInicio.addEventListener('click', () => {
             localStorage.removeItem('nombreCliente');
@@ -109,6 +165,12 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCarrito.addEventListener('click', () => { location.href = "carrito.html"; });
     }
 
+    if (btnCerrarSesion) {
+        btnCerrarSesion.addEventListener('click', () => {
+            location.href = "loginAdmin.html";
+        });
+    }
+
     // =========================================================================
     // 4. LÓGICA DE PANTALLA: CATÁLOGO (Nodos Seguros)
     // =========================================================================
@@ -121,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         tituloCatalogo.textContent = categoria === "powerups" ? "Power Ups" : "Vehículos";
 
-        fetch(`http://localhost:3000/api/productos?categoria=${categoria}&page=${pagina}`)
+        fetch(`http://localhost:3000/api/productos?categoria=${categoria}`)
             .then(response => response.json())
             .then(data => {
                 articulos = data.productos;
