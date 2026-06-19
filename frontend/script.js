@@ -1,6 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // 1. CAPTURA DE ELEMENTOS DEL DOM
+<<<<<<< HEAD
+=======
+    // =========================================================================
+     // 1. CAPTURA DE ELEMENTOS DEL DOM
+>>>>>>> origin/sebas
     // Elementos de Index (Bienvenida)
     const nombreCliente = document.getElementById('input-nombre');
     const btnComprar = document.getElementById('btn-comprar');
@@ -38,8 +43,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnVolverInicio = document.getElementById('btn-volver-inicio');
     const btnVolverCategorias = document.getElementById('btn-volver-categorias');
     const btnCerrarSesion =document.getElementById('btn-cerrar-sesion');
+<<<<<<< HEAD
     
   
+=======
+
+    // Estado Global Local
+    let articulos = [];
+    let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+    // =========================================================================
+>>>>>>> origin/sebas
     // 2. SISTEMA DE TEMAS (Claro / Oscuro)
 
     const temaGuardado = localStorage.getItem('tema');
@@ -93,6 +107,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (btnVolverInicio) {
+        btnVolverInicio.addEventListener('click', () => {
+            localStorage.removeItem('nombreCliente');
+            localStorage.removeItem('ticketFinal');
+            location.href = "index.html";
+        });
+    }
+
+    if (btnVolverCategorias) {
+        btnVolverCategorias.addEventListener('click', () => { location.href = "categorias.html"; });
+    }
+
+    if (btnCarrito) {
+        btnCarrito.addEventListener('click', () => { location.href = "carrito.html"; });
+    }
+     // =========================================================================
+    // 3.1 CONTROLADORES DE NAVEGACIÓN ADMIN CONSOLE
+    // =========================================================================
     if (btnIngresarAdmin) {
         btnIngresarAdmin.addEventListener('click',  async ()=> {
             const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
@@ -136,32 +168,24 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Error conectando con el backend:", error);
         }
     });
+<<<<<<< HEAD
       
+=======
+
+>>>>>>> origin/sebas
     }
 
-
-    if (btnVolverInicio) {
-        btnVolverInicio.addEventListener('click', () => {
-            localStorage.removeItem('nombreCliente');
-            localStorage.removeItem('ticketFinal');
-            location.href = "index.html";
-        });
-    }
-
-    if (btnVolverCategorias) {
-        btnVolverCategorias.addEventListener('click', () => { location.href = "categorias.html"; });
-    }
-
-    if (btnCarrito) {
-        btnCarrito.addEventListener('click', () => { location.href = "carrito.html"; });
-    }
-
-    if (btnCerrarSesion) {
+     if (btnCerrarSesion) {
         btnCerrarSesion.addEventListener('click', () => {
             location.href = "loginAdmin.html";
         });
     }
 
+<<<<<<< HEAD
+=======
+
+    // =========================================================================
+>>>>>>> origin/sebas
     // 4. LÓGICA DE PANTALLA: CATÁLOGO (Nodos Seguros)
 
     let articulos = [];
@@ -180,11 +204,19 @@ document.addEventListener('DOMContentLoaded', () => {
             tituloCatalogo.textContent = "Vehículo";
         }
 
+<<<<<<< HEAD
         try{
             const urlBuscada = `http://localhost:3000/api/productos?categoria=${categoria}&page=${pagina}`;
             const respuestaServidor = await fetch(urlBuscada);
             const data = await respuestaServidor.json();
             articulos = data.productos;
+=======
+        fetch(`http://localhost:3000/api/productos?categoria=${categoria}&page=${pagina}`)
+            .then(response => response.json())
+            .then(data => {
+                articulos = data.productos;
+                if (btnCarrito) btnCarrito.classList.remove('d-none');
+>>>>>>> origin/sebas
 
             if(btnCarrito){
                 btnCarrito.classList.remove('d-none');
@@ -361,7 +393,123 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+<<<<<<< HEAD
 
+=======
+    // =========================================================================
+    // 4.5 LÓGICA DE PANTALLA: dashboard 
+    // =========================================================================
+    function cargarDashboard(pagina = 1) {
+    fetch(`http://localhost:3000/api/productos?page=${pagina}&admin=true`)
+        .then(res => res.json())
+        .then(data => {
+            // Renderizamos la tabla con los productos de esta página
+            renderizarDashboard(data.productos);
+
+            // Construimos los botones de paginación con los valores del backend
+            construirControlesPaginacionDashboard(data.paginas, data.paginaActual);
+        })
+        .catch(err => console.error("Error cargando productos:", err));
+}
+
+function renderizarDashboard(listaProductos) {
+    const tabla = document.querySelector("tbody");
+    tabla.textContent = ""; // limpiar antes
+
+    listaProductos.forEach(prod => {
+        const fila = document.createElement("tr");
+
+        const tdId = document.createElement("td");
+        tdId.textContent = prod.id;
+
+        const tdImg = document.createElement("td");
+        const img = document.createElement("img");
+        img.src = `http://localhost:3000/resources/img-productos/${prod.imagen}`;
+        img.style.width = "60px";
+        img.style.height = "60px";
+        tdImg.appendChild(img);
+
+        const tdNombre = document.createElement("td");
+        tdNombre.textContent = prod.nombre;
+
+        const tdCat = document.createElement("td");
+        tdCat.textContent = prod.categoria;
+
+        const tdPrecio = document.createElement("td");
+        tdPrecio.textContent = `$${prod.precio}`;
+
+        const tdEstado = document.createElement("td");
+        tdEstado.textContent = prod.activo ? "Activo" : "Inactivo";
+
+        const tdAcciones = document.createElement("td");
+        tdAcciones.className = "text-center";
+
+        // Botón activar/desactivar
+        const btnEstado = document.createElement("button");
+        btnEstado.className = `btn btn-sm ${prod.activo ? "btn-warning" : "btn-success"}`;
+        btnEstado.textContent = prod.activo ? "Desactivar" : "Activar";
+        btnEstado.addEventListener("click", () => {
+            fetch(`http://localhost:3000/api/productos/${prod.id}/estado`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ activo: !prod.activo })
+            })
+            .then(() => cargarDashboard()); // refresca la tabla
+        });
+
+        // Botón editar
+        const btnEditar = document.createElement("button");
+        btnEditar.className = "btn btn-sm btn-primary ms-2";
+        btnEditar.textContent = "Editar";
+        btnEditar.addEventListener("click", () => {
+            alert(`Editar producto: ${prod.nombre}`);
+            // Aquí podrías abrir un modal con formulario
+        });
+
+        tdAcciones.appendChild(btnEstado);
+        tdAcciones.appendChild(btnEditar);
+
+        fila.appendChild(tdId);
+        fila.appendChild(tdImg);
+        fila.appendChild(tdNombre);
+        fila.appendChild(tdCat);
+        fila.appendChild(tdPrecio);
+        fila.appendChild(tdEstado);
+        fila.appendChild(tdAcciones);
+
+        tabla.appendChild(fila);
+    });
+}
+
+function construirControlesPaginacionDashboard(totalPaginas, paginaActual) {
+    let contenedorPaginacion = document.getElementById('paginacion-controles');
+    if (!contenedorPaginacion) {
+        contenedorPaginacion = document.createElement('div');
+        contenedorPaginacion.id = 'paginacion-controles';
+        contenedorPaginacion.className = "d-flex justify-content-center gap-2 w-100 mt-4";
+        document.querySelector("main").appendChild(contenedorPaginacion);
+    }
+    contenedorPaginacion.textContent = "";
+
+    if (totalPaginas <= 1) return;
+
+    for (let i = 1; i <= totalPaginas; i++) {
+        const btnPagina = document.createElement('button');
+        btnPagina.textContent = i;
+        btnPagina.className = `btn ${i === paginaActual ? 'btn-danger' : 'btn-outline-secondary'}`;
+    
+        btnPagina.addEventListener('click', () => {
+            cargarDashboard(i); // recarga la tabla con la página seleccionada
+        });
+        contenedorPaginacion.appendChild(btnPagina);
+    }
+}
+
+// Inicializamos en la página 1
+cargarDashboard(1);
+
+    // =========================================================================
+>>>>>>> origin/sebas
     // 5. LÓGICA DE PANTALLA: CARRITO (Estructura de Tabla Segura)
 
     let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
