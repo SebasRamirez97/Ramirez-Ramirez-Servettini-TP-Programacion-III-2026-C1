@@ -111,9 +111,28 @@ const actualizarProducto = async (req, res) => {
     }
 };
 
+const cambiarEstadoProducto = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { activo } = req.body;
 
+        const producto = await Producto.findByPk(id);
+        if (!producto) {
+            return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+
+        await producto.update({ activo });
+
+        res.json({ 
+            mensaje: `Producto ${activo ? 'activado' : 'desactivado'} correctamente`, 
+            producto 
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al cambiar el estado del producto' });
+    }
+};
 
 module.exports = { 
-    getProductos, getProductoById, crearProducto, actualizarProducto 
+    getProductos, getProductoById, crearProducto, actualizarProducto , cambiarEstadoProducto
 };
 

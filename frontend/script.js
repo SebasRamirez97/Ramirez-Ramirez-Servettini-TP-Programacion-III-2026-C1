@@ -1,11 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. CAPTURA DE ELEMENTOS DEL DOM
-<<<<<<< HEAD
-=======
+   
     // =========================================================================
      // 1. CAPTURA DE ELEMENTOS DEL DOM
->>>>>>> origin/sebas
     // Elementos de Index (Bienvenida)
     const nombreCliente = document.getElementById('input-nombre');
     const btnComprar = document.getElementById('btn-comprar');
@@ -43,17 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnVolverInicio = document.getElementById('btn-volver-inicio');
     const btnVolverCategorias = document.getElementById('btn-volver-categorias');
     const btnCerrarSesion =document.getElementById('btn-cerrar-sesion');
-<<<<<<< HEAD
     
+    // Elementos input
+    const formularioProducto = document.querySelector('form'); 
+    const inputNombre = document.getElementById('nombre');
+    const selectCategoria = document.getElementById('categoria');
+    const inputPrecio = document.getElementById('precio');
+    const inputImagen = document.getElementById('imagen');
   
-=======
-
-    // Estado Global Local
-    let articulos = [];
-    let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-
-    // =========================================================================
->>>>>>> origin/sebas
     // 2. SISTEMA DE TEMAS (Claro / Oscuro)
 
     const temaGuardado = localStorage.getItem('tema');
@@ -168,11 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Error conectando con el backend:", error);
         }
     });
-<<<<<<< HEAD
-      
-=======
-
->>>>>>> origin/sebas
     }
 
      if (btnCerrarSesion) {
@@ -181,11 +170,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-<<<<<<< HEAD
-=======
 
     // =========================================================================
->>>>>>> origin/sebas
     // 4. LÓGICA DE PANTALLA: CATÁLOGO (Nodos Seguros)
 
     let articulos = [];
@@ -204,19 +190,11 @@ document.addEventListener('DOMContentLoaded', () => {
             tituloCatalogo.textContent = "Vehículo";
         }
 
-<<<<<<< HEAD
         try{
             const urlBuscada = `http://localhost:3000/api/productos?categoria=${categoria}&page=${pagina}`;
             const respuestaServidor = await fetch(urlBuscada);
             const data = await respuestaServidor.json();
             articulos = data.productos;
-=======
-        fetch(`http://localhost:3000/api/productos?categoria=${categoria}&page=${pagina}`)
-            .then(response => response.json())
-            .then(data => {
-                articulos = data.productos;
-                if (btnCarrito) btnCarrito.classList.remove('d-none');
->>>>>>> origin/sebas
 
             if(btnCarrito){
                 btnCarrito.classList.remove('d-none');
@@ -393,9 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-<<<<<<< HEAD
-
-=======
     // =========================================================================
     // 4.5 LÓGICA DE PANTALLA: dashboard 
     // =========================================================================
@@ -505,11 +480,8 @@ function construirControlesPaginacionDashboard(totalPaginas, paginaActual) {
     }
 }
 
-// Inicializamos en la página 1
-cargarDashboard(1);
 
     // =========================================================================
->>>>>>> origin/sebas
     // 5. LÓGICA DE PANTALLA: CARRITO (Estructura de Tabla Segura)
 
     let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
@@ -664,7 +636,7 @@ cargarDashboard(1);
                     productos : productosComprados
 
                 };
-
+                try{
                 const respuesta = await fetch('http://localhost:3000/api/ventas/crear',{
                     method: 'POST',
                     headers: {'Content-Type':'application/json'},
@@ -682,32 +654,31 @@ cargarDashboard(1);
                     total: sumaTotal
                 };
 
-                
+                localStorage.setItem("ticketFinal", JSON.stringify(ticketFinal));
                 localStorage.removeItem("carrito"); 
                 carrito = [];
                 window.location.href = "ticket.html";
+                } catch (err) {
+                    console.error("Error al procesar la venta:", err);
+                    alert("No se pudo guardar la venta en la base de datos.");
+                }
             };
             bModal.show();
         });
     }
 
-    if (tablaCarrito) {
-        mostrarCarrito();
-    }
-
-
     // 6. LÓGICA DE PANTALLA: TICKET DINÁMICO
 
     if (ticketProductosBody) {
-
-        if (ticketFinal) {
-            if (ticketOperacion) ticketOperacion.textContent = ticketFinal.nroOperacion;
-            if (ticketCliente) ticketCliente.textContent = ticketFinal.cliente;
-            if (ticketFecha) ticketFecha.textContent = ticketFinal.fecha;
-            if (ticketTotal) ticketTotal.textContent = `$${ticketFinal.total}`;
+        const datosTicketLocal = JSON.parse(localStorage.getItem('ticketFinal'));
+        if (datosTicketLocal) {
+            if (ticketOperacion) ticketOperacion.textContent = datosTicketLocal.nroOperacion;
+            if (ticketCliente) ticketCliente.textContent = datosTicketLocal.cliente;
+            if (ticketFecha) ticketFecha.textContent = datosTicketLocal.fecha;
+            if (ticketTotal) ticketTotal.textContent = `$${datosTicketLocal.total}`;
 
             ticketProductosBody.textContent = "";
-            ticketFinal.productos.forEach(p => {
+            datosTicketLocal.productos.forEach(p => {
                 const tr = document.createElement('tr');
 
                 const tdNom = document.createElement('td');
@@ -735,19 +706,80 @@ cargarDashboard(1);
                 
                 const opcionesConfig = {
                     margin:       10,
-                    //filename:     `ticket-${datosTicket ? datosTicket.nroOperacion : 'compra'}.pdf`,
+                    filename:     `ticket-${datosTicketLocal ? datosTicketLocal.nroOperacion : 'compra'}.pdf`,
                     image:        { type: 'jpeg', quality: 0.98 },
                     html2canvas:  { 
                         scale: 2,             
                         useCORS: true,        
-                        backgroundColor: '#ffffff'
+                        backgroundColor: '#ffffff',
+                        scrollY: 0 // <--- SALVAVIDAS 1: Obliga a sacar la foto desde el inicio de la pantalla, ignorando si el usuario scroleó.
                     },
-                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak:    { mode: 'avoid-all' } // <--- SALVAVIDAS 2: Le prohíbe terminantemente a la librería romper el diseño en dos hojas.
                 };
 
                 html2pdf().set(opcionesConfig).from(elementoTicket).save();
             });
         }
     }
-    cargarCatalogo();
+
+    // 7. Logica para crear productos
+
+    function configurarFormularioProducto() {
+
+        const formulario = document.querySelector('form');
+        
+        if (!formulario) {
+            return; 
+        }
+
+        formulario.addEventListener('submit', async function(evento) {
+            
+            evento.preventDefault(); 
+
+            const productoNuevo = new FormData();
+
+            productoNuevo.append('nombre', inputNombre.value.trim());
+            productoNuevo.append('categoria', selectCategoria.value);
+            productoNuevo.append('precio', inputPrecio.value);
+
+            if (inputImagen.files.length > 0) {
+                productoNuevo.append('imagen', inputImagen.files[0]);
+            }
+            try {
+                const respuesta = await fetch('http://localhost:3000/api/productos/crear', {
+                    method: 'POST',
+                    body: productoNuevo 
+                });
+
+                if (respuesta.ok) {
+                    alert('¡Producto guardado con éxito en el sistema!');
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('El servidor rechazó el producto. Verificá los campos.');
+                }
+
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                alert('No se pudo conectar con el servidor. ¿Está el backend prendido?');
+            }
+        });
+    }
+
+    if (contenedorProductos) {
+        cargarCatalogo();
+    }
+
+    if (tablaCarrito) {
+        mostrarCarrito();
+    }
+
+    if (window.location.pathname.includes('dashboard.html')) {
+        cargarDashboard(1);
+    }
+
+    const formularioExiste = document.querySelector('form');
+    if (formularioExiste) {
+        configurarFormularioProducto();
+    }
 });
