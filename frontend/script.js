@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // =========================================================================
     // 1. CAPTURA DE ELEMENTOS DEL DOM
-    // =========================================================================
     // Elementos de Index (Bienvenida)
     const nombreCliente = document.getElementById('input-nombre');
     const btnComprar = document.getElementById('btn-comprar');
@@ -41,13 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnVolverCategorias = document.getElementById('btn-volver-categorias');
     const btnCerrarSesion =document.getElementById('btn-cerrar-sesion');
     
-    // Estado Global Local
-    let articulos = [];
-    let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-
-    // =========================================================================
+  
     // 2. SISTEMA DE TEMAS (Claro / Oscuro)
-    // =========================================================================
+
     const temaGuardado = localStorage.getItem('tema');
 
     if (temaGuardado === 'oscuro') {
@@ -76,9 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =========================================================================
+ 
     // 3. CONTROLADORES DE NAVEGACIÓN Y FLUJOS GENERALES
-    // =========================================================================
+
     if (btnCatPowerups) {
         btnCatPowerups.addEventListener('click', () => { location.href = "catalogo.html?categoria=powerups&page=1"; });
     }
@@ -142,10 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Error conectando con el backend:", error);
         }
     });
-
-
-           
-
+      
     }
 
 
@@ -171,28 +162,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =========================================================================
     // 4. LÓGICA DE PANTALLA: CATÁLOGO (Nodos Seguros)
-    // =========================================================================
-    if (tituloCatalogo && contenedorProductos) {
+
+    let articulos = [];
+    
+    async function cargarCatalogo() {
+
         const params = new URLSearchParams(window.location.search);
         const categoria = params.get("categoria") || "powerups";
         const pagina = params.get("page") || "1";
 
         localStorage.setItem('ultimaCategoria', categoria);
 
-        tituloCatalogo.textContent = categoria === "powerups" ? "Power Ups" : "Vehículos";
+        if(categoria === "powerups"){
+            tituloCatalogo.textContent = "Power Up";
+        }else{
+            tituloCatalogo.textContent = "Vehículo";
+        }
 
-        fetch(`http://localhost:3000/api/productos?categoria=${categoria}`)
-            .then(response => response.json())
-            .then(data => {
-                articulos = data.productos;
-                if (btnCarrito) btnCarrito.classList.remove('d-none');
+        try{
+            const urlBuscada = `http://localhost:3000/api/productos?categoria=${categoria}&page=${pagina}`;
+            const respuestaServidor = await fetch(urlBuscada);
+            const data = await respuestaServidor.json();
+            articulos = data.productos;
 
-                renderizarProductosCatálogo(articulos);
-                construirControlesPaginacion(data.paginas, parseInt(pagina), categoria);
-            })
-            .catch(error => console.error("Error conectando con la API del Backend:", error));
+            if(btnCarrito){
+                btnCarrito.classList.remove('d-none');
+            }
+            renderizarProductosCatálogo(articulos);
+            construirControlesPaginacion(data.paginas, parseInt(pagina),categoria);
+        }catch(error){
+            console.error("Error conectando con la API del Backend:", error);
+        }
+        
     }
 
     function renderizarProductosCatálogo(listaProductos) {
@@ -359,9 +361,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =========================================================================
+
     // 5. LÓGICA DE PANTALLA: CARRITO (Estructura de Tabla Segura)
-    // =========================================================================
+
+    let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
     function guardarCarritoYRenderizar() {
         localStorage.setItem("carrito", JSON.stringify(carrito));
         mostrarCarrito();
@@ -466,13 +470,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnFinalizarCompra) {
         btnFinalizarCompra.addEventListener("click", () => {
-            const modalEl = document.getElementById('modalCarritoAviso');
+            const modalCarrito = document.getElementById('modalCarritoAviso');
             const modalMsg = document.getElementById('modalCarritoMensaje');
             const btnCanc = document.getElementById('btnModalCancelar');
             const btnConf = document.getElementById('btnModalConfirmar');
             
-            if (!modalEl || !modalMsg) return;
-            const bModal = new bootstrap.Modal(modalEl);
+            if (!modalCarrito || !modalMsg) return;
+            const bModal = new bootstrap.Modal(modalCarrito);
 
             if (carrito.length === 0) {
                 modalMsg.textContent = "El carrito está vacío. ¡Agregá artículos antes de confirmar!";
@@ -486,19 +490,51 @@ document.addEventListener('DOMContentLoaded', () => {
             if (btnCanc) btnCanc.textContent = "Cancelar";
             if (btnConf) btnConf.classList.remove('d-none');
 
-            btnConf.onclick = () => {
+            btnConf.onclick = async () => {
                 bModal.hide();
-                const nroOperacionAleatorio = Math.floor(1000000000000 + Math.random() * 9000000000000);
 
-                const ticketFinal = {
-                    nroOperacion: nroOperacionAleatorio,
-                    cliente: localStorage.getItem('nombreCliente') || 'Cliente Anónimo',
-                    fecha: new Date().toLocaleString('es-AR'),
-                    productos: carrito,
-                    total: carrito.reduce((acc, p) => acc + (p.precio * p.cantidad), 0)
+                let sumaTotal = 0;
+
+                for (let i = 0; i < carrito.length; i++) {
+                    let productoActual = carrito[i];
+                    let subtotal = productoActual.precio * productoActual.cantidad;
+                    
+                    sumaTotal = sumaTotal + subtotal;
+                }
+
+                const productosComprados = [];
+                carrito.forEach((producto)=>{
+                    productosComprados.push({
+                        id: producto.id ,
+                        cantidad : producto.cantidad
+                    });
+                });
+
+                const datosVenta = {
+                    nombre_cliente : localStorage.getItem('nombreCliente'),
+                    precio_total : sumaTotal,
+                    productos : productosComprados
+
                 };
 
-                localStorage.setItem("ticketFinal", JSON.stringify(ticketFinal));
+                const respuesta = await fetch('http://localhost:3000/api/ventas/crear',{
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(datosVenta)
+                });
+
+                const ventaCreada = await respuesta.json();
+                console.log('Venta registrada:', ventaCreada)
+
+                const ticketFinal = {
+                    nroOperacion : ventaCreada.id,
+                    cliente: datosVenta.nombre_cliente || 'Cliente Anónimo',
+                    fecha: new Date().toLocaleString('es-AR'),
+                    productos: carrito,
+                    total: sumaTotal
+                };
+
+                
                 localStorage.removeItem("carrito"); 
                 carrito = [];
                 window.location.href = "ticket.html";
@@ -511,20 +547,19 @@ document.addEventListener('DOMContentLoaded', () => {
         mostrarCarrito();
     }
 
-    // =========================================================================
-    // 6. LÓGICA DE PANTALLA: TICKET DINÁMICO
-    // =========================================================================
-    if (ticketProductosBody) {
-        const datosTicket = JSON.parse(localStorage.getItem('ticketFinal'));
 
-        if (datosTicket) {
-            if (ticketOperacion) ticketOperacion.textContent = datosTicket.nroOperacion;
-            if (ticketCliente) ticketCliente.textContent = datosTicket.cliente;
-            if (ticketFecha) ticketFecha.textContent = datosTicket.fecha;
-            if (ticketTotal) ticketTotal.textContent = `$${datosTicket.total}`;
+    // 6. LÓGICA DE PANTALLA: TICKET DINÁMICO
+
+    if (ticketProductosBody) {
+
+        if (ticketFinal) {
+            if (ticketOperacion) ticketOperacion.textContent = ticketFinal.nroOperacion;
+            if (ticketCliente) ticketCliente.textContent = ticketFinal.cliente;
+            if (ticketFecha) ticketFecha.textContent = ticketFinal.fecha;
+            if (ticketTotal) ticketTotal.textContent = `$${ticketFinal.total}`;
 
             ticketProductosBody.textContent = "";
-            datosTicket.productos.forEach(p => {
+            ticketFinal.productos.forEach(p => {
                 const tr = document.createElement('tr');
 
                 const tdNom = document.createElement('td');
@@ -552,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const opcionesConfig = {
                     margin:       10,
-                    filename:     `ticket-${datosTicket ? datosTicket.nroOperacion : 'compra'}.pdf`,
+                    //filename:     `ticket-${datosTicket ? datosTicket.nroOperacion : 'compra'}.pdf`,
                     image:        { type: 'jpeg', quality: 0.98 },
                     html2canvas:  { 
                         scale: 2,             
@@ -566,4 +601,5 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+    cargarCatalogo();
 });

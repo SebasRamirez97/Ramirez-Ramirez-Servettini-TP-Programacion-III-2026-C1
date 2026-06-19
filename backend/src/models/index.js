@@ -2,9 +2,9 @@ const sequelize = require('../config/sequelize');
 const Producto = require('./Producto');
 const Administrador = require('./Administrador');
 const Venta = require('./Venta');
+const VentaProductos = require('./VentaProductos');
 
-// por el momento quiero que se carguen los productos y los diferentes seeders
-// Venta.belongsToMany(Producto, { through: 'VentaProductos' });
-// Producto.belongsToMany(Venta, { through: 'VentaProductos' });
+Venta.belongsToMany(Producto, { through: VentaProductos , foreignKey:'ventaId' });
+Producto.belongsToMany(Venta, { through: VentaProductos , foreignKey: 'productoId' });
 
-module.exports = { sequelize, Producto, Administrador, Venta };
+module.exports = { sequelize, Producto, Administrador, Venta, VentaProductos };

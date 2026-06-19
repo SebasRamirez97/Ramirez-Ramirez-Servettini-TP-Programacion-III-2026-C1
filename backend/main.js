@@ -5,7 +5,7 @@ const path = require('path');
 
 const productoRoutes = require('./src/routes/producto.routes');
 const administradorRoutes = require('./src/routes/administrador.routes');
-//const ventaRoutes = require('./src/routes/venta.routes');
+const ventaRoutes = require('./src/routes/venta.routes');
 
 
 const app = express();
@@ -13,7 +13,7 @@ app.use(cors({origin: 'http://127.0.0.1:5500' }));
 app.use(express.json());
 
 
-//app.use('/api/ventas', ventaRoutes);
+app.use('/api/ventas', ventaRoutes);
 app.use('/api/administradores', administradorRoutes);
 app.use('/api/productos/', productoRoutes);
 app.use('/resources', express.static(path.join(__dirname, 'resources')));
