@@ -1,12 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const { verificarIdEntero } = require('../middlewares/validarInt')
 const imgMiddlewares = require('../middlewares/upload');
-const { getProductos, getProductoById, actualizarProducto } = require('../controllers/productoController');
+const { getProductos, getProductoById, actualizarProducto, crearProducto} = require('../controllers/productoController');
 
-router.get('/:id', getProductoById);
-
-router.patch('/editar/:id', imgMiddlewares.single('imagen'), actualizarProducto);
+router.get('/:id', verificarIdEntero, getProductoById);
 
 router.get('/', getProductos);
+
+router.post("/crear", imgMiddlewares.single('imagen'), crearProducto);
+
+router.patch('/editar/:id',verificarIdEntero, imgMiddlewares.single('imagen'), actualizarProducto);
 
 module.exports = router;
