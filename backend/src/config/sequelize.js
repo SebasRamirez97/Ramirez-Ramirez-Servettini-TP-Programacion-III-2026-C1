@@ -1,24 +1,16 @@
 const { Sequelize } = require('sequelize');
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
+  process.env.DB_NAME,      
+  process.env.DB_USER,      
+  process.env.DB_PASSWORD,  
   {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
-    dialect: 'mysql',
-    logging: false
+    dialect: 'mysql'        
   }
 );
-
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log('✅ Conexión a MySQL establecida correctamente');
-  })
-  .catch((error) => {
-    console.error('❌ Error al conectar con MySQL:', error.message);
-  });
 
 module.exports = sequelize;

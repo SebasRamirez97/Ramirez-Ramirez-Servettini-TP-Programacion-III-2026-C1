@@ -3,8 +3,8 @@ const Producto = require('./Producto');
 const Administrador = require('./Administrador');
 const Venta = require('./Venta');
 
-// Una venta tiene muchos productos, y un producto puede estar en muchas ventas
-Venta.belongsToMany(Producto, { through: 'VentaProductos' });
-Producto.belongsToMany(Venta, { through: 'VentaProductos' });
+// por el momento quiero que se carguen los productos y los diferentes seeders
+// Venta.belongsToMany(Producto, { through: 'VentaProductos' });
+// Producto.belongsToMany(Venta, { through: 'VentaProductos' });
 
 module.exports = { sequelize, Producto, Administrador, Venta };

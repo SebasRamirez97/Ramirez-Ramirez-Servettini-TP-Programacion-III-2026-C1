@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const validarId = require('../middlewares/validarId'); // <-- Middleware importado
 
 const {
     getProductos,
@@ -9,6 +10,8 @@ const {
 
 router.get('/', getProductos);
 router.post('/', crearProducto);
-router.delete('/:id', eliminarProducto);
+
+// Primero valida el ID, si pasa, ejecuta la eliminación
+router.delete('/:id', validarId, eliminarProducto);
 
 module.exports = router;

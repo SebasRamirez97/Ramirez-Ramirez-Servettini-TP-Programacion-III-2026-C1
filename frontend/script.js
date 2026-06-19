@@ -3,16 +3,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
     // 1. CAPTURA DE ELEMENTOS DEL DOM
     // =========================================================================
+    // Elementos de Index (Bienvenida)
     const nombreCliente = document.getElementById('input-nombre');
     const btnComprar = document.getElementById('btn-comprar');
+
+    // Elementos de loginAdmin (Bienvenida)
+    const emailAdmin = document.getElementById('input-email');
+    const contraseñaAdmin = document.getElementById('input-contraseña');
+    const btnIngresarAdmin = document.getElementById('btn-ingresar-admin');
+
+    // Elementos de Categorías (Pantalla Intermedia)
     const btnCatPowerups = document.getElementById('btn-cat-powerups');
     const btnCatVehiculos = document.getElementById('btn-cat-vehiculos');
+
+    // Elementos de Catálogo
     const contenedorProductos = document.getElementById('contenedor-productos');
     const tituloCatalogo = document.getElementById('titulo-catalogo');
     const btnCarrito = document.getElementById('btn-carrito'); 
+    
+    // Elementos de Carrito
     const tablaCarrito = document.getElementById('tabla-carrito');
     const totalHTML = document.getElementById('total');
+
     const btnFinalizarCompra = document.getElementById('comprar');
+    const btnSeguirComprando = document.getElementById('btn-seguir-comprando');
 
     // Elementos de Ticket
     const ticketOperacion = document.getElementById('ticket-operacion');
@@ -21,22 +35,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const ticketProductosBody = document.getElementById('ticket-productos-body');
     const ticketTotal = document.getElementById('ticket-total');
 
-    // Navegación
+    // Elementos Comunes y Navegación
     const btnTema = document.getElementById('btn-tema');      
     const btnVolverInicio = document.getElementById('btn-volver-inicio');
     const btnVolverCategorias = document.getElementById('btn-volver-categorias');
+    const btnCerrarSesion =document.getElementById('btn-cerrar-sesion');
     
+    // Estado Global Local
     let articulos = [];
     let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
     // =========================================================================
-    // 2. SISTEMA DE TEMAS (Sol / Luna)
+    // 2. SISTEMA DE TEMAS (Claro / Oscuro)
     // =========================================================================
     const temaGuardado = localStorage.getItem('tema');
+
     if (temaGuardado === 'oscuro') {
         document.body.classList.add('dark-mode');
         if (btnTema) {
-            btnTema.innerHTML = '☀️'; 
+            btnTema.textContent = '☀️'; // textContent es seguro
             btnTema.classList.remove('btn-dark');
             btnTema.classList.add('btn-light');
         }
@@ -46,12 +63,12 @@ document.addEventListener('DOMContentLoaded', () => {
         btnTema.addEventListener('click', () => {
             const modoOscuroActivo = document.body.classList.toggle('dark-mode');
             if (modoOscuroActivo) {
-                btnTema.innerHTML = '☀️'; 
+                btnTema.textContent = '☀️';
                 btnTema.classList.remove('btn-dark');
                 btnTema.classList.add('btn-light');
                 localStorage.setItem('tema', 'oscuro');
             } else {
-                btnTema.innerHTML = '🌙'; 
+                btnTema.textContent = '🌙';
                 btnTema.classList.remove('btn-light');
                 btnTema.classList.add('btn-dark');
                 localStorage.setItem('tema', 'claro');
@@ -60,18 +77,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // 3. CATEGORÍAS NAVEGACIÓN
+    // 3. CONTROLADORES DE NAVEGACIÓN Y FLUJOS GENERALES
     // =========================================================================
     if (btnCatPowerups) {
-        btnCatPowerups.addEventListener('click', () => { location.href = "catalogo.html?categoria=powerups"; });
-    }
-    if (btnCatVehiculos) {
-        btnCatVehiculos.addEventListener('click', () => { location.href = "catalogo.html?categoria=vehiculos"; });
+        btnCatPowerups.addEventListener('click', () => { location.href = "catalogo.html?categoria=powerups&page=1"; });
     }
 
-    // =========================================================================
-    // 4. FLUJOS GENERALES
-    // =========================================================================
+    if (btnCatVehiculos) {
+        btnCatVehiculos.addEventListener('click', () => { location.href = "catalogo.html?categoria=vehiculos&page=1"; });
+    }
+
     if (btnComprar) {
         btnComprar.addEventListener('click', () => {
             if (nombreCliente.value.trim() === '') {
@@ -83,6 +98,56 @@ document.addEventListener('DOMContentLoaded', () => {
             location.href = "categorias.html";
         });
     }
+
+    if (btnIngresarAdmin) {
+        btnIngresarAdmin.addEventListener('click',  async ()=> {
+            const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
+        const modalBody = document.querySelector("#modalLogin .modal-body");
+
+        if (emailAdmin.value.trim() === '') {
+            modalBody.textContent = "Por favor ingresá un email para continuar.";
+            modalLogin.show();
+            return;
+        }
+
+        if (contraseñaAdmin.value.trim() === '') {
+            modalBody.textContent = "Por favor ingresá una contraseña para continuar.";
+            modalLogin.show();
+            return;
+        }
+         try {
+            const response = await fetch("http://localhost:3000/api/administradores/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: emailAdmin.value.trim(),
+                    password: contraseñaAdmin.value.trim()
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Si el backend devolvió error (404 o 401)
+                const modal = new bootstrap.Modal(document.getElementById('modalLogin'));
+                document.querySelector("#modalLogin .modal-body").textContent = data.error;
+                modal.show();
+                return;
+            }
+
+            localStorage.setItem("adminEmail", data.admin.email);
+            location.href = "dashboard.html";
+
+        } catch (error) {
+            console.error("Error conectando con el backend:", error);
+        }
+    });
+
+
+           
+
+    }
+
 
     if (btnVolverInicio) {
         btnVolverInicio.addEventListener('click', () => {
@@ -100,66 +165,113 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCarrito.addEventListener('click', () => { location.href = "carrito.html"; });
     }
 
-    // =========================================================================
-    // 5. RENDERS DEL CATÁLOGO
-    // =========================================================================
-    if (tituloCatalogo && contenedorProductos) {
-        fetch('./articulos.json')
-            .then(response => response.json())
-            .then(data => {
-                articulos = data;
-                if (btnCarrito) btnCarrito.classList.remove('d-none');
-                const params = new URLSearchParams(window.location.search);
-                const categoria = params.get("categoria");
-                if (categoria) {
-                    mostrarCategoria(categoria, categoria === "powerups" ? "Power Ups" : "Vehículos");
-                }
-            });
+    if (btnCerrarSesion) {
+        btnCerrarSesion.addEventListener('click', () => {
+            location.href = "loginAdmin.html";
+        });
     }
 
-    function mostrarCategoria(categoriaFiltro, textoTitulo) {
-        tituloCatalogo.textContent = textoTitulo;
-        contenedorProductos.innerHTML = "";
-        
-        const filtrados = articulos.filter(item => item.categoria === categoriaFiltro && item.activo !== false);
+    // =========================================================================
+    // 4. LÓGICA DE PANTALLA: CATÁLOGO (Nodos Seguros)
+    // =========================================================================
+    if (tituloCatalogo && contenedorProductos) {
+        const params = new URLSearchParams(window.location.search);
+        const categoria = params.get("categoria") || "powerups";
+        const pagina = params.get("page") || "1";
 
-        filtrados.forEach(producto => {
+        localStorage.setItem('ultimaCategoria', categoria);
+
+        tituloCatalogo.textContent = categoria === "powerups" ? "Power Ups" : "Vehículos";
+
+        fetch(`http://localhost:3000/api/productos?categoria=${categoria}`)
+            .then(response => response.json())
+            .then(data => {
+                articulos = data.productos;
+                if (btnCarrito) btnCarrito.classList.remove('d-none');
+
+                renderizarProductosCatálogo(articulos);
+                construirControlesPaginacion(data.paginas, parseInt(pagina), categoria);
+            })
+            .catch(error => console.error("Error conectando con la API del Backend:", error));
+    }
+
+    function renderizarProductosCatálogo(listaProductos) {
+        contenedorProductos.textContent = ""; // Limpieza segura sin innerHTML
+        
+        if (listaProductos.length === 0) {
+            const pNoProd = document.createElement('p');
+            pNoProd.className = "text-center text-muted col-12";
+            pNoProd.textContent = "No hay productos disponibles en esta sección.";
+            contenedorProductos.appendChild(pNoProd);
+            return;
+        }
+
+        listaProductos.forEach(producto => {
             const article = document.createElement('article');
             article.classList.add('producto-card');
 
-            article.innerHTML = `
-                <img src="${producto.imagen || 'https://via.placeholder.com/200x150?text=Sin+Imagen'}" alt="${producto.nombre}" class="producto-img">
-                <h4>${producto.nombre}</h4>
-                <p class="text-muted small">${producto.descripcion}</p>
-                <p class="fs-4 fw-bold text-success">$${producto.precio}</p>
-                <div class="selector-cantidad">
-                    <button class="btn-cantidad menos">-</button>
-                    <span class="cantidad-numero fw-bold px-2">1</span>
-                    <button class="btn-cantidad mas">+</button>
-                </div>
-                <button class="btn btn-danger w-100 mt-2 btn-agregar">Agregar al carrito</button>
-            `;
+            const nombreCarpeta = 'img-productos';
 
-            const btnMas = article.querySelector('.mas');
-            const btnMenos = article.querySelector('.menos');
-            const spanCant = article.querySelector('.cantidad-numero');
-            const btnAgregar = article.querySelector('.btn-agregar');
+            const urlImagen = `http://localhost:3000/resources/${nombreCarpeta}/${producto.imagen}`;
+            const img = document.createElement('img');
+            img.src = urlImagen;
+            img.classList.add('producto-img');
 
+            const h4 = document.createElement('h4');
+            h4.textContent = producto.nombre;
+
+            const pDesc = document.createElement('p');
+            pDesc.className = "text-muted small";
+            pDesc.textContent = producto.descripcion;
+
+            const pPrecio = document.createElement('p');
+            pPrecio.className = "fs-4 fw-bold text-success";
+            pPrecio.textContent = `$${producto.precio}`;
+
+            // Contenedor de cantidad
+            const selectorCantidad = document.createElement('div');
+            selectorCantidad.className = "selector-cantidad";
+
+            const btnMenos = document.createElement('button');
+            btnMenos.className = "btn-cantidad menos";
+            btnMenos.textContent = "-";
+
+            const spanCant = document.createElement('span');
+            spanCant.className = "cantidad-numero fw-bold px-2";
+            spanCant.textContent = "1";
+
+            const btnMas = document.createElement('button');
+            btnMas.className = "btn-cantidad mas";
+            btnMas.textContent = "+";
+
+            selectorCantidad.appendChild(btnMenos);
+            selectorCantidad.appendChild(spanCant);
+            selectorCantidad.appendChild(btnMas);
+
+            const btnAgregar = document.createElement('button');
+            btnAgregar.className = "btn btn-danger w-100 mt-2 btn-agregar";
+            btnAgregar.textContent = "Agregar al carrito";
+
+            // Eventos locales nativos
             btnMas.addEventListener('click', () => { spanCant.textContent = parseInt(spanCant.textContent) + 1; });
             btnMenos.addEventListener('click', () => {
                 let actual = parseInt(spanCant.textContent);
                 if (actual > 1) spanCant.textContent = actual - 1;
             });
-
+            
             btnAgregar.addEventListener('click', () => {
                 const cantidadAAgregar = parseInt(spanCant.textContent);
-                carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-                const existente = carrito.find(item => item.id === producto.id);
+                const itemExistente = carrito.find(item => item.id === producto.id);
 
-                if (existente) {
-                    existente.cantidad += cantidadAAgregar;
+                if (itemExistente) {
+                    itemExistente.cantidad += cantidadAAgregar;
                 } else {
-                    carrito.push({ id: producto.id, nombre: producto.nombre, precio: producto.precio, cantidad: cantidadAAgregar });
+                    carrito.push({
+                        id: producto.id,
+                        nombre: producto.nombre,
+                        precio: producto.precio,
+                        cantidad: cantidadAAgregar
+                    });
                 }
 
                 localStorage.setItem('carrito', JSON.stringify(carrito));
@@ -174,39 +286,81 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 1000);
             });
 
+            // Ensamblamos la tarjeta de forma segura
+            article.appendChild(img);
+            article.appendChild(h4);
+            article.appendChild(pDesc);
+            article.appendChild(pPrecio);
+            article.appendChild(selectorCantidad);
+            article.appendChild(btnAgregar);
+
             contenedorProductos.appendChild(article);
         });
     }
 
+    function construirControlesPaginacion(totalPaginas, paginaActual, categoriaActual) {
+        let contenedorPaginacion = document.getElementById('paginacion-controles');
+        if (!contenedorPaginacion) {
+            contenedorPaginacion = document.createElement('div');
+            contenedorPaginacion.id = 'paginacion-controles';
+            contenedorPaginacion.className = "d-flex justify-content-center gap-2 w-100 mt-4";
+            contenedorProductos.parentNode.insertBefore(contenedorPaginacion, contenedorProductos.nextSibling);
+        }
+        contenedorPaginacion.textContent = "";
+
+        if (totalPaginas <= 1) return;
+
+        for (let i = 1; i <= totalPaginas; i++) {
+            const btnPagina = document.createElement('button');
+            btnPagina.textContent = i;
+            btnPagina.className = `btn ${i === paginaActual ? 'btn-danger' : 'btn-outline-secondary'}`;
+            
+            btnPagina.addEventListener('click', () => {
+                location.href = `catalogo.html?categoria=${categoriaActual}&page=${i}`;
+            });
+            contenedorPaginacion.appendChild(btnPagina);
+        }
+    }
+
     function mostrarGloboFlotante(mensaje) {
-        const contenedor = document.querySelector('.contenedor-carrito-popup');
-        if (!contenedor) return;
+    // 1. Estructura: Buscamos o creamos el contenedor con su clase correspondiente
+        let contenedor = document.querySelector('.contenedor-carrito-popup');
+        if (!contenedor) {
+            contenedor = document.createElement('div');
+            contenedor.className = 'contenedor-carrito-popup';
+            document.body.appendChild(contenedor);
+        }
+
+        // 2. Lógica de control: Evitamos duplicados
         const viejo = contenedor.querySelector('.globo-agregado');
         if (viejo) viejo.remove();
 
+        // 3. Estructura: Creamos el globo y le inyectamos el texto seguro
         const globo = document.createElement('div');
-        globo.classList.add('globo-agregado');
+        globo.className = 'globo-agregado';
         globo.textContent = mensaje;
+
         contenedor.appendChild(globo);
 
+        // 4. Lógica de tiempos: Agregamos la clase de salida y luego removemos el nodo
         setTimeout(() => {
-            globo.style.transition = "opacity 0.3s ease";
-            globo.style.opacity = "0";
-            setTimeout(() => globo.remove(), 300);
+            globo.classList.add('oculto'); 
+            setTimeout(() => globo.remove(), 400); // Espera a que termine la transición CSS
         }, 2000);
     }
 
     const botonesNavLateral = document.querySelectorAll('.nav-categoria');
     if (botonesNavLateral.length > 0) {
-        botonesNavLateral.forEach(b => {
-            b.addEventListener('click', (e) => {
-                location.href = `catalogo.html?categoria=${e.target.getAttribute('data-categoria')}`;
+        botonesNavLateral.forEach(boton => {
+            boton.addEventListener('click', (e) => {
+                const cat = e.target.getAttribute('data-categoria');
+                location.href = `catalogo.html?categoria=${cat}&page=1`;
             });
         });
     }
 
     // =========================================================================
-    // 6. LÓGICA DEL CARRITO (CON MODAL MODERNO REEMPLAZANDO ALERT DE IMAGE_A8E817.PNG)
+    // 5. LÓGICA DE PANTALLA: CARRITO (Estructura de Tabla Segura)
     // =========================================================================
     function guardarCarritoYRenderizar() {
         localStorage.setItem("carrito", JSON.stringify(carrito));
@@ -215,43 +369,100 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function mostrarCarrito() {
         if (!tablaCarrito || !totalHTML) return;
-        tablaCarrito.innerHTML = "";
+
+        tablaCarrito.textContent = ""; // Limpieza limpia sin inyectar string vacío
         let total = 0;
 
         if (carrito.length === 0) {
-            tablaCarrito.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">El carrito está vacío</td></tr>`;
+            const trVacio = document.createElement('tr');
+            const tdVacio = document.createElement('td');
+            tdVacio.colSpan = 5;
+            tdVacio.className = "text-center text-muted py-4";
+            tdVacio.textContent = "El carrito está vacío";
+            trVacio.appendChild(tdVacio);
+            tablaCarrito.appendChild(trVacio);
             totalHTML.textContent = "0";
             return;
         }
 
-        carrito.forEach((p, idx) => {
-            const sub = p.precio * p.cantidad;
-            total += sub;
-            tablaCarrito.innerHTML += `
-            <tr>
-                <td class="fw-medium">${p.nombre}</td>
-                <td>$${p.precio}</td>
-                <td class="text-center">
-                    <button class="btn btn-sm btn-dark btn-cantidad-tabla me-2" onclick="restarCantidad(${idx})">-</button>
-                    <span class="fw-bold px-1">${p.cantidad}</span>
-                    <button class="btn btn-sm btn-dark btn-cantidad-tabla ms-2" onclick="sumarCantidad(${idx})">+</button>
-                </td>
-                <td class="fw-semibold text-success">$${sub}</td>
-                <td class="text-center">
-                    <button class="btn btn-sm btn-outline-danger px-3" onclick="eliminarProducto(${idx})">Eliminar</button>
-                </td>
-            </tr>`;
+        carrito.forEach((producto, index) => {
+            const subtotal = producto.precio * producto.cantidad;
+            total += subtotal;
+
+            const tr = document.createElement('tr');
+
+            const tdNombre = document.createElement('td');
+            tdNombre.className = "fw-medium";
+            tdNombre.textContent = producto.nombre;
+
+            const tdPrecio = document.createElement('td');
+            tdPrecio.textContent = `$${producto.precio}`;
+
+            // Celda de controles de cantidad inline
+            const tdCantidad = document.createElement('td');
+            tdCantidad.className = "text-center";
+
+            const btnRestar = document.createElement('button');
+            btnRestar.className = "btn btn-sm btn-dark btn-cantidad-tabla me-2";
+            btnRestar.textContent = "-";
+            btnRestar.addEventListener('click', () => {
+                carrito[index].cantidad--;
+                if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
+                guardarCarritoYRenderizar();
+            });
+
+            const spanCantidad = document.createElement('span');
+            spanCantidad.className = "fw-bold";
+            spanCantidad.textContent = producto.cantidad;
+
+            const btnSumar = document.createElement('button');
+            btnSumar.className = "btn btn-sm btn-dark btn-cantidad-tabla ms-2";
+            btnSumar.textContent = "+";
+            btnSumar.addEventListener('click', () => {
+                carrito[index].cantidad++;
+                guardarCarritoYRenderizar();
+            });
+
+            tdCantidad.appendChild(btnRestar);
+            tdCantidad.appendChild(spanCantidad);
+            tdCantidad.appendChild(btnSumar);
+
+            const tdSubtotal = document.createElement('td');
+            tdSubtotal.className = "fw-semibold text-success";
+            tdSubtotal.textContent = `$${subtotal}`;
+
+            const tdAccion = document.createElement('td');
+            tdAccion.className = "text-center";
+
+            const btnEliminar = document.createElement('button');
+            btnEliminar.className = "btn btn-sm btn-outline-danger px-3";
+            btnEliminar.textContent = "Eliminar";
+            btnEliminar.addEventListener('click', () => {
+                carrito.splice(index, 1);
+                guardarCarritoYRenderizar();
+            });
+            tdAccion.appendChild(btnEliminar);
+
+            // Montamos la fila de la tabla
+            tr.appendChild(tdNombre);
+            tr.appendChild(tdPrecio);
+            tr.appendChild(tdCantidad);
+            tr.appendChild(tdSubtotal);
+            tr.appendChild(tdAccion);
+
+            tablaCarrito.appendChild(tr);
         });
+
         totalHTML.textContent = total;
     }
 
-    window.sumarCantidad = function(idx) { carrito[idx].cantidad += 1; guardarCarritoYRenderizar(); };
-    window.restarCantidad = function(idx) {
-        carrito[idx].cantidad -= 1;
-        if (carrito[idx].cantidad <= 0) carrito.splice(idx, 1);
-        guardarCarritoYRenderizar();
-    };
-    window.eliminarProducto = function(idx) { carrito.splice(idx, 1); guardarCarritoYRenderizar(); };
+    if (btnSeguirComprando) {
+        btnSeguirComprando.addEventListener('click', () => {
+            // Leemos la última categoría visitada. Si no hay ninguna, usamos 'powerups' por defecto.
+            const ultimaCat = localStorage.getItem('ultimaCategoria') || 'powerups';
+            location.href = `catalogo.html?categoria=${ultimaCat}&page=1`;
+        });
+    }
 
     if (btnFinalizarCompra) {
         btnFinalizarCompra.addEventListener("click", () => {
@@ -263,72 +474,95 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!modalEl || !modalMsg) return;
             const bModal = new bootstrap.Modal(modalEl);
 
-            // Caso 1: Intentar pagar sin productos (Sustituye la alerta de image_a8e817.png)
             if (carrito.length === 0) {
                 modalMsg.textContent = "El carrito está vacío. ¡Agregá artículos antes de confirmar!";
-                btnCanc.textContent = "Entendido";
-                btnConf.classList.add('d-none'); 
+                if (btnCanc) btnCanc.textContent = "Entendido";
+                if (btnConf) btnConf.classList.add('d-none'); 
                 bModal.show();
                 return;
             }
 
-            // Caso 2: Confirmación con Modal estético
             modalMsg.textContent = "¿Está seguro de que desea confirmar la compra en este autoservicio?";
-            btnCanc.textContent = "Cancelar";
-            btnConf.classList.remove('d-none');
+            if (btnCanc) btnCanc.textContent = "Cancelar";
+            if (btnConf) btnConf.classList.remove('d-none');
 
             btnConf.onclick = () => {
                 bModal.hide();
-                const nroOp = Math.floor(1000000000000 + Math.random() * 9000000000000);
-                const ticket = {
-                    nroOperacion: nroOp,
+                const nroOperacionAleatorio = Math.floor(1000000000000 + Math.random() * 9000000000000);
+
+                const ticketFinal = {
+                    nroOperacion: nroOperacionAleatorio,
                     cliente: localStorage.getItem('nombreCliente') || 'Cliente Anónimo',
                     fecha: new Date().toLocaleString('es-AR'),
                     productos: carrito,
                     total: carrito.reduce((acc, p) => acc + (p.precio * p.cantidad), 0)
                 };
-                localStorage.setItem("ticketFinal", JSON.stringify(ticket));
-                localStorage.removeItem("carrito");
+
+                localStorage.setItem("ticketFinal", JSON.stringify(ticketFinal));
+                localStorage.removeItem("carrito"); 
+                carrito = [];
                 window.location.href = "ticket.html";
             };
             bModal.show();
         });
     }
 
-    if (tablaCarrito) mostrarCarrito();
+    if (tablaCarrito) {
+        mostrarCarrito();
+    }
 
     // =========================================================================
-    // 7. LÓGICA DEL TICKET
+    // 6. LÓGICA DE PANTALLA: TICKET DINÁMICO
     // =========================================================================
     if (ticketProductosBody) {
-        const datos = JSON.parse(localStorage.getItem('ticketFinal'));
-        if (datos) {
-            if (ticketOperacion) ticketOperacion.textContent = datos.nroOperacion;
-            if (ticketCliente) ticketCliente.textContent = datos.cliente;
-            if (ticketFecha) ticketFecha.textContent = datos.fecha;
-            if (ticketTotal) ticketTotal.textContent = `$${datos.total}`;
+        const datosTicket = JSON.parse(localStorage.getItem('ticketFinal'));
 
-            ticketProductosBody.innerHTML = "";
-            datos.productos.forEach(p => {
-                ticketProductosBody.innerHTML += `
-                <tr>
-                    <td>${p.nombre}</td>
-                    <td class="text-center">${p.cantidad} x $${p.precio}</td>
-                    <td class="text-end fw-medium">$${p.precio * p.cantidad}</td>
-                </tr>`;
+        if (datosTicket) {
+            if (ticketOperacion) ticketOperacion.textContent = datosTicket.nroOperacion;
+            if (ticketCliente) ticketCliente.textContent = datosTicket.cliente;
+            if (ticketFecha) ticketFecha.textContent = datosTicket.fecha;
+            if (ticketTotal) ticketTotal.textContent = `$${datosTicket.total}`;
+
+            ticketProductosBody.textContent = "";
+            datosTicket.productos.forEach(p => {
+                const tr = document.createElement('tr');
+
+                const tdNom = document.createElement('td');
+                tdNom.textContent = p.nombre;
+
+                const tdDetalle = document.createElement('td');
+                tdDetalle.className = "text-center";
+                tdDetalle.textContent = `${p.cantidad} x $${p.precio}`;
+
+                const tdSub = document.createElement('td');
+                tdSub.className = "text-end fw-medium";
+                tdSub.textContent = `$${p.precio * p.cantidad}`;
+
+                tr.appendChild(tdNom);
+                tr.appendChild(tdDetalle);
+                tr.appendChild(tdSub);
+                ticketProductosBody.appendChild(tr);
             });
         }
 
-        const btnPDF = document.getElementById('btn-descargar-pdf');
-        if (btnPDF) {
-            btnPDF.addEventListener('click', () => {
-                html2pdf().set({
-                    margin: 10,
-                    filename: `ticket-${datos ? datos.nroOperacion : 'compra'}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                }).from(document.querySelector('.ticket-contenedor')).save();
+        const btnDescargarPDF = document.getElementById('btn-descargar-pdf');
+        if (btnDescargarPDF) {
+            btnDescargarPDF.addEventListener('click', () => {
+                const elementoTicket = document.querySelector('.ticket-contenedor');
+                
+                const opcionesConfig = {
+                    margin:       10,
+                    filename:     `ticket-${datosTicket ? datosTicket.nroOperacion : 'compra'}.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { 
+                        scale: 2,             
+                        useCORS: true,        
+                        backgroundColor: '#ffffff'
+                    },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                html2pdf().set(opcionesConfig).from(elementoTicket).save();
             });
         }
     }
