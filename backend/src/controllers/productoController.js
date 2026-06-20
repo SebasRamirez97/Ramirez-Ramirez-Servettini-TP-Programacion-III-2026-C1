@@ -6,22 +6,14 @@ const getProductos = async (req, res) => {
         const limit = parseInt(req.query.limit) || 6;
         const offset = (page - 1) * limit;
         
-        // Capturamos los parámetros de la request
         const esAdministrador = (req.query.admin === 'true');
         const categoria = req.query.categoria;
 
-        // Definimos el objeto 'where' dinámicamente
         let filtro = {};
 
-        // 1. Lógica con if/else para los productos activos
-        if (!esAdministrador) {
-            filtro.activo = true;
-        }
-
-        // 2. Lógica con if/else para la categoría
-        if (categoria) {
-            filtro.categoria = categoria;
-        }
+        if (!esAdministrador) {filtro.activo = true;}
+        
+        if (categoria) {filtro.categoria = categoria;}
 
         const { count, rows } = await Producto.findAndCountAll({
             where: filtro,
@@ -57,22 +49,22 @@ const getProductoById = async (req, res) => {
 };
 
 const crearProducto = async (req, res) => {
-    try {
-        const { nombre, precio, tipo } = req.body;
-        
-        const imagen = req.file ? req.file.filename : 'default.jpg'; 
-
-        const nuevoProducto = await Producto.create({
-            nombre,
-            precio,
-            tipo,
-            imagen,
-            activo: true
-        });
-
-        res.status(201).json(nuevoProducto);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al crear el producto' });
+    try{
+        const {nombre , categoria , precio , descripcion , activo} = req.body;
+        const imagen = req.file.filename;
+        const producto = await Producto.create(
+            {
+                "nombre" : nombre,
+                "categoria" : categoria,
+                "precio" : precio,
+                "imagen" : imagen,
+                "descripcion" : descripcion,
+                "activo" : true
+            }
+        );
+        res.json(producto);
+    }catch (error) {
+        res.status(404).json({ error: 'Error al crear el producto' });
     }
 };
 
@@ -86,7 +78,6 @@ const actualizarProducto = async (req, res) => {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
 
-        // Lógica de imagen sin ternarios
         let nuevaImagen;
         if (req.file) {
             nuevaImagen = req.file.filename;
@@ -94,7 +85,6 @@ const actualizarProducto = async (req, res) => {
             nuevaImagen = producto.imagen;
         }
 
-        // Lógica de nombre sin ternarios
         let nuevoNombre;
         if (nombre) {
             nuevoNombre = nombre;
@@ -102,7 +92,6 @@ const actualizarProducto = async (req, res) => {
             nuevoNombre = producto.nombre;
         }
 
-        // Lógica de precio sin ternarios
         let nuevoPrecio;
         if (precio) {
             nuevoPrecio = precio;
@@ -110,7 +99,6 @@ const actualizarProducto = async (req, res) => {
             nuevoPrecio = producto.precio;
         }
 
-        // Guardamos los cambios
         await producto.update({ 
             nombre: nuevoNombre, 
             precio: nuevoPrecio, 
@@ -145,6 +133,6 @@ const cambiarEstadoProducto = async (req, res) => {
 };
 
 module.exports = { 
-    getProductos, getProductoById, crearProducto, actualizarProducto, cambiarEstadoProducto 
+    getProductos, getProductoById, crearProducto, actualizarProducto , cambiarEstadoProducto
 };
 

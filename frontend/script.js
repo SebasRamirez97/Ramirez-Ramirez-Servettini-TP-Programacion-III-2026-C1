@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailAdmin = document.getElementById('input-email');
     const contraseñaAdmin = document.getElementById('input-contraseña');
     const btnIngresarAdmin = document.getElementById('btn-ingresar-admin');
+    const btnAccesoRapido = document.getElementById('btn-acceso-rapido');
 
     // Elementos de Categorías (Pantalla Intermedia)
     const btnCatPowerups = document.getElementById('btn-cat-powerups');
@@ -39,12 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnTema = document.getElementById('btn-tema');      
     const btnVolverInicio = document.getElementById('btn-volver-inicio');
     const btnVolverCategorias = document.getElementById('btn-volver-categorias');
-    const btnCerrarSesion =document.getElementById('btn-cerrar-sesion');
+    const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
     
-    // Estado Global Local
-    let articulos = [];
-    let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-
+    // Elementos input
+    const inputNombre = document.getElementById('nombre');
+    const selectCategoria = document.getElementById('categoria');
+    const inputPrecio = document.getElementById('precio');
+    const inputImagen = document.getElementById('imagen');
+  
     // =========================================================================
     // 2. SISTEMA DE TEMAS (Claro / Oscuro)
     // =========================================================================
@@ -53,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (temaGuardado === 'oscuro') {
         document.body.classList.add('dark-mode');
         if (btnTema) {
-            btnTema.textContent = '☀️'; // textContent es seguro
+            btnTema.textContent = '☀️';
             btnTema.classList.remove('btn-dark');
             btnTema.classList.add('btn-light');
         }
@@ -99,56 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (btnIngresarAdmin) {
-        btnIngresarAdmin.addEventListener('click',  async ()=> {
-            const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
-        const modalBody = document.querySelector("#modalLogin .modal-body");
-
-        if (emailAdmin.value.trim() === '') {
-            modalBody.textContent = "Por favor ingresá un email para continuar.";
-            modalLogin.show();
-            return;
-        }
-
-        if (contraseñaAdmin.value.trim() === '') {
-            modalBody.textContent = "Por favor ingresá una contraseña para continuar.";
-            modalLogin.show();
-            return;
-        }
-         try {
-            const response = await fetch("http://localhost:3000/api/administradores/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: emailAdmin.value.trim(),
-                    password: contraseñaAdmin.value.trim()
-                })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                // Si el backend devolvió error (404 o 401)
-                const modal = new bootstrap.Modal(document.getElementById('modalLogin'));
-                document.querySelector("#modalLogin .modal-body").textContent = data.error;
-                modal.show();
-                return;
-            }
-
-            localStorage.setItem("adminEmail", data.admin.email);
-            location.href = "dashboard.html";
-
-        } catch (error) {
-            console.error("Error conectando con el backend:", error);
-        }
-    });
-
-
-           
-
-    }
-
-
     if (btnVolverInicio) {
         btnVolverInicio.addEventListener('click', () => {
             localStorage.removeItem('nombreCliente');
@@ -165,6 +118,74 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCarrito.addEventListener('click', () => { location.href = "carrito.html"; });
     }
 
+    // =========================================================================
+    // 3.1 CONTROLADORES DE NAVEGACIÓN ADMIN CONSOLE
+    // =========================================================================
+    if (btnIngresarAdmin) {
+        btnIngresarAdmin.addEventListener('click',  async ()=> {
+            const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
+            const modalBody = document.querySelector("#modalLogin .modal-body");
+
+            if (emailAdmin.value.trim() === '') {
+                modalBody.textContent = "Por favor ingresá un email para continuar.";
+                modalLogin.show();
+                return;
+            }
+
+            if (contraseñaAdmin.value.trim() === '') {
+                modalBody.textContent = "Por favor ingresá una contraseña para continuar.";
+                modalLogin.show();
+                return;
+            }
+            try {
+                const response = await fetch("http://localhost:3000/api/administradores/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email: emailAdmin.value.trim(),
+                        password: contraseñaAdmin.value.trim()
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    const modal = new bootstrap.Modal(document.getElementById('modalLogin'));
+                    document.querySelector("#modalLogin .modal-body").textContent = data.error;
+                    modal.show();
+                    return;
+                }
+
+                localStorage.setItem("adminEmail", data.admin.email);
+                location.href = "dashboard.html";
+
+            } catch (error) {
+                console.error("Error conectando con el backend:", error);
+            }
+        });
+    }
+
+    if (btnAccesoRapido) {
+        btnAccesoRapido.addEventListener('click', async function() {
+            try {
+                const respuesta = await fetch('http://localhost:3000/api/administradores');
+                const data = await respuesta.json();
+
+                if (respuesta.ok && data.administradores && data.administradores.length > 0) {
+                    let primerAdmin = data.administradores[0]; 
+                    emailAdmin.value = primerAdmin.email;
+                    contraseñaAdmin.value = '1234567890'; 
+                    btnIngresarAdmin.click();
+                } else {
+                    alert('No se encontraron administradores registrados en el sistema.');
+                }
+            } catch (error) {
+                console.error('Error en el acceso rápido:', error);
+                alert('Hubo un problema de conexión al intentar traer el administrador de pruebas.');
+            }
+        });
+    }
+
     if (btnCerrarSesion) {
         btnCerrarSesion.addEventListener('click', () => {
             location.href = "loginAdmin.html";
@@ -172,31 +193,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // 4. LÓGICA DE PANTALLA: CATÁLOGO (Nodos Seguros)
+    // 4. LÓGICA DE PANTALLA: CATÁLOGO
     // =========================================================================
-    if (tituloCatalogo && contenedorProductos) {
+    let articulos = [];
+    
+    async function cargarCatalogo() {
         const params = new URLSearchParams(window.location.search);
         const categoria = params.get("categoria") || "powerups";
         const pagina = params.get("page") || "1";
 
         localStorage.setItem('ultimaCategoria', categoria);
 
-        tituloCatalogo.textContent = categoria === "powerups" ? "Power Ups" : "Vehículos";
+        if(categoria === "powerups"){
+            tituloCatalogo.textContent = "Power Up";
+        }else{
+            tituloCatalogo.textContent = "Vehículo";
+        }
 
-        fetch(`http://localhost:3000/api/productos?categoria=${categoria}`)
-            .then(response => response.json())
-            .then(data => {
-                articulos = data.productos;
-                if (btnCarrito) btnCarrito.classList.remove('d-none');
+        try{
+            const urlBuscada = `http://localhost:3000/api/productos?categoria=${categoria}&page=${pagina}`;
+            const respuestaServidor = await fetch(urlBuscada);
+            const data = await respuestaServidor.json();
+            articulos = data.productos;
 
-                renderizarProductosCatálogo(articulos);
-                construirControlesPaginacion(data.paginas, parseInt(pagina), categoria);
-            })
-            .catch(error => console.error("Error conectando con la API del Backend:", error));
+            if(btnCarrito){
+                btnCarrito.classList.remove('d-none');
+            }
+            renderizarProductosCatálogo(articulos);
+            construirControlesPaginacion(data.paginas, parseInt(pagina), categoria);
+        }catch(error){
+            console.error("Error conectando con la API del Backend:", error);
+        }
     }
 
     function renderizarProductosCatálogo(listaProductos) {
-        contenedorProductos.textContent = ""; // Limpieza segura sin innerHTML
+        contenedorProductos.textContent = ""; 
         
         if (listaProductos.length === 0) {
             const pNoProd = document.createElement('p');
@@ -210,9 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const article = document.createElement('article');
             article.classList.add('producto-card');
 
-            const nombreCarpeta = 'img-productos';
-
-            const urlImagen = `http://localhost:3000/resources/${nombreCarpeta}/${producto.imagen}`;
+            const urlImagen = `http://localhost:3000/resources/img-productos/${producto.imagen}`;
             const img = document.createElement('img');
             img.src = urlImagen;
             img.classList.add('producto-img');
@@ -228,7 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
             pPrecio.className = "fs-4 fw-bold text-success";
             pPrecio.textContent = `$${producto.precio}`;
 
-            // Contenedor de cantidad
             const selectorCantidad = document.createElement('div');
             selectorCantidad.className = "selector-cantidad";
 
@@ -252,7 +280,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btnAgregar.className = "btn btn-danger w-100 mt-2 btn-agregar";
             btnAgregar.textContent = "Agregar al carrito";
 
-            // Eventos locales nativos
             btnMas.addEventListener('click', () => { spanCant.textContent = parseInt(spanCant.textContent) + 1; });
             btnMenos.addEventListener('click', () => {
                 let actual = parseInt(spanCant.textContent);
@@ -270,6 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         id: producto.id,
                         nombre: producto.nombre,
                         precio: producto.precio,
+                        character: producto.imagen, // Guarda imagen de referencia si hace falta
                         cantidad: cantidadAAgregar
                     });
                 }
@@ -286,7 +314,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 1000);
             });
 
-            // Ensamblamos la tarjeta de forma segura
             article.appendChild(img);
             article.appendChild(h4);
             article.appendChild(pDesc);
@@ -323,7 +350,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function mostrarGloboFlotante(mensaje) {
-    // 1. Estructura: Buscamos o creamos el contenedor con su clase correspondiente
         let contenedor = document.querySelector('.contenedor-carrito-popup');
         if (!contenedor) {
             contenedor = document.createElement('div');
@@ -331,21 +357,18 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(contenedor);
         }
 
-        // 2. Lógica de control: Evitamos duplicados
         const viejo = contenedor.querySelector('.globo-agregado');
         if (viejo) viejo.remove();
 
-        // 3. Estructura: Creamos el globo y le inyectamos el texto seguro
         const globo = document.createElement('div');
         globo.className = 'globo-agregado';
         globo.textContent = mensaje;
 
         contenedor.appendChild(globo);
 
-        // 4. Lógica de tiempos: Agregamos la clase de salida y luego removemos el nodo
         setTimeout(() => {
             globo.classList.add('oculto'); 
-            setTimeout(() => globo.remove(), 400); // Espera a que termine la transición CSS
+            setTimeout(() => globo.remove(), 400);
         }, 2000);
     }
 
@@ -360,8 +383,241 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // 5. LÓGICA DE PANTALLA: CARRITO (Estructura de Tabla Segura)
+    // 4.5 LÓGICA DE PANTALLA: DASHBOARD
     // =========================================================================
+    async function cargarDashboard(pagina = 1) {
+        try {
+            const urlBuscada = `http://localhost:3000/api/productos?page=${pagina}&admin=true`;
+            const respuestaServidor = await fetch(urlBuscada);
+            const data = await respuestaServidor.json();
+
+            renderizarDashboard(data.productos, data.paginaActual);
+            construirControlesPaginacionDashboard(data.paginas, data.paginaActual);
+        } catch (error) {
+            console.error("Error conectando con la API del Dashboard:", error);
+        }
+    }
+
+    function renderizarDashboard(listaProductos, paginaActual) {
+        const tabla = document.getElementById("tabla-dashboard-productos") || document.querySelector("tbody");
+        if (!tabla) return;
+        
+        tabla.textContent = ""; 
+
+        listaProductos.forEach(function(prod) {
+            let editando = false; 
+            let archivoSeleccionado = null; 
+            let imagenEliminada = false;    
+
+            const fila = document.createElement("tr");
+
+            const tdId = document.createElement("td");
+            tdId.textContent = prod.id;
+
+            const tdImg = document.createElement("td");
+            const img = document.createElement("img");
+            img.src = `http://localhost:3000/resources/img-productos/${prod.imagen}`;
+            img.style.width = "60px";
+            img.style.height = "60px";
+            img.style.objectFit = "contain";
+            tdImg.appendChild(img);
+
+            const tdNombre = document.createElement("td");
+            tdNombre.textContent = prod.nombre;
+
+            const tdCat = document.createElement("td");
+            tdCat.textContent = prod.categoria;
+
+            const tdPrecio = document.createElement("td");
+            tdPrecio.textContent = `$${prod.precio}`;
+
+            const tdEstado = document.createElement("td");
+            tdEstado.textContent = prod.activo ? "Activo" : "Inactivo";
+
+            const tdAcciones = document.createElement("td");
+            tdAcciones.className = "text-center";
+
+            const btnEstado = document.createElement("button");
+            btnEstado.className = `btn btn-sm ${prod.activo ? "btn-warning" : "btn-success"}`;
+            btnEstado.textContent = prod.activo ? "Desactivar" : "Activar";
+            
+            btnEstado.addEventListener("click", async function() {
+                try {
+                    const respuesta = await fetch(`http://localhost:3000/api/productos/${prod.id}/estado`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ activo: !prod.activo })
+                    });
+                    if (respuesta.ok) {
+                        cargarDashboard(paginaActual);
+                    }
+                } catch (error) {
+                    console.error("Error al cambiar estado:", error);
+                }
+            });
+
+            const btnEditar = document.createElement("button");
+            btnEditar.className = "btn btn-sm btn-primary ms-2";
+            btnEditar.textContent = "Editar";
+
+            btnEditar.addEventListener("click", async function() {
+                if (!editando) {
+                    editando = true;
+                    btnEditar.textContent = "Guardar";
+                    btnEditar.className = "btn btn-sm btn-success ms-2";
+                    btnEstado.disabled = true; 
+
+                    const inputNombreForm = document.createElement("input");
+                    inputNombreForm.type = "text";
+                    inputNombreForm.className = "form-control form-control-sm";
+                    inputNombreForm.value = prod.nombre;
+                    tdNombre.textContent = ""; 
+                    tdNombre.appendChild(inputNombreForm);
+
+                    const inputPrecioForm = document.createElement("input");
+                    inputPrecioForm.type = "number";
+                    inputPrecioForm.className = "form-control form-control-sm";
+                    inputPrecioForm.value = prod.precio;
+                    tdPrecio.textContent = "";
+                    tdPrecio.appendChild(inputPrecioForm);
+
+                    const contenedorControlesImg = document.createElement("div");
+                    contenedorControlesImg.className = "d-inline-flex flex-column gap-1 align-items-center ms-2";
+                    contenedorControlesImg.style.verticalAlign = "middle";
+
+                    const btnSubirImg = document.createElement("button");
+                    btnSubirImg.type = "button";
+                    btnSubirImg.className = "btn btn-xs btn-outline-primary p-0 d-flex align-items-center justify-content-center";
+                    btnSubirImg.style.width = "22px";
+                    btnSubirImg.style.height = "22px";
+                    btnSubirImg.textContent = "⬆️";
+
+                    const btnBorrarImg = document.createElement("button");
+                    btnBorrarImg.type = "button";
+                    btnBorrarImg.className = "btn btn-xs btn-outline-danger p-0 d-flex align-items-center justify-content-center";
+                    btnBorrarImg.style.width = "22px";
+                    btnBorrarImg.style.height = "22px";
+                    btnBorrarImg.textContent = "🗑️";
+
+                    const inputOcultoFile = document.createElement("input");
+                    inputOcultoFile.type = "file";
+                    inputOcultoFile.accept = "image/*";
+                    inputOcultoFile.style.display = "none";
+
+                    btnSubirImg.addEventListener("click", function() {
+                        inputOcultoFile.click();
+                    });
+
+                    inputOcultoFile.addEventListener("change", function() {
+                        if (inputOcultoFile.files.length > 0) {
+                            archivoSeleccionado = inputOcultoFile.files[0];
+                            imagenEliminada = false;
+                            img.src = URL.createObjectURL(archivoSeleccionado); 
+                        }
+                    });
+
+                    btnBorrarImg.addEventListener("click", function() {
+                        archivoSeleccionado = null;
+                        imagenEliminada = true;
+                        inputOcultoFile.value = ""; 
+                        img.src = "http://localhost:3000/resources/img-productos/default.png"; 
+                    });
+
+                    contenedorControlesImg.appendChild(btnSubirImg);
+                    contenedorControlesImg.appendChild(btnBorrarImg);
+                    contenedorControlesImg.appendChild(inputOcultoFile);
+                    tdImg.appendChild(contenedorControlesImg);
+
+                    const btnCancelar = document.createElement("button");
+                    btnCancelar.className = "btn btn-sm btn-secondary ms-1";
+                    btnCancelar.textContent = "X";
+                    btnCancelar.addEventListener("click", function() {
+                        cargarDashboard(paginaActual); 
+                    });
+                    tdAcciones.appendChild(btnCancelar);
+
+                } else {
+                    const valorNombre = tdNombre.querySelector("input").value.trim();
+                    const valorPrecio = tdPrecio.querySelector("input").value;
+
+                    if (valorNombre === "" || valorPrecio === "") {
+                        alert("Por favor, completá todos los campos antes de guardar.");
+                        return;
+                    }
+
+                    const valijaEdicion = new FormData();
+                    valijaEdicion.append("nombre", valorNombre);
+                    valijaEdicion.append("precio", valorPrecio);
+
+                    if (archivoSeleccionado) {
+                        valijaEdicion.append("imagen", archivoSeleccionado); 
+                    } else if (imagenEliminada) {
+                        valijaEdicion.append("imagen", "default.png"); 
+                    }
+
+                    try {
+                        const respuesta = await fetch(`http://localhost:3000/api/productos/editar/${prod.id}`, {
+                            method: "PATCH",
+                            body: valijaEdicion
+                        });
+
+                        if (respuesta.ok) {
+                            alert("¡Producto modificado con éxito!");
+                            cargarDashboard(paginaActual); 
+                        } else {
+                            alert("Hubo un problema al intentar guardar las modificaciones.");
+                        }
+                    } catch (error) {
+                        console.error("Error conectando con el backend en la edición:", error);
+                        alert("No se pudo conectar con el servidor.");
+                    }
+                }
+            });
+
+            tdAcciones.appendChild(btnEstado);
+            tdAcciones.appendChild(btnEditar);
+
+            fila.appendChild(tdId);
+            fila.appendChild(tdImg);
+            fila.appendChild(tdNombre);
+            fila.appendChild(tdCat);
+            fila.appendChild(tdPrecio);
+            fila.appendChild(tdEstado);
+            fila.appendChild(tdAcciones);
+
+            tabla.appendChild(fila);
+        });
+    }
+
+    function construirControlesPaginacionDashboard(totalPaginas, paginaActual) {
+        let contenedorPaginacion = document.getElementById('paginacion-controles');
+        if (!contenedorPaginacion) {
+            contenedorPaginacion = document.createElement('div');
+            contenedorPaginacion.id = 'paginacion-controles';
+            contenedorPaginacion.className = "d-flex justify-content-center gap-2 w-100 mt-4";
+            document.querySelector("main").appendChild(contenedorPaginacion);
+        }
+        contenedorPaginacion.textContent = "";
+
+        if (totalPaginas <= 1) return;
+
+        for (let i = 1; i <= totalPaginas; i++) {
+            const btnPagina = document.createElement('button');
+            btnPagina.textContent = i;
+            btnPagina.className = `btn ${i === paginaActual ? 'btn-danger' : 'btn-outline-secondary'}`;
+        
+            btnPagina.addEventListener('click', () => {
+                cargarDashboard(i); 
+            });
+            contenedorPaginacion.appendChild(btnPagina);
+        }
+    }
+
+    // =========================================================================
+    // 5. LÓGICA DE PANTALLA: CARRITO
+    // =========================================================================
+    let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
     function guardarCarritoYRenderizar() {
         localStorage.setItem("carrito", JSON.stringify(carrito));
         mostrarCarrito();
@@ -370,7 +626,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function mostrarCarrito() {
         if (!tablaCarrito || !totalHTML) return;
 
-        tablaCarrito.textContent = ""; // Limpieza limpia sin inyectar string vacío
+        tablaCarrito.textContent = ""; 
         let total = 0;
 
         if (carrito.length === 0) {
@@ -398,7 +654,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const tdPrecio = document.createElement('td');
             tdPrecio.textContent = `$${producto.precio}`;
 
-            // Celda de controles de cantidad inline
             const tdCantidad = document.createElement('td');
             tdCantidad.className = "text-center";
 
@@ -443,7 +698,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             tdAccion.appendChild(btnEliminar);
 
-            // Montamos la fila de la tabla
             tr.appendChild(tdNombre);
             tr.appendChild(tdPrecio);
             tr.appendChild(tdCantidad);
@@ -458,7 +712,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnSeguirComprando) {
         btnSeguirComprando.addEventListener('click', () => {
-            // Leemos la última categoría visitada. Si no hay ninguna, usamos 'powerups' por defecto.
             const ultimaCat = localStorage.getItem('ultimaCategoria') || 'powerups';
             location.href = `catalogo.html?categoria=${ultimaCat}&page=1`;
         });
@@ -466,13 +719,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnFinalizarCompra) {
         btnFinalizarCompra.addEventListener("click", () => {
-            const modalEl = document.getElementById('modalCarritoAviso');
+            const modalCarrito = document.getElementById('modalCarritoAviso');
             const modalMsg = document.getElementById('modalCarritoMensaje');
             const btnCanc = document.getElementById('btnModalCancelar');
             const btnConf = document.getElementById('btnModalConfirmar');
             
-            if (!modalEl || !modalMsg) return;
-            const bModal = new bootstrap.Modal(modalEl);
+            if (!modalCarrito || !modalMsg) return;
+            const bModal = new bootstrap.Modal(modalCarrito);
 
             if (carrito.length === 0) {
                 modalMsg.textContent = "El carrito está vacío. ¡Agregá artículos antes de confirmar!";
@@ -486,45 +739,71 @@ document.addEventListener('DOMContentLoaded', () => {
             if (btnCanc) btnCanc.textContent = "Cancelar";
             if (btnConf) btnConf.classList.remove('d-none');
 
-            btnConf.onclick = () => {
+            btnConf.onclick = async () => {
                 bModal.hide();
-                const nroOperacionAleatorio = Math.floor(1000000000000 + Math.random() * 9000000000000);
 
-                const ticketFinal = {
-                    nroOperacion: nroOperacionAleatorio,
-                    cliente: localStorage.getItem('nombreCliente') || 'Cliente Anónimo',
-                    fecha: new Date().toLocaleString('es-AR'),
-                    productos: carrito,
-                    total: carrito.reduce((acc, p) => acc + (p.precio * p.cantidad), 0)
+                let sumaTotal = 0;
+                for (let i = 0; i < carrito.length; i++) {
+                    sumaTotal += (carrito[i].precio * carrito[i].cantidad);
+                }
+
+                const productosComprados = [];
+                carrito.forEach((producto)=>{
+                    productosComprados.push({
+                        id: producto.id,
+                        cantidad : producto.cantidad
+                    });
+                });
+
+                const datosVenta = {
+                    nombre_cliente : localStorage.getItem('nombreCliente'),
+                    precio_total : sumaTotal,
+                    productos : productosComprados
                 };
 
-                localStorage.setItem("ticketFinal", JSON.stringify(ticketFinal));
-                localStorage.removeItem("carrito"); 
-                carrito = [];
-                window.location.href = "ticket.html";
+                try{
+                    const respuesta = await fetch('http://localhost:3000/api/ventas/crear',{
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify(datosVenta)
+                    });
+
+                    const ventaCreada = await respuesta.json();
+
+                    const ticketFinal = {
+                        nroOperacion : ventaCreada.id,
+                        cliente: datosVenta.nombre_cliente || 'Cliente Anónimo',
+                        fecha: new Date().toLocaleString('es-AR'),
+                        productos: carrito,
+                        total: sumaTotal
+                    };
+
+                    localStorage.setItem("ticketFinal", JSON.stringify(ticketFinal));
+                    localStorage.removeItem("carrito"); 
+                    carrito = [];
+                    window.location.href = "ticket.html";
+                } catch (err) {
+                    console.error("Error al procesar la venta:", err);
+                    alert("No se pudo guardar la venta en la base de datos.");
+                }
             };
             bModal.show();
         });
-    }
-
-    if (tablaCarrito) {
-        mostrarCarrito();
     }
 
     // =========================================================================
     // 6. LÓGICA DE PANTALLA: TICKET DINÁMICO
     // =========================================================================
     if (ticketProductosBody) {
-        const datosTicket = JSON.parse(localStorage.getItem('ticketFinal'));
-
-        if (datosTicket) {
-            if (ticketOperacion) ticketOperacion.textContent = datosTicket.nroOperacion;
-            if (ticketCliente) ticketCliente.textContent = datosTicket.cliente;
-            if (ticketFecha) ticketFecha.textContent = datosTicket.fecha;
-            if (ticketTotal) ticketTotal.textContent = `$${datosTicket.total}`;
+        const datosTicketLocal = JSON.parse(localStorage.getItem('ticketFinal'));
+        if (datosTicketLocal) {
+            if (ticketOperacion) ticketOperacion.textContent = datosTicketLocal.nroOperacion;
+            if (ticketCliente) ticketCliente.textContent = datosTicketLocal.cliente;
+            if (ticketFecha) ticketFecha.textContent = datosTicketLocal.fecha;
+            if (ticketTotal) ticketTotal.textContent = `$${datosTicketLocal.total}`;
 
             ticketProductosBody.textContent = "";
-            datosTicket.productos.forEach(p => {
+            datosTicketLocal.productos.forEach(p => {
                 const tr = document.createElement('tr');
 
                 const tdNom = document.createElement('td');
@@ -552,18 +831,171 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const opcionesConfig = {
                     margin:       10,
-                    filename:     `ticket-${datosTicket ? datosTicket.nroOperacion : 'compra'}.pdf`,
+                    filename:     `ticket-${datosTicketLocal ? datosTicketLocal.nroOperacion : 'compra'}.pdf`,
                     image:        { type: 'jpeg', quality: 0.98 },
                     html2canvas:  { 
                         scale: 2,             
                         useCORS: true,        
-                        backgroundColor: '#ffffff'
+                        backgroundColor: '#ffffff',
+                        scrollY: 0 
                     },
-                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak:    { mode: 'avoid-all' } 
                 };
 
                 html2pdf().set(opcionesConfig).from(elementoTicket).save();
             });
         }
+    }
+
+    // =========================================================================
+    // 7. LÓGICA PARA CREAR PRODUCTOS
+    // =========================================================================
+    function configurarFormularioProducto() {
+        const formulario = document.querySelector('form');
+        if (!formulario) return; 
+
+        formulario.addEventListener('submit', async function(evento) {
+            evento.preventDefault(); 
+
+            const productoNuevo = new FormData();
+            productoNuevo.append('nombre', inputNombre.value.trim());
+            productoNuevo.append('categoria', selectCategoria.value);
+            productoNuevo.append('precio', inputPrecio.value);
+
+            if (inputImagen.files.length > 0) {
+                productoNuevo.append('imagen', inputImagen.files[0]);
+            }
+            try {
+                const respuesta = await fetch('http://localhost:3000/api/productos/crear', {
+                    method: 'POST',
+                    body: productoNuevo 
+                });
+
+                if (respuesta.ok) {
+                    alert('¡Producto guardado con éxito en el sistema!');
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('El servidor rechazó el producto. Verificá los campos.');
+                }
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                alert('No se pudo conectar con el servidor. ¿Está el backend prendido?');
+            }
+        });
+    }
+
+    // =========================================================================
+    // 8. LÓGICA DE PANTALLA: HISTORIAL DE VENTAS (ventas.html)
+    // =========================================================================
+    async function cargarHistorialVentas() {
+        const tbody = document.getElementById('tabla-ventas-body');
+        if (!tbody) return;
+
+        try {
+            const urlVentas = 'http://localhost:3000/api/ventas';
+            const respuesta = await fetch(urlVentas);
+            
+            if (!respuesta.ok) {
+                throw new Error(`Error del servidor: ${respuesta.status}`);
+            }
+
+            const ventas = await respuesta.json();
+            tbody.textContent = ""; 
+
+            if (!ventas || ventas.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="5" class="text-center text-muted py-4">No hay ventas registradas en el sistema.</td>`;
+                tbody.appendChild(tr);
+                return;
+            }
+
+            ventas.forEach(venta => {
+                const fila = document.createElement('tr');
+
+                const tdFactura = document.createElement('td');
+                tdFactura.textContent = `#${String(venta.id).padStart(6, '0')}`;
+
+                const tdFecha = document.createElement('td');
+                const fechaBase = venta.createdAt || venta.fecha;
+                tdFecha.textContent = fechaBase ? new Date(fechaBase).toLocaleDateString('es-AR') : 'Sin fecha';
+
+                const tdCliente = document.createElement('td');
+                tdCliente.textContent = venta.nombre_cliente || 'Cliente Anónimo';
+
+                const tdProductos = document.createElement('td');
+                const ul = document.createElement('ul');
+                ul.className = "mb-0 small";
+
+                // Mapeo tolerante de relaciones (en Sequelize puede variar según alias del modelo)
+                const listaProductos = venta.Productos || venta.productos;
+
+                if (listaProductos && listaProductos.length > 0) {
+                    listaProductos.forEach(prod => {
+                        const li = document.createElement('li');
+                        
+                        // Captura segura de la cantidad guardada en la tabla pivot Many-to-Many
+                        const tablaPivot = prod.VentaProductos || prod.VentaProducto || prod.through;
+                        const cant = tablaPivot ? tablaPivot.cantidad : (prod.cantidad || 1);
+                        
+                        li.textContent = `${prod.nombre || 'Producto'} x${cant}`;
+                        ul.appendChild(li);
+                    });
+                } else {
+                    const liVacio = document.createElement('li');
+                    liVacio.className = "text-muted";
+                    liVacio.textContent = "Sin detalles";
+                    ul.appendChild(liVacio);
+                }
+                tdProductos.appendChild(ul);
+
+                const tdTotal = document.createElement('td');
+                tdTotal.className = "fw-bold text-success";
+                const totalFormateado = venta.precio_total ? parseFloat(venta.precio_total).toLocaleString('es-AR') : '0';
+                tdTotal.textContent = `$${totalFormateado}`;
+
+                fila.appendChild(tdFactura);
+                fila.appendChild(tdFecha);
+                fila.appendChild(tdCliente);
+                fila.appendChild(tdProductos);
+                fila.appendChild(tdTotal);
+
+                tbody.appendChild(fila);
+            });
+
+        } catch (error) {
+            console.error("Error al traer las ventas de la API:", error);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center text-danger fw-bold py-4">
+                        Error al conectar con el servidor o procesar los datos de Sequelize.
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // =========================================================================
+    // DISPARADORES E INICIALIZADORES
+    // =========================================================================
+    if (contenedorProductos) {
+        cargarCatalogo();
+    }
+
+    if (tablaCarrito) {
+        mostrarCarrito();
+    }
+
+    if (window.location.pathname.includes('dashboard.html')) {
+        cargarDashboard(1);
+    }
+
+    if (window.location.pathname.includes('ventas.html')) {
+        cargarHistorialVentas();
+    }
+
+    const formularioExiste = document.querySelector('form');
+    if (formularioExiste) {
+        configurarFormularioProducto();
     }
 });
