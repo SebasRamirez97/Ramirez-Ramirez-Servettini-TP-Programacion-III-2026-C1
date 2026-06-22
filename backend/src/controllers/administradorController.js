@@ -1,6 +1,6 @@
 const { where } = require('sequelize');
 const bcrypt = require("bcrypt");
-const {Administrador } = require('../models/index');
+const {Administrador , Producto} = require('../models/index');
 
 
 const crearAdministrador = async  (req, res) => {
@@ -60,4 +60,33 @@ const verificarLogin = async(req, res) => {
     res.json({mensaje: "Login exitoso" , admin:{email: admin.email}});
 }
 
-module.exports = {crearAdministrador,getAdministradores, verificarLogin}
+const mostrarLogin = (req, res) => {
+    res.render('loginAdmin'); 
+};
+
+const mostrarDashboard = async (req, res) => {
+    try {
+        // 1. Buscamos TODOS los productos de MySQL usando Sequelize
+        const listaProductos = await Producto.findAll({ order: [['id', 'ASC']] });
+
+        // 2. Renderizamos el archivo "dashboard.ejs" pasándole los datos adentro de un objeto
+        res.render('dashboard', { productos: listaProductos });
+
+    } catch (error) {
+        console.error("Error al cargar el dashboard EJS:", error);
+        res.status(500).send("Error interno del servidor al cargar el panel.");
+    }
+};
+
+const mostrarFormularioProducto = (req, res) => {
+    res.render('formulario-producto'); 
+};
+
+
+
+module.exports = {crearAdministrador,
+                    getAdministradores,
+                    verificarLogin,
+                    mostrarLogin ,
+                    mostrarDashboard,
+                mostrarFormularioProducto}

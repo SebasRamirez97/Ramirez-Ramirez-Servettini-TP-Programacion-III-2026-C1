@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             localStorage.setItem("adminEmail", data.admin.email);
-            location.href = "dashboard.html";
+            location.href = "/api/administradores/dashboard";
 
         } catch (error) {
             console.error("Error conectando con el backend:", error);
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
      if (btnCerrarSesion) {
         btnCerrarSesion.addEventListener('click', () => {
-            location.href = "loginAdmin.html";
+            location.href = "/api/administradores/login";
         });
     }
 
@@ -408,132 +408,75 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =========================================================================
-    // 4.5 LÓGICA DE PANTALLA: dashboard 
-    // =========================================================================
-    async function cargarDashboard(pagina = 1) {
-    
-    // 2. Envolvemos todo en un bloque seguro try/catch
-    try {
-        const urlBuscada = `http://localhost:3000/api/productos?page=${pagina}&admin=true`;
-        
-        const respuestaServidor = await fetch(urlBuscada);
-        
-        const data = await respuestaServidor.json();
+// =========================================================================
+// 4.5 LÓGICA DEL DASHBOARD (VERSION DEFINITIVA SSR + MULTIPART FORM)
+// =========================================================================
 
-        renderizarDashboard(data.productos, data.paginaActual);
-        construirControlesPaginacionDashboard(data.paginas, data.paginaActual);
-        
-    } catch (error) {
-        console.error("Error conectando con la API del Dashboard:", error);
-    }
+if (window.location.pathname.includes('/administradores/dashboard')) {
+    configurarBotonesDashboardEJS();
 }
 
-function renderizarDashboard(listaProductos, paginaActual) {
+function configurarBotonesDashboardEJS() {
     
-    const tabla = document.getElementById("tabla-dashboard-productos") || document.querySelector("tbody");
-    if (!tabla) return;
-    
-    tabla.textContent = ""; // Limpiamos las filas anteriores
+    // 1. ESCUCHAR LOS BOTONES DE ACTIVAR / DESACTIVAR
+    const botonesEstado = document.querySelectorAll('.btn-cambiar-estado');
+    botonesEstado.forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id');
+            const activo = btn.getAttribute('data-activo') === 'true';
 
-    listaProductos.forEach(function(prod) {
-        
-        // 🌟 ESTADOS INTERNOS DE ESTA FILA EN PARTICULAR
-        let editando = false; 
-        let archivoSeleccionado = null; // Guardará la foto nueva si el usuario sube una
-        let imagenEliminada = false;    // Guardará si el usuario tocó el tacho de basura
-
-        const fila = document.createElement("tr");
-
-        // Celda 1: ID (Siempre fija)
-        const tdId = document.createElement("td");
-        tdId.textContent = prod.id;
-
-        // Celda 2: Imagen (Contenedor base)
-        const tdImg = document.createElement("td");
-        const img = document.createElement("img");
-        img.src = `http://localhost:3000/resources/img-productos/${prod.imagen}`;
-        img.style.width = "60px";
-        img.style.height = "60px";
-        img.style.objectFit = "contain";
-        tdImg.appendChild(img);
-
-        // Celda 3: Nombre
-        const tdNombre = document.createElement("td");
-        tdNombre.textContent = prod.nombre;
-
-        // Celda 4: Categoría
-        const tdCat = document.createElement("td");
-        tdCat.textContent = prod.categoria;
-
-        // Celda 5: Precio
-        const tdPrecio = document.createElement("td");
-        tdPrecio.textContent = `$${prod.precio}`;
-
-        // Celda 6: Estado (Fijo)
-        const tdEstado = document.createElement("td");
-        tdEstado.textContent = prod.activo ? "Activo" : "Inactivo";
-
-        // Celda 7: Contenedor de Botones de Acción
-        const tdAcciones = document.createElement("td");
-        tdAcciones.className = "text-center";
-
-        // Botón Activar / Desactivar
-        const btnEstado = document.createElement("button");
-        btnEstado.className = `btn btn-sm ${prod.activo ? "btn-warning" : "btn-success"}`;
-        btnEstado.textContent = prod.activo ? "Desactivar" : "Activar";
-        
-        btnEstado.addEventListener("click", async function() {
             try {
-                const respuesta = await fetch(`http://localhost:3000/api/productos/${prod.id}/estado`, {
+                const respuesta = await fetch(`http://localhost:3000/api/productos/${id}/estado`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ activo: !prod.activo })
+                    body: JSON.stringify({ activo: !activo })
                 });
+
                 if (respuesta.ok) {
-                    cargarDashboard(paginaActual);
+                    window.location.reload(); // Recarga y actualiza la tabla con EJS
+                } else {
+                    alert("Error al cambiar el estado en el servidor.");
                 }
             } catch (error) {
-                console.error("Error al cambiar estado:", error);
+                console.error("Error cambiando estado:", error);
             }
         });
+    });
 
-        // Botón Editar / Guardar
-        const btnEditar = document.createElement("button");
-        btnEditar.className = "btn btn-sm btn-primary ms-2";
-        btnEditar.textContent = "Editar";
+    // 2. ESCUCHAR LOS BOTONES DE EDICIÓN INLINE (CON CONTROLES DE IMAGEN)
+    const botonesEditar = document.querySelectorAll('.btn-editar-inline');
+    botonesEditar.forEach(btn => {
+        
+        // 🌟 ESTADOS LOCALES DE LA FILA EN EDICIÓN
+        let archivoSeleccionado = null;
+        let imagenEliminada = false;
 
-        // =====================================================================
-        // LÓGICA DEL BOTÓN EDITAR / GUARDAR (INTERRUPTOR)
-        // =====================================================================
-        btnEditar.addEventListener("click", async function() {
-            
-            if (!editando) {
-                // -------------------------------------------------------------
-                // MODO: ENTRAR A EDICIÓN (Transformar texto en inputs)
-                // -------------------------------------------------------------
-                editando = true;
-                btnEditar.textContent = "Guardar";
-                btnEditar.className = "btn btn-sm btn-success ms-2";
-                btnEstado.disabled = true; // Congelamos el botón de estado para evitar líos
+        btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id');
+            const fila = document.querySelector(`tr[data-id="${id}"]`);
+            if (!fila) return;
 
-                // 1. Convertir Nombre a Input
-                const inputNombre = document.createElement("input");
-                inputNombre.type = "text";
-                inputNombre.className = "form-control form-control-sm";
-                inputNombre.value = prod.nombre;
-                tdNombre.textContent = ""; // Borramos el texto estático
-                tdNombre.appendChild(inputNombre);
+            const celdaImg = fila.querySelector('.celda-img');
+            const imgElement = celdaImg.querySelector('img');
+            const celdaNombre = fila.querySelector('.celda-nombre');
+            const celdaPrecio = fila.querySelector('.celda-precio');
 
-                // 3. Convertir Precio a Input Numérico
-                const inputPrecio = document.createElement("input");
-                inputPrecio.type = "number";
-                inputPrecio.className = "form-control form-control-sm";
-                inputPrecio.value = prod.precio;
-                tdPrecio.textContent = "";
-                tdPrecio.appendChild(inputPrecio);
+            // -------------------------------------------------------------
+            // MODO: ENTRAR A EDITAR
+            // -------------------------------------------------------------
+            if (btn.textContent.trim() === 'Editar') {
+                btn.textContent = 'Guardar';
+                btn.className = 'btn btn-sm btn-success ms-2';
 
-                // 4. Agregar Botones de Control de Imagen (A los costados, verticales)
+                // Capturamos los valores estáticos actuales
+                const nombreActual = celdaNombre.textContent.trim();
+                const precioActual = celdaPrecio.textContent.trim().replace('$', '');
+
+                // Transformamos Nombre y Precio en Inputs
+                celdaNombre.innerHTML = `<input type="text" class="form-control form-control-sm" value="${nombreActual}">`;
+                celdaPrecio.innerHTML = `<input type="number" class="form-control form-control-sm" value="${precioActual}">`;
+
+                // Fabricamos los controles verticales para la Imagen a un costado
                 const contenedorControlesImg = document.createElement("div");
                 contenedorControlesImg.className = "d-inline-flex flex-column gap-1 align-items-center ms-2";
                 contenedorControlesImg.style.verticalAlign = "middle";
@@ -552,133 +495,81 @@ function renderizarDashboard(listaProductos, paginaActual) {
                 btnBorrarImg.style.height = "22px";
                 btnBorrarImg.textContent = "🗑️";
 
-                // Input de tipo archivo oculto que se disparará por atrás
                 const inputOcultoFile = document.createElement("input");
                 inputOcultoFile.type = "file";
                 inputOcultoFile.accept = "image/*";
                 inputOcultoFile.style.display = "none";
 
-                // Evento para Subir Foto (Simula el clic en el input oculto)
-                btnSubirImg.addEventListener("click", function() {
-                    inputOcultoFile.click();
-                });
+                // Evento para simular clic de subida
+                btnSubirImg.addEventListener("click", () => inputOcultoFile.click());
 
-                // Cuando el usuario elige la foto, cambiamos la vista previa al instante (Magia en vivo)
-                inputOcultoFile.addEventListener("change", function() {
+                // Evento al elegir archivo (Preview en caliente)
+                inputOcultoFile.addEventListener("change", () => {
                     if (inputOcultoFile.files.length > 0) {
                         archivoSeleccionado = inputOcultoFile.files[0];
                         imagenEliminada = false;
-                        img.src = URL.createObjectURL(archivoSeleccionado); // Cambia el Preview sin tocar el servidor todavía
+                        imgElement.src = URL.createObjectURL(archivoSeleccionado);
                     }
                 });
 
-                // Evento para Vaciar la Foto (Pone una imagen por defecto)
-                btnBorrarImg.addEventListener("click", function() {
+                // Evento para borrar imagen (Placeholder temporal)
+                btnBorrarImg.addEventListener("click", () => {
                     archivoSeleccionado = null;
                     imagenEliminada = true;
-                    inputOcultoFile.value = ""; // Limpiamos la selección por las dudas
-                    img.src = "http://localhost:3000/resources/img-productos/default.png"; // Placeholder
+                    inputOcultoFile.value = "";
+                    imgElement.src = "/img-productos/default.png";
                 });
 
                 contenedorControlesImg.appendChild(btnSubirImg);
                 contenedorControlesImg.appendChild(btnBorrarImg);
                 contenedorControlesImg.appendChild(inputOcultoFile);
-                tdImg.appendChild(contenedorControlesImg);
 
-                // 5. Agregar un Botón de Cancelar (Por si el admin se arrepiente)
-                const btnCancelar = document.createElement("button");
-                btnCancelar.className = "btn btn-sm btn-secondary ms-1";
-                btnCancelar.textContent = "X";
-                btnCancelar.addEventListener("click", function() {
-                    cargarDashboard(paginaActual); // La forma más fácil de resetear es recargar la página
-                });
-                tdAcciones.appendChild(btnCancelar);
+                // Pescamos el div con la clase d-flex que ya creamos en tu EJS
+                const contenedorFlexFoto = celdaImg.querySelector('.d-flex') || celdaImg;
+                contenedorFlexFoto.appendChild(contenedorControlesImg);
 
             } else {
                 // -------------------------------------------------------------
-                // MODO: GUARDAR CAMBIOS (Recolección y envío al Backend)
+                // MODO: GUARDAR CAMBIOS (Envío de datos + archivo)
                 // -------------------------------------------------------------
-                const valorNombre = tdNombre.querySelector("input").value.trim();
-                const valorPrecio = tdPrecio.querySelector("input").value;
+                const nuevoNombre = celdaNombre.querySelector('input').value.trim();
+                const nuevoPrecio = celdaPrecio.querySelector('input').value.trim();
 
-                if (valorNombre === "" || valorPrecio === "") {
-                    alert("Por favor, completá todos los campos antes de guardar.");
+                if (nuevoNombre === "" || nuevoPrecio === "") {
+                    alert("Por favor, completá todos los campos obligatorios.");
                     return;
                 }
 
-                // Armamos la valija de edición tradicional
                 const valijaEdicion = new FormData();
-                valijaEdicion.append("nombre", valorNombre);
-                valijaEdicion.append("precio", valorPrecio);
+                valijaEdicion.append("nombre", nuevoNombre);
+                valijaEdicion.append("precio", nuevoPrecio);
 
-                // Evaluamos qué pasó con la imagen en el formulario
+                // Validamos qué pasó con la foto en esta tanda de edición
                 if (archivoSeleccionado) {
-                    valijaEdicion.append("imagen", archivoSeleccionado); // Enviamos el archivo nuevo
+                    valijaEdicion.append("imagen", archivoSeleccionado);
                 } else if (imagenEliminada) {
-                    valijaEdicion.append("imagen", "default.png"); // Avisamos que quedó por defecto
+                    valijaEdicion.append("imagen", "default.png");
                 }
 
                 try {
-                    // Le pegamos a tu controlador de actualización: PATCH /api/productos/editar/:id
-                    const respuesta = await fetch(`http://localhost:3000/api/productos/editar/${prod.id}`, {
+                    const respuesta = await fetch(`http://localhost:3000/api/productos/editar/${id}`, {
                         method: "PATCH",
                         body: valijaEdicion
                     });
 
                     if (respuesta.ok) {
                         alert("¡Producto modificado con éxito!");
-                        cargarDashboard(paginaActual); // Refrescamos la tabla y congela los cambios
+                        window.location.reload(); // Recarga la página y congela los cambios en MySQL
                     } else {
                         alert("Hubo un problema al intentar guardar las modificaciones.");
                     }
-
                 } catch (error) {
-                    console.error("Error conectando con el backend en la edición:", error);
-                    alert("No se pudo conectar con el servidor.");
+                    console.error("Error guardando edición inline:", error);
                 }
             }
         });
-
-        // Ensamblaje de la fila inicial estática
-        tdAcciones.appendChild(btnEstado);
-        tdAcciones.appendChild(btnEditar);
-
-        fila.appendChild(tdId);
-        fila.appendChild(tdImg);
-        fila.appendChild(tdNombre);
-        fila.appendChild(tdCat);
-        fila.appendChild(tdPrecio);
-        fila.appendChild(tdEstado);
-        fila.appendChild(tdAcciones);
-
-        tabla.appendChild(fila);
     });
 }
-
-function construirControlesPaginacionDashboard(totalPaginas, paginaActual) {
-    let contenedorPaginacion = document.getElementById('paginacion-controles');
-    if (!contenedorPaginacion) {
-        contenedorPaginacion = document.createElement('div');
-        contenedorPaginacion.id = 'paginacion-controles';
-        contenedorPaginacion.className = "d-flex justify-content-center gap-2 w-100 mt-4";
-        document.querySelector("main").appendChild(contenedorPaginacion);
-    }
-    contenedorPaginacion.textContent = "";
-
-    if (totalPaginas <= 1) return;
-
-    for (let i = 1; i <= totalPaginas; i++) {
-        const btnPagina = document.createElement('button');
-        btnPagina.textContent = i;
-        btnPagina.className = `btn ${i === paginaActual ? 'btn-danger' : 'btn-outline-secondary'}`;
-    
-        btnPagina.addEventListener('click', () => {
-            cargarDashboard(i); // recarga la tabla con la página seleccionada
-        });
-        contenedorPaginacion.appendChild(btnPagina);
-    }
-}
-
 
     // =========================================================================
     // 5. LÓGICA DE PANTALLA: CARRITO (Estructura de Tabla Segura)
@@ -953,7 +844,7 @@ function construirControlesPaginacionDashboard(totalPaginas, paginaActual) {
 
                 if (respuesta.ok) {
                     alert('¡Producto guardado con éxito en el sistema!');
-                    window.location.href = 'dashboard.html';
+                    window.location.href = '/api/administradores/dashboard';
                 } else {
                     alert('El servidor rechazó el producto. Verificá los campos.');
                 }

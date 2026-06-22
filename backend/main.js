@@ -12,8 +12,10 @@ const app = express();
 
 app.use(cors({origin: 'http://127.0.0.1:5500' }));
 app.use(express.json());
-//app.set('view engine', 'ejs');
-//app.set('views','./vistas');
+app.use(express.static('../frontend'));
+app.use(express.static('../resources'));
+app.set('view engine', 'ejs');
+app.set('views','./src/views/');
 
 
 app.use('/api/ventas', ventaRoutes);

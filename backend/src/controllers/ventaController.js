@@ -37,4 +37,24 @@ const crearVenta = async(req,res)=>{
     }
 };
 
-module.exports = {crearVenta , getVentas};
+const mostrarVentasPanel = async (req, res) => {
+    try {
+        // Usamos tu misma consulta exacta (le sumamos un ordenamiento opcional para ver las últimas primero)
+        const ventasYProductos = await Venta.findAll({
+            include: {
+                model: Producto,
+                through: { attributes : ['cantidad']}
+            },
+            order: [['id', 'DESC']]
+        });
+
+        // Despachamos la plantilla pasándole tus datos reales de MySQL
+        res.render('ventas', { ventas: ventasYProductos });
+
+    } catch (error) {
+        console.error("Error al renderizar el panel de finanzas:", error);
+        res.status(500).send('Error al cargar los datos en la plantilla.');
+    }
+};
+
+module.exports = {crearVenta , getVentas, mostrarVentasPanel};
