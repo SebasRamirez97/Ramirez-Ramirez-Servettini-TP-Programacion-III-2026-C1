@@ -12,6 +12,7 @@ const app = express();
 
 app.use(cors({origin: 'http://127.0.0.1:5500' }));
 app.use(express.json());
+app.use(express.static('./src/public'));
 app.use(express.static('../frontend'));
 app.use(express.static('../resources'));
 app.set('view engine', 'ejs');

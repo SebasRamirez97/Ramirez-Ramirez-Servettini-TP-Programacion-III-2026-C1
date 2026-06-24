@@ -15,7 +15,7 @@
         if (localStorage.getItem('tema') === 'oscuro') {
             document.body.classList.add('dark-mode');
         }
-        </script>
+    </script>
 
     <header>
         <div class="container d-flex justify-content-between align-items-center">
@@ -27,7 +27,7 @@
                 <button id="btn-tema" type="button" class="btn btn-dark" style="font-size: 1.2rem; padding: 6px 12px;">
                     🌙
                 </button>
-                <a href="/api/administradores/login" class="btn btn-danger w-100 text-center"">Cerrar Sesión</a>
+                <a href="/api/administradores/login" class="btn btn-danger w-100 text-center">Cerrar Sesión</a>
             </nav>
         </div>
     </header>
@@ -36,7 +36,7 @@
         <div class="card shadow-sm p-4">
             <h2 class="h3 mb-4 text-center">Formulario de Producto</h2>
             
-            <form action="#" method="POST" enctype="multipart/form-data">
+            <form id="form-nuevo-producto" enctype="multipart/form-data">
                 
                 <div class="mb-3">
                     <label for="nombre" class="form-label font-weight-bold">Nombre del Producto</label>
@@ -59,7 +59,7 @@
 
                 <div class="mb-4">
                     <label for="imagen" class="form-label">Imagen del Producto</label>
-                    <input type="file" class="form-control btn btn-primary " id="imagen" accept="image/*">
+                    <input type="file" class="form-control btn btn-primary" id="imagen" accept="image/*">
                     <div class="form-text">Formatos permitidos: png, jpg, jpeg. Máx 2MB.</div>
                 </div>
 
@@ -78,6 +78,6 @@
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/script.js"></script>
+    <script src="/admin-script.js"></script>
 </body>
 </html>
