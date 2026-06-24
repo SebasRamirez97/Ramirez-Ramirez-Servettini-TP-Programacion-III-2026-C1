@@ -66,10 +66,8 @@ const mostrarLogin = (req, res) => {
 
 const mostrarDashboard = async (req, res) => {
     try {
-        // 1. Buscamos TODOS los productos de MySQL usando Sequelize
         const listaProductos = await Producto.findAll({ order: [['id', 'ASC']] });
 
-        // 2. Renderizamos el archivo "dashboard.ejs" pasándole los datos adentro de un objeto
         res.render('dashboard', { productos: listaProductos });
 
     } catch (error) {

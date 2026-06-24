@@ -120,7 +120,6 @@ const cambiarEstadoProducto = async (req, res) => {
         if (!producto) {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
-
         await producto.update({ activo });
 
         res.json({ 

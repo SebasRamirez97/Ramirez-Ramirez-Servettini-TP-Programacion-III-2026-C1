@@ -1,35 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-   
-    // =========================================================================
-     // 1. CAPTURA DE ELEMENTOS DEL DOM
-    // Elementos de Index (Bienvenida)
+    // Elementos pantalla Cliente
     const nombreCliente = document.getElementById('input-nombre');
     const btnComprar = document.getElementById('btn-comprar');
-
-    // Elementos de loginAdmin (Bienvenida)
-    const emailAdmin = document.getElementById('input-email');
-    const contraseñaAdmin = document.getElementById('input-contraseña');
-    const btnIngresarAdmin = document.getElementById('btn-ingresar-admin');
-    const btnAccesoRapido = document.getElementById('btn-acceso-rapido');
-
-    // Elementos de Categorías (Pantalla Intermedia)
     const btnCatPowerups = document.getElementById('btn-cat-powerups');
     const btnCatVehiculos = document.getElementById('btn-cat-vehiculos');
-
-    // Elementos de Catálogo
     const contenedorProductos = document.getElementById('contenedor-productos');
     const tituloCatalogo = document.getElementById('titulo-catalogo');
     const btnCarrito = document.getElementById('btn-carrito'); 
-    
-    // Elementos de Carrito
     const tablaCarrito = document.getElementById('tabla-carrito');
     const totalHTML = document.getElementById('total');
-
     const btnFinalizarCompra = document.getElementById('comprar');
     const btnSeguirComprando = document.getElementById('btn-seguir-comprando');
-
-    // Elementos de Ticket
     const ticketOperacion = document.getElementById('ticket-operacion');
     const ticketCliente = document.getElementById('ticket-cliente');
     const ticketFecha = document.getElementById('ticket-fecha');
@@ -42,21 +24,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnVolverCategorias = document.getElementById('btn-volver-categorias');
     const btnCerrarSesion =document.getElementById('btn-cerrar-sesion');
     
-    // Elementos input
+    // Elementos pantalla Admin
+    const emailAdmin = document.getElementById('input-email');
+    const contraseñaAdmin = document.getElementById('input-contraseña');
+    const btnIngresarAdmin = document.getElementById('btn-ingresar-admin');
+    const btnAccesoRapido = document.getElementById('btn-acceso-rapido');
     const formularioProducto = document.querySelector('form'); 
     const inputNombre = document.getElementById('nombre');
     const selectCategoria = document.getElementById('categoria');
     const inputPrecio = document.getElementById('precio');
     const inputImagen = document.getElementById('imagen');
   
-    // 2. SISTEMA DE TEMAS (Claro / Oscuro)
+    //SISTEMA DE TEMAS (Claro / Oscuro)
 
     const temaGuardado = localStorage.getItem('tema');
 
     if (temaGuardado === 'oscuro') {
         document.body.classList.add('dark-mode');
         if (btnTema) {
-            btnTema.textContent = '☀️'; // textContent es seguro
+            btnTema.textContent = '☀️';
             btnTema.classList.remove('btn-dark');
             btnTema.classList.add('btn-light');
         }
@@ -79,17 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
- 
-    // 3. CONTROLADORES DE NAVEGACIÓN Y FLUJOS GENERALES
-
     if (btnCatPowerups) {
         btnCatPowerups.addEventListener('click', () => { location.href = "catalogo.html?categoria=powerups&page=1"; });
     }
-
     if (btnCatVehiculos) {
         btnCatVehiculos.addEventListener('click', () => { location.href = "catalogo.html?categoria=vehiculos&page=1"; });
     }
-
     if (btnComprar) {
         btnComprar.addEventListener('click', () => {
             if (nombreCliente.value.trim() === '') {
@@ -117,9 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnCarrito) {
         btnCarrito.addEventListener('click', () => { location.href = "carrito.html"; });
     }
-     // =========================================================================
-    // 3.1 CONTROLADORES DE NAVEGACIÓN ADMIN CONSOLE
-    // =========================================================================
+
+    // Login Admin
     if (btnIngresarAdmin) {
         btnIngresarAdmin.addEventListener('click',  async ()=> {
             const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
@@ -149,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (!response.ok) {
-                // Si el backend devolvió error (404 o 401)
                 const modal = new bootstrap.Modal(document.getElementById('modalLogin'));
                 document.querySelector("#modalLogin .modal-body").textContent = data.error;
                 modal.show();
@@ -168,26 +147,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnAccesoRapido) {
         btnAccesoRapido.addEventListener('click', async function() {
             try {
-                // 1. Le pegamos a tu ruta (por defecto Sequelize va a usar la página 1)
                 const respuesta = await fetch('http://localhost:3000/api/administradores');
-                
-                // 2. Guardamos la respuesta completa del servidor
                 const data = await respuesta.json();
 
-                // 3. VALIDACIÓN CLAVE: Nos fijamos que la respuesta sea OK y que la propiedad 
-                // "data.administradores" exista y tenga al menos un usuario adentro.
                 if (respuesta.ok && data.administradores && data.administradores.length > 0) {
-                    
-                    // 4. Pescamos el primer administrador de esa lista específica
+
                     let primerAdmin = data.administradores[0]; 
-
-                    // 5. Rellenamos los casilleros del HTML automáticamente
                     emailAdmin.value = primerAdmin.email;
-                    
-                    // Poné acá la clave fija que usen para probar (ej: 'admin123' o la que tengan en la BD)
                     contraseñaAdmin.value = '1234567890'; 
-
-                    // 6. Disparamos el login automáticamente para ahorrar un clic
                     btnIngresarAdmin.click();
 
                 } else {
@@ -207,9 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-    // =========================================================================
-    // 4. LÓGICA DE PANTALLA: CATÁLOGO (Nodos Seguros)
+    // Catalogo
 
     let articulos = [];
     
@@ -245,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderizarProductosCatálogo(listaProductos) {
-        contenedorProductos.textContent = ""; // Limpieza segura sin innerHTML
+        contenedorProductos.textContent = "";
         
         if (listaProductos.length === 0) {
             const pNoProd = document.createElement('p');
@@ -277,7 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
             pPrecio.className = "fs-4 fw-bold text-success";
             pPrecio.textContent = `$${producto.precio}`;
 
-            // Contenedor de cantidad
             const selectorCantidad = document.createElement('div');
             selectorCantidad.className = "selector-cantidad";
 
@@ -301,7 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btnAgregar.className = "btn btn-danger w-100 mt-2 btn-agregar";
             btnAgregar.textContent = "Agregar al carrito";
 
-            // Eventos locales nativos
             btnMas.addEventListener('click', () => { spanCant.textContent = parseInt(spanCant.textContent) + 1; });
             btnMenos.addEventListener('click', () => {
                 let actual = parseInt(spanCant.textContent);
@@ -324,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 localStorage.setItem('carrito', JSON.stringify(carrito));
-                mostrarGloboFlotante(`+${cantidadAAgregar} ${producto.nombre} agregado`);
+                notificacionAgregadoCarrito(`+${cantidadAAgregar} ${producto.nombre} agregado`);
 
                 btnAgregar.textContent = '¡Agregado!';
                 btnAgregar.classList.replace('btn-danger', 'btn-success');
@@ -335,7 +298,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 1000);
             });
 
-            // Ensamblamos la tarjeta de forma segura
             article.appendChild(img);
             article.appendChild(h4);
             article.appendChild(pDesc);
@@ -371,8 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function mostrarGloboFlotante(mensaje) {
-    // 1. Estructura: Buscamos o creamos el contenedor con su clase correspondiente
+    function notificacionAgregadoCarrito(mensaje) {
         let contenedor = document.querySelector('.contenedor-carrito-popup');
         if (!contenedor) {
             contenedor = document.createElement('div');
@@ -380,21 +341,18 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(contenedor);
         }
 
-        // 2. Lógica de control: Evitamos duplicados
         const viejo = contenedor.querySelector('.globo-agregado');
         if (viejo) viejo.remove();
 
-        // 3. Estructura: Creamos el globo y le inyectamos el texto seguro
         const globo = document.createElement('div');
         globo.className = 'globo-agregado';
         globo.textContent = mensaje;
 
         contenedor.appendChild(globo);
 
-        // 4. Lógica de tiempos: Agregamos la clase de salida y luego removemos el nodo
         setTimeout(() => {
             globo.classList.add('oculto'); 
-            setTimeout(() => globo.remove(), 400); // Espera a que termine la transición CSS
+            setTimeout(() => globo.remove(), 400);
         }, 2000);
     }
 
@@ -408,171 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-// =========================================================================
-// 4.5 LÓGICA DEL DASHBOARD (VERSION DEFINITIVA SSR + MULTIPART FORM)
-// =========================================================================
-
-if (window.location.pathname.includes('/administradores/dashboard')) {
-    configurarBotonesDashboardEJS();
-}
-
-function configurarBotonesDashboardEJS() {
-    
-    // 1. ESCUCHAR LOS BOTONES DE ACTIVAR / DESACTIVAR
-    const botonesEstado = document.querySelectorAll('.btn-cambiar-estado');
-    botonesEstado.forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const id = btn.getAttribute('data-id');
-            const activo = btn.getAttribute('data-activo') === 'true';
-
-            try {
-                const respuesta = await fetch(`http://localhost:3000/api/productos/${id}/estado`, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ activo: !activo })
-                });
-
-                if (respuesta.ok) {
-                    window.location.reload(); // Recarga y actualiza la tabla con EJS
-                } else {
-                    alert("Error al cambiar el estado en el servidor.");
-                }
-            } catch (error) {
-                console.error("Error cambiando estado:", error);
-            }
-        });
-    });
-
-    // 2. ESCUCHAR LOS BOTONES DE EDICIÓN INLINE (CON CONTROLES DE IMAGEN)
-    const botonesEditar = document.querySelectorAll('.btn-editar-inline');
-    botonesEditar.forEach(btn => {
-        
-        // 🌟 ESTADOS LOCALES DE LA FILA EN EDICIÓN
-        let archivoSeleccionado = null;
-        let imagenEliminada = false;
-
-        btn.addEventListener('click', async () => {
-            const id = btn.getAttribute('data-id');
-            const fila = document.querySelector(`tr[data-id="${id}"]`);
-            if (!fila) return;
-
-            const celdaImg = fila.querySelector('.celda-img');
-            const imgElement = celdaImg.querySelector('img');
-            const celdaNombre = fila.querySelector('.celda-nombre');
-            const celdaPrecio = fila.querySelector('.celda-precio');
-
-            // -------------------------------------------------------------
-            // MODO: ENTRAR A EDITAR
-            // -------------------------------------------------------------
-            if (btn.textContent.trim() === 'Editar') {
-                btn.textContent = 'Guardar';
-                btn.className = 'btn btn-sm btn-success ms-2';
-
-                // Capturamos los valores estáticos actuales
-                const nombreActual = celdaNombre.textContent.trim();
-                const precioActual = celdaPrecio.textContent.trim().replace('$', '');
-
-                // Transformamos Nombre y Precio en Inputs
-                celdaNombre.innerHTML = `<input type="text" class="form-control form-control-sm" value="${nombreActual}">`;
-                celdaPrecio.innerHTML = `<input type="number" class="form-control form-control-sm" value="${precioActual}">`;
-
-                // Fabricamos los controles verticales para la Imagen a un costado
-                const contenedorControlesImg = document.createElement("div");
-                contenedorControlesImg.className = "d-inline-flex flex-column gap-1 align-items-center ms-2";
-                contenedorControlesImg.style.verticalAlign = "middle";
-
-                const btnSubirImg = document.createElement("button");
-                btnSubirImg.type = "button";
-                btnSubirImg.className = "btn btn-xs btn-outline-primary p-0 d-flex align-items-center justify-content-center";
-                btnSubirImg.style.width = "22px";
-                btnSubirImg.style.height = "22px";
-                btnSubirImg.textContent = "⬆️";
-
-                const btnBorrarImg = document.createElement("button");
-                btnBorrarImg.type = "button";
-                btnBorrarImg.className = "btn btn-xs btn-outline-danger p-0 d-flex align-items-center justify-content-center";
-                btnBorrarImg.style.width = "22px";
-                btnBorrarImg.style.height = "22px";
-                btnBorrarImg.textContent = "🗑️";
-
-                const inputOcultoFile = document.createElement("input");
-                inputOcultoFile.type = "file";
-                inputOcultoFile.accept = "image/*";
-                inputOcultoFile.style.display = "none";
-
-                // Evento para simular clic de subida
-                btnSubirImg.addEventListener("click", () => inputOcultoFile.click());
-
-                // Evento al elegir archivo (Preview en caliente)
-                inputOcultoFile.addEventListener("change", () => {
-                    if (inputOcultoFile.files.length > 0) {
-                        archivoSeleccionado = inputOcultoFile.files[0];
-                        imagenEliminada = false;
-                        imgElement.src = URL.createObjectURL(archivoSeleccionado);
-                    }
-                });
-
-                // Evento para borrar imagen (Placeholder temporal)
-                btnBorrarImg.addEventListener("click", () => {
-                    archivoSeleccionado = null;
-                    imagenEliminada = true;
-                    inputOcultoFile.value = "";
-                    imgElement.src = "/img-productos/default.png";
-                });
-
-                contenedorControlesImg.appendChild(btnSubirImg);
-                contenedorControlesImg.appendChild(btnBorrarImg);
-                contenedorControlesImg.appendChild(inputOcultoFile);
-
-                // Pescamos el div con la clase d-flex que ya creamos en tu EJS
-                const contenedorFlexFoto = celdaImg.querySelector('.d-flex') || celdaImg;
-                contenedorFlexFoto.appendChild(contenedorControlesImg);
-
-            } else {
-                // -------------------------------------------------------------
-                // MODO: GUARDAR CAMBIOS (Envío de datos + archivo)
-                // -------------------------------------------------------------
-                const nuevoNombre = celdaNombre.querySelector('input').value.trim();
-                const nuevoPrecio = celdaPrecio.querySelector('input').value.trim();
-
-                if (nuevoNombre === "" || nuevoPrecio === "") {
-                    alert("Por favor, completá todos los campos obligatorios.");
-                    return;
-                }
-
-                const valijaEdicion = new FormData();
-                valijaEdicion.append("nombre", nuevoNombre);
-                valijaEdicion.append("precio", nuevoPrecio);
-
-                // Validamos qué pasó con la foto en esta tanda de edición
-                if (archivoSeleccionado) {
-                    valijaEdicion.append("imagen", archivoSeleccionado);
-                } else if (imagenEliminada) {
-                    valijaEdicion.append("imagen", "default.png");
-                }
-
-                try {
-                    const respuesta = await fetch(`http://localhost:3000/api/productos/editar/${id}`, {
-                        method: "PATCH",
-                        body: valijaEdicion
-                    });
-
-                    if (respuesta.ok) {
-                        alert("¡Producto modificado con éxito!");
-                        window.location.reload(); // Recarga la página y congela los cambios en MySQL
-                    } else {
-                        alert("Hubo un problema al intentar guardar las modificaciones.");
-                    }
-                } catch (error) {
-                    console.error("Error guardando edición inline:", error);
-                }
-            }
-        });
-    });
-}
-
-    // =========================================================================
-    // 5. LÓGICA DE PANTALLA: CARRITO (Estructura de Tabla Segura)
+    // Carrito
 
     let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
@@ -584,7 +378,7 @@ function configurarBotonesDashboardEJS() {
     function mostrarCarrito() {
         if (!tablaCarrito || !totalHTML) return;
 
-        tablaCarrito.textContent = ""; // Limpieza limpia sin inyectar string vacío
+        tablaCarrito.textContent = "";
         let total = 0;
 
         if (carrito.length === 0) {
@@ -611,8 +405,6 @@ function configurarBotonesDashboardEJS() {
 
             const tdPrecio = document.createElement('td');
             tdPrecio.textContent = `$${producto.precio}`;
-
-            // Celda de controles de cantidad inline
             const tdCantidad = document.createElement('td');
             tdCantidad.className = "text-center";
 
@@ -657,7 +449,6 @@ function configurarBotonesDashboardEJS() {
             });
             tdAccion.appendChild(btnEliminar);
 
-            // Montamos la fila de la tabla
             tr.appendChild(tdNombre);
             tr.appendChild(tdPrecio);
             tr.appendChild(tdCantidad);
@@ -672,7 +463,6 @@ function configurarBotonesDashboardEJS() {
 
     if (btnSeguirComprando) {
         btnSeguirComprando.addEventListener('click', () => {
-            // Leemos la última categoría visitada. Si no hay ninguna, usamos 'powerups' por defecto.
             const ultimaCat = localStorage.getItem('ultimaCategoria') || 'powerups';
             location.href = `catalogo.html?categoria=${ultimaCat}&page=1`;
         });
@@ -757,8 +547,7 @@ function configurarBotonesDashboardEJS() {
         });
     }
 
-    // 6. LÓGICA DE PANTALLA: TICKET DINÁMICO
-
+    // Ticket
     if (ticketProductosBody) {
         const datosTicketLocal = JSON.parse(localStorage.getItem('ticketFinal'));
         if (datosTicketLocal) {
@@ -802,10 +591,10 @@ function configurarBotonesDashboardEJS() {
                         scale: 2,             
                         useCORS: true,        
                         backgroundColor: '#ffffff',
-                        scrollY: 0 // <--- SALVAVIDAS 1: Obliga a sacar la foto desde el inicio de la pantalla, ignorando si el usuario scroleó.
+                        scrollY: 0
                     },
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak:    { mode: 'avoid-all' } // <--- SALVAVIDAS 2: Le prohíbe terminantemente a la librería romper el diseño en dos hojas.
+                    pagebreak:    { mode: 'avoid-all' }
                 };
 
                 html2pdf().set(opcionesConfig).from(elementoTicket).save();
@@ -813,7 +602,152 @@ function configurarBotonesDashboardEJS() {
         }
     }
 
-    // 7. Logica para crear productos
+    // Dashboard
+    if (window.location.pathname.includes('/administradores/dashboard')) {
+        configurarBotonesDashboardEJS();
+    }
+
+    function configurarBotonesDashboardEJS() {
+        
+        const botonesEstado = document.querySelectorAll('.btn-cambiar-estado');
+        botonesEstado.forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-id');
+                const activo = btn.getAttribute('data-activo') === 'true';
+
+                try {
+                    const respuesta = await fetch(`http://localhost:3000/api/productos/${id}/estado`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ activo: !activo })
+                    });
+
+                    if (respuesta.ok) {
+                        window.location.reload();
+                    } else {
+                        alert("Error al cambiar el estado en el servidor.");
+                    }
+                } catch (error) {
+                    console.error("Error cambiando estado:", error);
+                }
+            });
+        });
+
+        const botonesEditar = document.querySelectorAll('.btn-editar-inline');
+        botonesEditar.forEach(btn => {
+            
+            let archivoSeleccionado = null;
+            let imagenEliminada = false;
+
+            btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-id');
+                const fila = document.querySelector(`tr[data-id="${id}"]`);
+                if (!fila) return;
+
+                const celdaImg = fila.querySelector('.celda-img');
+                const imgElement = celdaImg.querySelector('img');
+                const celdaNombre = fila.querySelector('.celda-nombre');
+                const celdaPrecio = fila.querySelector('.celda-precio');
+
+                // Modo editar
+                if (btn.textContent.trim() === 'Editar') {
+                    btn.textContent = 'Guardar';
+                    btn.className = 'btn btn-sm btn-success ms-2';
+
+                    const nombreActual = celdaNombre.textContent.trim();
+                    const precioActual = celdaPrecio.textContent.trim().replace('$', '');
+
+                    celdaNombre.innerHTML = `<input type="text" class="form-control form-control-sm" value="${nombreActual}">`;
+                    celdaPrecio.innerHTML = `<input type="number" class="form-control form-control-sm" value="${precioActual}">`;
+
+                    const contenedorControlesImg = document.createElement("div");
+                    contenedorControlesImg.className = "d-inline-flex flex-column gap-1 align-items-center ms-2";
+                    contenedorControlesImg.style.verticalAlign = "middle";
+
+                    const btnSubirImg = document.createElement("button");
+                    btnSubirImg.type = "button";
+                    btnSubirImg.className = "btn btn-xs btn-outline-primary p-0 d-flex align-items-center justify-content-center";
+                    btnSubirImg.style.width = "22px";
+                    btnSubirImg.style.height = "22px";
+                    btnSubirImg.textContent = "⬆️";
+
+                    const btnBorrarImg = document.createElement("button");
+                    btnBorrarImg.type = "button";
+                    btnBorrarImg.className = "btn btn-xs btn-outline-danger p-0 d-flex align-items-center justify-content-center";
+                    btnBorrarImg.style.width = "22px";
+                    btnBorrarImg.style.height = "22px";
+                    btnBorrarImg.textContent = "🗑️";
+
+                    const inputOcultoFile = document.createElement("input");
+                    inputOcultoFile.type = "file";
+                    inputOcultoFile.accept = "image/*";
+                    inputOcultoFile.style.display = "none";
+
+                    btnSubirImg.addEventListener("click", () => inputOcultoFile.click());
+
+                    inputOcultoFile.addEventListener("change", () => {
+                        if (inputOcultoFile.files.length > 0) {
+                            archivoSeleccionado = inputOcultoFile.files[0];
+                            imagenEliminada = false;
+                            imgElement.src = URL.createObjectURL(archivoSeleccionado);
+                        }
+                    });
+
+                    btnBorrarImg.addEventListener("click", () => {
+                        archivoSeleccionado = null;
+                        imagenEliminada = true;
+                        inputOcultoFile.value = "";
+                        imgElement.src = "/img-productos/default.png";
+                    });
+
+                    contenedorControlesImg.appendChild(btnSubirImg);
+                    contenedorControlesImg.appendChild(btnBorrarImg);
+                    contenedorControlesImg.appendChild(inputOcultoFile);
+
+                    const contenedorFlexFoto = celdaImg.querySelector('.d-flex') || celdaImg;
+                    contenedorFlexFoto.appendChild(contenedorControlesImg);
+
+                } else {
+
+                    const nuevoNombre = celdaNombre.querySelector('input').value.trim();
+                    const nuevoPrecio = celdaPrecio.querySelector('input').value.trim();
+
+                    if (nuevoNombre === "" || nuevoPrecio === "") {
+                        alert("Por favor, completá todos los campos obligatorios.");
+                        return;
+                    }
+
+                    const valijaEdicion = new FormData();
+                    valijaEdicion.append("nombre", nuevoNombre);
+                    valijaEdicion.append("precio", nuevoPrecio);
+
+                    if (archivoSeleccionado) {
+                        valijaEdicion.append("imagen", archivoSeleccionado);
+                    } else if (imagenEliminada) {
+                        valijaEdicion.append("imagen", "default.png");
+                    }
+
+                    try {
+                        const respuesta = await fetch(`http://localhost:3000/api/productos/editar/${id}`, {
+                            method: "PATCH",
+                            body: valijaEdicion
+                        });
+
+                        if (respuesta.ok) {
+                            alert("¡Producto modificado con éxito!");
+                            window.location.reload();
+                        } else {
+                            alert("Hubo un problema al intentar guardar las modificaciones.");
+                        }
+                    } catch (error) {
+                        console.error("Error guardando edición inline:", error);
+                    }
+                }
+            });
+        });
+    }
+
+    // Crear Productos
 
     function configurarFormularioProducto() {
 
@@ -852,6 +786,93 @@ function configurarBotonesDashboardEJS() {
             } catch (error) {
                 console.error('Error de conexión:', error);
                 alert('No se pudo conectar con el servidor. ¿Está el backend prendido?');
+            }
+        });
+    }
+
+    // Exportar Historial de Ventas a Excel
+    const btnExportarExcel = document.getElementById('btn-exportar-excel');
+
+    if (btnExportarExcel) {
+        btnExportarExcel.addEventListener('click', () => {
+            const tabla = document.getElementById('tabla-ventas');
+            
+            if (!tabla) {
+                alert('No se encontró la tabla de ventas para exportar.');
+                return;
+            }
+
+            // 1. Convertir la tabla HTML en una hoja de trabajo (worksheet) de Excel
+            const hojaTrabajo = XLSX.utils.table_to_sheet(tabla);
+
+            /* Opcional: Si tu tabla tiene una columna de "Acciones" (con botones), 
+            Excel la va a exportar con textos raros. Si querés borrar, por ejemplo, 
+            la columna 6 antes de exportar, podés investigar "delete_cols", 
+            pero para empezar, esto te exporta todo el texto limpio.
+            */
+
+            // 2. Crear un libro de trabajo (workbook) vacío
+            const libroTrabajo = XLSX.utils.book_new();
+
+            // 3. Añadir la hoja de ventas al libro con el nombre "Historial"
+            XLSX.utils.book_append_sheet(libroTrabajo, hojaTrabajo, "Historial Ventas");
+
+            // 4. Generar el archivo y disparar la descarga automática
+            const fechaActual = new Date().toISOString().slice(0, 10); // Formato AAAA-MM-DD
+            XLSX.writeFile(libroTrabajo, `Reporte_Ventas_${fechaActual}.xlsx`);
+        });
+    }
+
+    // ==========================================================================
+    // SISTEMA DE AUDIO (Música de fondo)
+    // ==========================================================================
+    const musica = document.getElementById('musica-fondo');
+    const btnMusica = document.getElementById('btn-musica');
+    const barraVolumen = document.getElementById('barra-volumen');
+
+    if (musica && btnMusica && barraVolumen) {
+        // 1. Forzar el volumen inicial al 50%
+        musica.volume = 0.5;
+
+        // ⚠️ POLÍTICA DE NAVEGADORES: Google Chrome y Firefox bloquean el autoplay de audio.
+        // La música NO puede arrancar sola hasta que el usuario haga click en CUALQUIER lado de la pantalla.
+        document.addEventListener('click', () => {
+            if (musica.paused && !musica.dataset.comenzada) {
+                musica.play().catch(err => console.log("Autoplay bloqueado temporalmente por el navegador."));
+                musica.dataset.comenzada = true;
+                btnMusica.textContent = '🔊';
+            }
+        }, { once: true }); // 'once: true' hace que este detector se destruya al primer click
+
+        // 2. Evento del botón (Play / Pausa)
+        btnMusica.addEventListener('click', (e) => {
+            e.stopPropagation(); // Evita que se dispare el click global de arriba
+            
+            if (musica.paused) {
+                musica.play();
+                btnMusica.textContent = '🔊';
+            } else {
+                musica.pause();
+                btnMusica.textContent = '🔈';
+            }
+        });
+
+        // 3. Evento de la barra de volumen
+        barraVolumen.addEventListener('input', () => {
+            musica.volume = barraVolumen.value;
+
+            // Cambiar dinámicamente el emoji según el nivel de volumen
+            if (parseFloat(musica.volume) === 0) {
+                btnMusica.textContent = '❌'; // Silenciado
+            } else if (musica.volume < 0.4) {
+                btnMusica.textContent = '🔈'; // Volumen bajo
+            } else {
+                btnMusica.textContent = '🔊'; // Volumen alto
+            }
+
+            // Si suben el volumen estando pausado, que se le dé play automático
+            if (musica.paused && musica.volume > 0) {
+                musica.play();
             }
         });
     }

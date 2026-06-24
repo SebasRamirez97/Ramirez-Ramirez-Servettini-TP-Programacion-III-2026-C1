@@ -21,7 +21,14 @@ app.set('views','./src/views/');
 app.use('/api/ventas', ventaRoutes);
 app.use('/api/administradores', administradorRoutes);
 app.use('/api/productos/', productoRoutes);
-app.use('/resources', express.static(path.join(__dirname, 'resources')));
+app.use('/resources', express.static('resources'));
+
+app.use((req, res, next) => {
+    res.status(404).json({ 
+        error: "Not Found",
+        message: `El endpoint requested [${req.method} ${req.url}] no existe.` 
+    });
+});
 
 sequelize.sync({ force: false })
     .then(() => console.log('Tablas sincronizadas'))

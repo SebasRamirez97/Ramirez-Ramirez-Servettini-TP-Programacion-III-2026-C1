@@ -39,7 +39,6 @@ const crearVenta = async(req,res)=>{
 
 const mostrarVentasPanel = async (req, res) => {
     try {
-        // Usamos tu misma consulta exacta (le sumamos un ordenamiento opcional para ver las últimas primero)
         const ventasYProductos = await Venta.findAll({
             include: {
                 model: Producto,
@@ -47,8 +46,6 @@ const mostrarVentasPanel = async (req, res) => {
             },
             order: [['id', 'DESC']]
         });
-
-        // Despachamos la plantilla pasándole tus datos reales de MySQL
         res.render('ventas', { ventas: ventasYProductos });
 
     } catch (error) {

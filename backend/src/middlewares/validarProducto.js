@@ -1,41 +1,57 @@
 const { z } = require("zod");
 
 // 🛡️ MIDDLEWARE PARA CREAR PRODUCTO
-const validarCrearProducto = (req, res, next) => {
-    // 1. Definimos el contrato de Zod para las dos cosas que querés cuidar
-    const EsquemaCrear = z.object({
-        precio: z.coerce.number().positive("El precio debe ser un número positivo"),
-        imagen: z.string({ required_error: "La imagen es obligatoria" }) // Exige que sea un texto (el filename)
-    });
+function validarCrearProducto(req, res, next) {
+    try {
+        // 1. Definimos el esquema con tus mensajes personalizados
+        const esquemaCrear = z.object({
+            precio: z.coerce.number({ message: "El precio debe ser un número" }).positive({ message: "El precio debe ser un número positivo" }),
+            imagen: z.string({ message: "La imagen es obligatoria y debe ser un texto" })
+        });
 
-    // 2. Le pasamos los datos que dejaron las etapas anteriores
-    const precioRecibido = req.body.precio;
-    // Si Multer subió la foto con éxito, req.file va a existir y tendrá un filename
-    const fotoRecibida = req.file ? req.file.filename : undefined;
+        // 2. Capturamos los datos (manejando si viene o no el archivo de Multer)
+        const datosAValidar = {
+            precio: req.body.precio,
+            imagen: req.file ? req.file.filename : undefined
+        };
 
-    // 3. El .parse() de tu profesor: si el precio es negativo o la foto es undefined, ACÁ explota y frena el flujo hacia la BD
-    EsquemaCrear.parse({
-        precio: precioRecibido,
-        imagen: fotoRecibida
-    });
+        // 3. Validamos
+        esquemaCrear.parse(datosAValidar);
+        
+        next(); // Si todo está bien, pasa al controlador
+    } catch (error) {
+        // Al estilo de tu parcial: capturamos el error de Zod y respondemos 400
+        res.status(400).json({ 
+            error: "Datos inválidos", 
+            detalles: error.errors ? error.errors.map(e => e.message) : error.message 
+        });
+    }
+}
 
-    next();
-};
+// 🛡️ MIDDLEWARE PARA EDITAR PRODUCTO
+function validarEditarProducto(req, res, next) {
+    try {
+        // En la edición usamos .optional() por si no modifican ese campo
+        const esquemaEditar = z.object({
+            precio: z.coerce.number({ message: "El precio debe ser un número" }).positive({ message: "El precio editado debe ser positivo" }).optional(),
+            imagen: z.string({ message: "La imagen debe ser un texto" }).optional()
+        });
 
-// 🛡️ MIDDLEWARE PARA EDITAR PRODUCTO (En la tabla inline, la foto es opcional si dejan la vieja)
-const validarEditarProducto = (req, res, next) => {
-    const EsquemaEditar = z.object({
-        precio: z.coerce.number().positive("El precio editado debe ser positivo").optional(),
-        imagen: z.string().optional()
-    });
+        const datosAValidar = {
+            precio: req.body.precio ? req.body.precio : undefined,
+            imagen: req.file ? req.file.filename : undefined
+        };
 
-    EsquemaEditar.parse({
-        precio: req.body.precio,
-        imagen: req.file ? req.file.filename : undefined
-    });
-
-    next();
-};
+        esquemaEditar.parse(datosAValidar);
+        
+        next();
+    } catch (error) {
+        res.status(400).json({ 
+            error: "Datos inválidos al editar", 
+            detalles: error.errors ? error.errors.map(e => e.message) : error.message 
+        });
+    }
+}
 
 module.exports = {
     validarCrearProducto,
