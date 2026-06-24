@@ -1,63 +1,55 @@
-const { where } = require('sequelize');
 const bcrypt = require("bcrypt");
-const {Administrador } = require('../models/index');
+const {
+  crearAdministradorDB,
+  getAdministradoresDB,
+  buscarAdminPorEmailDB,
+} = require("../services/administrador.service");
 
-
-const crearAdministrador = async  (req, res) => {
-    try{
-        const {email , password} = req.body;
-
-        const hashedPassword = bcrypt.hashSync(password, 10);
-
-        const nuevoAdmin = await Administrador.create({
-            email,
-            password: hashedPassword
-        });
-
-        res.status(201).json({mensaje: "Administrador creado", admin: nuevoAdmin})
-
-    } catch (error){
-        res.status(500).json({error: error.message})
-    }
-}
-
-const getAdministradores = async (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 6;
-        const offset = (page - 1) * limit;
-
-        const { count, rows } = await Administrador.findAndCountAll({
-            limit,
-            offset
-        });
-
-        res.json({
-            total: count,
-            paginas: Math.ceil(count / limit),
-            paginaActual: page,
-            administradores: rows
-        });
-
-    } catch (error) {
-        res.status(500).json({ error: 'Error al obtener administradores' });
-    }
+const crearAdministrador = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const nuevoAdmin = await crearAdministradorDB(email, password);
+    res.status(201).json({ mensaje: "Administrador creado", admin: nuevoAdmin });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
-const verificarLogin = async(req, res) => {
-    const {email, password} = req.body;
+const getAdministradores = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const { count, rows } = await getAdministradoresDB(page, limit);
 
-    const admin = await Administrador.findOne({where: {email } });
-    if(!admin){
-        return res.status(404).json({error: "Administrador no encontrado"});
+    res.json({
+      total: count,
+      paginas: Math.ceil(count / limit),
+      paginaActual: page,
+      administradores: rows,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener administradores" });
+  }
+};
+
+const verificarLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const admin = await buscarAdminPorEmailDB(email);
+
+    if (!admin) {
+      return res.status(404).json({ error: "Administrador no encontrado" });
     }
 
     const esValida = bcrypt.compareSync(password, admin.password);
-    if(!esValida){
-        return res.status(401).json({error: "Contraseña incorrecta"});
+    if (!esValida) {
+      return res.status(401).json({ error: "Contraseña incorrecta" });
     }
 
-    res.json({mensaje: "Login exitoso" , admin:{email: admin.email}});
-}
+    res.json({ mensaje: "Login exitoso", admin: { email: admin.email } });
+  } catch (error) {
+    res.status(500).json({ error: "Error al verificar login" });
+  }
+};
 
-module.exports = {crearAdministrador,getAdministradores, verificarLogin}
+module.exports = { crearAdministrador, getAdministradores, verificarLogin };

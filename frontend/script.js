@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnCarrito) {
         btnCarrito.addEventListener('click', () => { location.href = "carrito.html"; });
     }
-     // =========================================================================
+    // =========================================================================
     // 3.1 CONTROLADORES DE NAVEGACIÓN ADMIN CONSOLE
     // =========================================================================
     if (btnIngresarAdmin) {
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     emailAdmin.value = primerAdmin.email;
                     
                     // Poné acá la clave fija que usen para probar (ej: 'admin123' o la que tengan en la BD)
-                    contraseñaAdmin.value = '1234567890'; 
+                    contraseñaAdmin.value = 'coso1234'; 
 
                     // 6. Disparamos el login automáticamente para ahorrar un clic
                     btnIngresarAdmin.click();

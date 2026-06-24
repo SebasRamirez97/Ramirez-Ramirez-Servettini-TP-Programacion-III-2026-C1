@@ -1,138 +1,91 @@
-const { Producto } = require('../models/index');
+const {
+  getProductosDB,
+  getProductoByIdDB,
+  crearProductoDB,
+  actualizarProductoDB,
+  cambiarEstadoProductoDB,
+} = require("../services/producto.service");
 
 const getProductos = async (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 6;
-        const offset = (page - 1) * limit;
-        
-        const esAdministrador = (req.query.admin === 'true');
-        const categoria = req.query.categoria;
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const esAdministrador = (req.query.admin === 'true');
+    const categoria = req.query.categoria;
 
-        let filtro = {};
+    const { count, rows } = await getProductosDB(page, limit, esAdministrador, categoria);
 
-        if (!esAdministrador) {filtro.activo = true;}
-        
-        if (categoria) {filtro.categoria = categoria;}
-
-        const { count, rows } = await Producto.findAndCountAll({
-            where: filtro,
-            limit: limit,
-            offset: offset
-        });
-
-        res.json({
-            total: count,
-            paginas: Math.ceil(count / limit),
-            paginaActual: page,
-            productos: rows
-        });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al obtener productos' });
-    }
+    res.json({
+      total: count,
+      paginas: Math.ceil(count / limit),
+      paginaActual: page,
+      productos: rows,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener productos' });
+  }
 };
 
 const getProductoById = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const producto = await Producto.findByPk(id);
-        if (!producto) {
-            return res.status(404).json({ error: 'Producto no encontrado' });
-        }
-        res.json(producto);
-
-    } catch (error) {
-        res.status(500).json({ error: 'Error al obtener el producto' });
-    }
+  try {
+    const producto = await getProductoByIdDB(req.params.id);
+    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+    res.json(producto);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener el producto' });
+  }
 };
 
 const crearProducto = async (req, res) => {
-    try{
-        const {nombre , categoria , precio , descripcion , activo} = req.body;
-        const imagen = req.file.filename;
-        const producto = await Producto.create(
-            {
-                "nombre" : nombre,
-                "categoria" : categoria,
-                "precio" : precio,
-                "imagen" : imagen,
-                "descripcion" : descripcion,
-                "activo" : true
-            }
-        );
-        res.json(producto);
-    }catch (error) {
-        res.status(404).json({ error: 'Error al crear el producto' });
-    }
+  try {
+    const { nombre, categoria, precio, descripcion } = req.body;
+    const imagen = req.file?.filename || "default.png";
+
+    const producto = await crearProductoDB({
+      nombre, categoria, precio, descripcion, imagen, activo: true
+    });
+
+    res.status(201).json(producto);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al crear el producto' });
+  }
 };
 
 const actualizarProducto = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { nombre, precio } = req.body;
-        
-        const producto = await Producto.findByPk(id);
-        if (!producto) {
-            return res.status(404).json({ error: 'Producto no encontrado' });
-        }
+  try {
+    const { id } = req.params;
+    const { nombre, precio } = req.body;
+    const producto = await getProductoByIdDB(id);
 
-        let nuevaImagen;
-        if (req.file) {
-            nuevaImagen = req.file.filename;
-        } else {
-            nuevaImagen = producto.imagen;
-        }
+    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
 
-        let nuevoNombre;
-        if (nombre) {
-            nuevoNombre = nombre;
-        } else {
-            nuevoNombre = producto.nombre;
-        }
+    const datos = {
+      nombre: nombre || producto.nombre,
+      precio: precio || producto.precio,
+      imagen: req.file ? req.file.filename : producto.imagen,
+    };
 
-        let nuevoPrecio;
-        if (precio) {
-            nuevoPrecio = precio;
-        } else {
-            nuevoPrecio = producto.precio;
-        }
-
-        await producto.update({ 
-            nombre: nuevoNombre, 
-            precio: nuevoPrecio, 
-            imagen: nuevaImagen 
-        });
-
-        res.json({ mensaje: 'Producto modificado con éxito', producto });
-    } catch (error) {
-        res.status(500).json({ error: 'Error al actualizar el producto' });
-    }
+    const actualizado = await actualizarProductoDB(id, datos);
+    res.json({ mensaje: 'Producto modificado con éxito', producto: actualizado });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al actualizar el producto' });
+  }
 };
 
 const cambiarEstadoProducto = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { activo } = req.body;
+  try {
+    const { id } = req.params;
+    const { activo } = req.body;
 
-        const producto = await Producto.findByPk(id);
-        if (!producto) {
-            return res.status(404).json({ error: 'Producto no encontrado' });
-        }
+    const producto = await cambiarEstadoProductoDB(id, activo);
+    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
 
-        await producto.update({ activo });
-
-        res.json({ 
-            mensaje: `Producto ${activo ? 'activado' : 'desactivado'} correctamente`, 
-            producto 
-        });
-    } catch (error) {
-        res.status(500).json({ error: 'Error al cambiar el estado del producto' });
-    }
+    res.json({ mensaje: `Producto ${activo ? 'activado' : 'desactivado'} correctamente`, producto });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al cambiar el estado del producto' });
+  }
 };
 
-module.exports = { 
-    getProductos, getProductoById, crearProducto, actualizarProducto , cambiarEstadoProducto
-};
+module.exports = { getProductos, getProductoById, crearProducto, actualizarProducto, cambiarEstadoProducto };
+
 
