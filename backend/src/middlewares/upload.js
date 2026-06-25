@@ -1,6 +1,6 @@
 const multer = require("multer");
 const path = require("path");
-const fs = require("fs"); // Módulo para manejar carpetas
+const fs = require("fs");
 
 const imgMiddlewares = multer({
   limits: {
@@ -20,13 +20,10 @@ const imgMiddlewares = multer({
 
   storage: multer.diskStorage({
     destination: (req, file, callback) => {
-
       const carpeta = "img-productos";
       
-      // Construimos la ruta absoluta
-      const rutaDestino = path.join(__dirname, "../../resources", carpeta);
+      const rutaDestino = path.join("resources", carpeta);
 
-      // Si la carpeta NO existe, la creamos antes de guardar la foto
       if (!fs.existsSync(rutaDestino)) {
         fs.mkdirSync(rutaDestino, { recursive: true });
       }
@@ -35,7 +32,6 @@ const imgMiddlewares = multer({
     },
     
     filename: (req, file, callback) => {
-      // Nombre único con fecha actual
       callback(null, `IMG-${Date.now()}${path.extname(file.originalname)}`);
     },
   }),

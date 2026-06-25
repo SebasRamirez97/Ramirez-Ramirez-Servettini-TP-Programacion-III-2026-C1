@@ -8,52 +8,26 @@ const administradorRoutes = require('./src/routes/administrador.routes');
 const ventaRoutes = require('./src/routes/venta.routes');
 
 const app = express();
-app.use(cors({ origin: 'http://127.0.0.1:5500' }));
+
+app.use(cors({origin: 'http://127.0.0.1:5500' }));
 app.use(express.json());
-
-// Motor de vistas EJS
+app.use(express.static('./src/public'));
+app.use(express.static('../frontend'));
+app.use(express.static('../resources'));
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'src', 'views'));
-
-// Archivos estáticos (CSS, JS, imágenes de UI)
-app.use(express.static(path.join(__dirname, 'src', 'public')));
-
-// Archivos de negocio (logo, imágenes de productos, etc.)
-app.use('/resources', express.static(path.join(__dirname,'..', 'resources')));
-
-// Para redirigir al inicio
-app.use('/frontend', express.static(path.join(__dirname, '..', 'frontend')));
+app.set('views','./src/views/');
 
 // Rutas API
 app.use('/api/ventas', ventaRoutes);
 app.use('/api/administradores', administradorRoutes);
-app.use('/api/productos', productoRoutes);
+app.use('/api/productos/', productoRoutes);
+app.use('/resources', express.static('resources'));
 
-// Rutas de vistas
-app.get('/admin/login', (req, res) => {
-  res.render('loginAdmin', { 
-    titulo: 'Tenkiu - Autoservicio',
-    mensajeModal: ''
-  });
-});
-
-app.get('/admin/dashboard', (req, res) => {
-  res.render('dashboard', { 
-    titulo: 'Tenkiu - Dashboard Administrador',
-    mensajeModal: ''
-  });
-});
-
-app.get('/admin/dashboard', (req, res) => {
-  res.render('dashboard', { titulo: 'Panel de Administración' });
-});
-
-app.get('/admin/ventas', (req, res) => {
-  res.render('ventas', { titulo: 'Listado de Ventas' });
-});
-
-app.get('/admin/producto/nuevo', (req, res) => {
-  res.render('formularioProducto', { titulo: 'Nuevo Producto' });
+app.use((req, res, next) => {
+    res.status(404).json({ 
+        error: "Not Found",
+        message: `El endpoint requested [${req.method} ${req.url}] no existe.` 
+    });
 });
 
 sequelize.sync({ force: false })

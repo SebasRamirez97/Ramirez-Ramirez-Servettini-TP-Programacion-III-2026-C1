@@ -1,22 +1,34 @@
 const bcrypt = require("bcrypt");
-const { Administrador } = require("../models/index");
+const { Administrador, Producto } = require('../models/index');
 
 const crearAdministradorDB = async (email, password) => {
-  const hashedPassword = bcrypt.hashSync(password, 10);
-  return await Administrador.create({ email, password: hashedPassword });
+    // La lógica de negocio (hashear la contraseña) se resuelve en el servicio
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    return await Administrador.create({
+        email,
+        password: hashedPassword
+    });
 };
 
-const getAdministradoresDB = async (page, limit) => {
-  const offset = (page - 1) * limit;
-  return await Administrador.findAndCountAll({ limit, offset });
+const buscarAdministradoresDB = async (limit, offset) => {
+    return await Administrador.findAndCountAll({
+        limit,
+        offset
+    });
 };
 
 const buscarAdminPorEmailDB = async (email) => {
-  return await Administrador.findOne({ where: { email } });
+    return await Administrador.findOne({ where: { email } });
+};
+
+const buscarProductosDashboardDB = async () => {
+    // El dashboard necesita los productos ordenados de forma ascendente
+    return await Producto.findAll({ order: [['id', 'ASC']] });
 };
 
 module.exports = {
-  crearAdministradorDB,
-  getAdministradoresDB,
-  buscarAdminPorEmailDB,
+    crearAdministradorDB,
+    buscarAdministradoresDB,
+    buscarAdminPorEmailDB,
+    buscarProductosDashboardDB
 };
