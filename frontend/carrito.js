@@ -1,10 +1,26 @@
 const tabla = document.getElementById("tabla-carrito");
 const totalHTML = document.getElementById("total");
 
-let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+// Cambiamos localStorage por la lectura de los parámetros de la URL
+const urlParams = new URLSearchParams(window.location.search);
+const clienteActual = urlParams.get('cliente') || 'Cliente Anónimo';
+const productosParam = urlParams.get('productos');
+
+let carrito = [];
+
+if (productosParam) {
+    try {
+        carrito = JSON.parse(decodeURIComponent(productosParam));
+    } catch (e) {
+        carrito = [];
+    }
+}
 
 function guardarCarrito() {
-    localStorage.setItem("carrito", JSON.stringify(carrito));
+    // Reemplazamos localStorage por la actualización de la barra de direcciones de la URL
+    const nuevosProductos = encodeURIComponent(JSON.stringify(carrito));
+    const nuevaUrl = `${window.location.pathname}?cliente=${encodeURIComponent(clienteActual)}&productos=${nuevosProductos}`;
+    window.history.replaceState(null, '', nuevaUrl);
 }
 
 function mostrarCarrito() {
@@ -74,7 +90,8 @@ function mostrarCarrito() {
     totalHTML.textContent = total;
 }
 
-function sumarCantidad(index) {
+// Agregamos window. para que tus onclick inline del HTML las encuentren sin error
+window.sumarCantidad = function(index) {
 
     carrito[index].cantidad++;
 
@@ -83,7 +100,7 @@ function sumarCantidad(index) {
     mostrarCarrito();
 }
 
-function restarCantidad(index) {
+window.restarCantidad = function(index) {
 
     carrito[index].cantidad--;
 
@@ -97,7 +114,7 @@ function restarCantidad(index) {
     mostrarCarrito();
 }
 
-function eliminarProducto(index) {
+window.eliminarProducto = function(index) {
 
     carrito.splice(index, 1);
 
@@ -107,7 +124,7 @@ function eliminarProducto(index) {
 }
 
 document.getElementById("comprar")
-.addEventListener("click", () => {
+.addEventListener("click", async () => {
 
     if (carrito.length === 0) {
 
@@ -115,28 +132,37 @@ document.getElementById("comprar")
         return;
     }
 
-    const ticket = {
+    // Cambiamos el guardado en localStorage por la petición POST directa a tu API de Sequelize
+    const totalCompra = carrito.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
 
-        fecha: new Date().toLocaleString(),
-
-        productos: carrito,
-
-        total: carrito.reduce(
-            (acc, p) =>
-                acc + p.precio * p.cantidad,
-            0
-        )
+    const datosCompra = {
+        nombre_cliente: clienteActual,
+        precio_total: totalCompra,
+        productos: carrito.map(p => ({
+            id: parseInt(p.id),
+            cantidad: p.cantidad
+        }))
     };
 
-    localStorage.setItem(
-        "ticket",
-        JSON.stringify(ticket)
-    );
+    try {
+        const respuesta = await fetch('http://localhost:3000/api/ventas/crear', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datosCompra)
+        });
 
-    localStorage.removeItem("carrito");
-
-    window.location.href =
-        "ticket.html";
+        if (respuesta.ok) {
+            alert(`¡Compra registrada con éxito para el cliente: ${clienteActual}!`);
+            window.location.href = 'ventas.html';
+        } else {
+            alert('Hubo un error al procesar el guardado en el servidor.');
+        }
+    } catch (error) {
+        console.error("Error al conectar con el backend:", error);
+        alert('No se pudo establecer conexión con la API.');
+    }
 });
 
 mostrarCarrito();

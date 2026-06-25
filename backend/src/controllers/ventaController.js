@@ -1,6 +1,6 @@
 const { Venta, Producto } = require("../models/index");
 
-// 1. REGISTRAR UNA NUEVA VENTA (Desde el botón comprar de tu carrito)
+// POST: http://localhost:3000/api/ventas/crear
 const crearVenta = async (req, res) => {
     try {
         const nombreCliente = req.body.nombre_cliente;
@@ -17,35 +17,32 @@ const crearVenta = async (req, res) => {
             precio_total: precioTotal
         });
 
-        // El bucle for...of frena y espera que se guarde cada registro intermedio
+        // Bucle for...of síncrono para Sequelize
         for (const producto of productos) {
             await venta.addProducto(producto.id, {
                 through: { cantidad: producto.cantidad }
             });
         }
 
-        // Respondemos recién cuando TODO el proceso en la base de datos terminó
         res.status(201).json(venta);
-
     } catch (error) {
         console.error("Error al registrar la venta:", error);
         res.status(500).json({ error: 'Error al registrar la venta' });
     }
 };
 
-// 2. OBTENER LAS VENTAS (Para enviarle los datos reales a ventas.html)
+// GET: http://localhost:3000/api/ventas
 const getVentas = async (req, res) => {
     try {
         const ventas = await Venta.findAll({
             include: {
                 model: Producto,
-                // Sequelize mapea la tabla asociativa usando el nombre del modelo pluralizado
                 through: { attributes: ['cantidad'] }
             }
         });
         res.json(ventas);
     } catch (error) {
-        console.error(error);
+        console.error("Error al obtener las ventas:", error);
         res.status(500).json({ error: 'Error al obtener los datos' });
     }
 };
