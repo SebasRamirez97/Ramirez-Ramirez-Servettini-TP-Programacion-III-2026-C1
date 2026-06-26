@@ -1,4 +1,10 @@
-const { Producto } = require('../models/index');
+const { 
+    buscarProductosDB, 
+    buscarProductoPorIdDB, 
+    crearProductoDB, 
+    actualizarProductoDB, 
+    cambiarEstadoProductoDB 
+} = require('../services/producto.service');
 
 const getProductos = async (req, res) => {
     try {
@@ -10,16 +16,11 @@ const getProductos = async (req, res) => {
         const categoria = req.query.categoria;
 
         let filtro = {};
+        if (!esAdministrador) { filtro.activo = true; }
+        if (categoria) { filtro.categoria = categoria; }
 
-        if (!esAdministrador) {filtro.activo = true;}
-        
-        if (categoria) {filtro.categoria = categoria;}
-
-        const { count, rows } = await Producto.findAndCountAll({
-            where: filtro,
-            limit: limit,
-            offset: offset
-        });
+        // Llamamos al servicio pasando los parámetros limpios
+        const { count, rows } = await buscarProductosDB(filtro, limit, offset);
 
         res.json({
             total: count,
@@ -37,7 +38,8 @@ const getProductos = async (req, res) => {
 const getProductoById = async (req, res) => {
     try {
         const { id } = req.params;
-        const producto = await Producto.findByPk(id);
+        const producto = await buscarProductoPorIdDB(id);
+        
         if (!producto) {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
@@ -49,21 +51,23 @@ const getProductoById = async (req, res) => {
 };
 
 const crearProducto = async (req, res) => {
-    try{
-        const {nombre , categoria , precio , descripcion , activo} = req.body;
+    try {
+        const { nombre, categoria, precio, descripcion } = req.body;
         const imagen = req.file.filename;
-        const producto = await Producto.create(
-            {
-                "nombre" : nombre,
-                "categoria" : categoria,
-                "precio" : precio,
-                "imagen" : imagen,
-                "descripcion" : descripcion,
-                "activo" : true
-            }
-        );
+
+        // Armamos el objeto limpio de JS
+        const datosNuevoProducto = {
+            nombre,
+            categoria,
+            precio,
+            imagen,
+            descripcion,
+            activo: true
+        };
+
+        const producto = await crearProductoDB(datosNuevoProducto);
         res.json(producto);
-    }catch (error) {
+    } catch (error) {
         res.status(404).json({ error: 'Error al crear el producto' });
     }
 };
@@ -72,40 +76,16 @@ const actualizarProducto = async (req, res) => {
     try {
         const { id } = req.params;
         const { nombre, precio } = req.body;
+        const imagen = req.file ? req.file.filename : undefined;
+
+        // Mandamos los datos sueltos al servicio para que resuelva los fallbacks
+        const productoModificado = await actualizarProductoDB(id, { nombre, precio, imagen });
         
-        const producto = await Producto.findByPk(id);
-        if (!producto) {
+        if (!productoModificado) {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
 
-        let nuevaImagen;
-        if (req.file) {
-            nuevaImagen = req.file.filename;
-        } else {
-            nuevaImagen = producto.imagen;
-        }
-
-        let nuevoNombre;
-        if (nombre) {
-            nuevoNombre = nombre;
-        } else {
-            nuevoNombre = producto.nombre;
-        }
-
-        let nuevoPrecio;
-        if (precio) {
-            nuevoPrecio = precio;
-        } else {
-            nuevoPrecio = producto.precio;
-        }
-
-        await producto.update({ 
-            nombre: nuevoNombre, 
-            precio: nuevoPrecio, 
-            imagen: nuevaImagen 
-        });
-
-        res.json({ mensaje: 'Producto modificado con éxito', producto });
+        res.json({ mensaje: 'Producto modificado con éxito', producto: productoModificado });
     } catch (error) {
         res.status(500).json({ error: 'Error al actualizar el producto' });
     }
@@ -116,16 +96,15 @@ const cambiarEstadoProducto = async (req, res) => {
         const { id } = req.params;
         const { activo } = req.body;
 
-        const producto = await Producto.findByPk(id);
-        if (!producto) {
+        const productoModificado = await cambiarEstadoProductoDB(id, activo);
+        
+        if (!productoModificado) {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
 
-        await producto.update({ activo });
-
         res.json({ 
             mensaje: `Producto ${activo ? 'activado' : 'desactivado'} correctamente`, 
-            producto 
+            producto: productoModificado 
         });
     } catch (error) {
         res.status(500).json({ error: 'Error al cambiar el estado del producto' });
@@ -133,6 +112,9 @@ const cambiarEstadoProducto = async (req, res) => {
 };
 
 module.exports = { 
-    getProductos, getProductoById, crearProducto, actualizarProducto , cambiarEstadoProducto
+    getProductos, 
+    getProductoById, 
+    crearProducto, 
+    actualizarProducto, 
+    cambiarEstadoProducto
 };
-

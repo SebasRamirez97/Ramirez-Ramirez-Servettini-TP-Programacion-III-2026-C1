@@ -1,25 +1,25 @@
-const { where } = require('sequelize');
 const bcrypt = require("bcrypt");
-const {Administrador } = require('../models/index');
+const {
+    crearAdministradorDB,
+    buscarAdministradoresDB,
+    buscarAdminPorEmailDB,
+    buscarProductosDashboardDB
+} = require("../services/administrador.service");
 
+// 1. OPERACIONES DE LA API (RESPUESTAS JSON)
 
-const crearAdministrador = async  (req, res) => {
-    try{
-        const {email , password} = req.body;
+const crearAdministrador = async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
-        const hashedPassword = bcrypt.hashSync(password, 10);
+        // Le mandamos los datos limpios al servicio
+        const nuevoAdmin = await crearAdministradorDB(email, password);
 
-        const nuevoAdmin = await Administrador.create({
-            email,
-            password: hashedPassword
-        });
-
-        res.status(201).json({mensaje: "Administrador creado", admin: nuevoAdmin})
-
-    } catch (error){
-        res.status(500).json({error: error.message})
+        res.status(201).json({ mensaje: "Administrador creado", admin: nuevoAdmin });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
-}
+};
 
 const getAdministradores = async (req, res) => {
     try {
@@ -27,10 +27,7 @@ const getAdministradores = async (req, res) => {
         const limit = parseInt(req.query.limit) || 6;
         const offset = (page - 1) * limit;
 
-        const { count, rows } = await Administrador.findAndCountAll({
-            limit,
-            offset
-        });
+        const { count, rows } = await buscarAdministradoresDB(limit, offset);
 
         res.json({
             total: count,
@@ -38,26 +35,61 @@ const getAdministradores = async (req, res) => {
             paginaActual: page,
             administradores: rows
         });
-
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener administradores' });
     }
 };
 
-const verificarLogin = async(req, res) => {
-    const {email, password} = req.body;
+const verificarLogin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
-    const admin = await Administrador.findOne({where: {email } });
-    if(!admin){
-        return res.status(404).json({error: "Administrador no encontrado"});
+        // Buscamos si el usuario existe usando el servicio
+        const admin = await buscarAdminPorEmailDB(email);
+        if (!admin) {
+            return res.status(404).json({ error: "Administrador no encontrado" });
+        }
+
+        // El controlador valida si el password coincide con Express
+        const esValida = bcrypt.compareSync(password, admin.password);
+        if (!esValida) {
+            return res.status(401).json({ error: "Contraseña incorrecta" });
+        }
+
+        res.json({ mensaje: "Login exitoso", admin: { email: admin.email } });
+    } catch (error) {
+        res.status(500).json({ error: "Error en el proceso de login" });
     }
+};
 
-    const esValida = bcrypt.compareSync(password, admin.password);
-    if(!esValida){
-        return res.status(401).json({error: "Contraseña incorrecta"});
+// 🖥️ 2. OPERACIONES DE RENDERIZADO (VISTAS EJS)
+
+const mostrarLogin = (req, res) => {
+    res.render('loginAdmin'); 
+};
+
+const mostrarDashboard = async (req, res) => {
+    try {
+        // El servicio nos trae el array de productos puros
+        const listaProductos = await buscarProductosDashboardDB();
+
+        // El controlador los inyecta en la plantilla HTML
+        res.render('dashboard', { productos: listaProductos });
+    } catch (error) {
+        console.error("Error al cargar el dashboard EJS:", error);
+        res.status(500).send("Error interno del servidor al cargar el panel.");
     }
+};
 
-    res.json({mensaje: "Login exitoso" , admin:{email: admin.email}});
-}
+const mostrarFormularioProducto = (req, res) => {
+    res.render('formulario-producto'); 
+};
 
-module.exports = {crearAdministrador,getAdministradores, verificarLogin}
+module.exports = {
+    crearAdministrador,
+    getAdministradores,
+    verificarLogin,
+    mostrarLogin,
+    mostrarDashboard,
+    mostrarFormularioProducto
+};

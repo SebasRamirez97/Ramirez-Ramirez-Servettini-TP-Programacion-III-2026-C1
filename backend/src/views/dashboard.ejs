@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenkiu - Dashboard Administrador</title>
+
+    <link rel="icon" href="/logo.png" type="image/png" />
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body> <script>
+        if (localStorage.getItem('tema') === 'oscuro') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+
+    <header>
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <img src="/logo.png" alt="Logo" style="width: 40px; height: 40px;">
+                <h1 class="m-0 fuente-marca gap-2">Tenkiu - Panel Admin</h1>
+            </div>
+            <nav class="d-flex gap-3">
+                <button id="btn-tema" type="button" class="btn btn-dark" style="font-size: 1.2rem; padding: 6px 12px;">
+                    🌙
+                </button>
+                <a href="/api/administradores/login" class="btn btn-danger w-100 text-center"">Cerrar Sesión</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container my-5">
+        <div class="d-grid align-items-center mb-4 gap-3" style="grid-template-columns: 3fr 1.5fr 1.5fr;">
+            <h2>Listado General de Productos</h2>
+            <a href="/api/ventas/panel" class="btn btn-warning">Ver ventas</a>
+            <a href="/api/administradores/productos/nuevo" class="btn btn-primary">+ Agregar Nuevo Producto</a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover table-dark-custom align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Tipo / Categoría</th>
+                            <th>Precio</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% productos.forEach(function(prod) { %>
+                            <tr data-id="<%= prod.id %>">
+                                <td class="celda-id"><%= prod.id %></td>
+                                <td class="celda-img">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="http://localhost:3000/resources/img-productos/<%= prod.imagen %>" alt="<%= prod.nombre %>" style="width: 60px; height: 60px; object-fit: contain;">
+                                    </div>
+                                </td>
+                                <td class="celda-nombre"><%= prod.nombre %></td>
+                                <td class="celda-cat"><%= prod.categoria %></td>
+                                <td class="celda-precio">$<%= prod.precio %></td>
+                                <td class="celda-estado"><%= prod.activo ? "Activo" : "Inactivo" %></td>
+                                <td class="text-center celda-acciones">
+                                    <button class="btn btn-sm <%= prod.activo ? 'btn-danger' : 'btn-success' %> btn-cambiar-estado" data-id="<%= prod.id %>" data-activo="<%= prod.activo %>">
+                                        <%= prod.activo ? "Desactivar" : "Activar" %>
+                                    </button>
+                                    <button class="btn btn-sm btn-primary ms-2 btn-editar-inline" data-id="<%= prod.id %>">
+                                        Editar
+                                    </button>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white-50 text-center py-3 mt-auto">
+        <div class="container">
+            <p class="m-0 small">UTN Avellaneda - Programación III</p>
+            <p class="m-0 small"><strong>Alumnos:</strong> Ramirez - Ramirez - Servettini</p>
+        </div>
+    </footer >
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin-script.js"></script>
+</body>
+</html>

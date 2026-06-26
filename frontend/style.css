@@ -1,15 +1,12 @@
-
-/* Registro de tu fuente descargada */
+/* ==========================================================================
+   1. FUENTES Y VARIABLES (Configuración Inicial)
+   ========================================================================== */
 @font-face {
-    font-family: 'Metal-Slug-Latino-Regular'; /* El nombre que vos elijas para usarla */
-    src: url('fuentes/Metal-Slug-Latino-Regular.otf') format('opentype'); /* Ruta exacta al archivo */
+    font-family: 'Metal-Slug-Latino-Regular';
+    src: url('fuentes/Metal-Slug-Latino-Regular.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
 }
-
-/* =========================================
-   1. VARIABLES DE TEMA (CLARO / OSCURO)
-   ========================================= */
 
 :root {
     --bg-body: #ffffff;
@@ -22,7 +19,7 @@
     --text-footer: #ffffff;
 }
 
-/* Variables que se activan al aplicar la clase dark-mode al body */
+/* Variables mutadas para Modo Oscuro */
 body.dark-mode {
     --bg-body: #121212;
     --text-body: #f8f9fa;
@@ -32,24 +29,9 @@ body.dark-mode {
     --bg-footer: #0d0d0d;
 }
 
-.fuente-marca {
-    font-family: 'Metal-Slug-Latino-Regular', sans-serif;
-    display: inline-block;
-    padding: 0 5px;
-    
-    /* RELLENO DEGRADADO */
-    background: linear-gradient(to bottom, #ffaa00 20%, #ff0000 80%);
-    -webkit-background-clip: text;       
-    -webkit-text-fill-color: transparent; 
-
-    /* CONTORNO VECTORIAL UNIFORME */
-    -webkit-text-stroke: 1px #000; /* Dibuja una línea perfecta de 1.5px alrededor de cada letra */
- 
-}
-
-/* =========================================
-   2. ESTRUCTURA GLOBAL Y HEADER
-   ========================================= */
+/* ==========================================================================
+   2. ESTILOS GENERALES (Etiquetas HTML directas)
+   ========================================================================== */
 body {
     display: flex;
     flex-direction: column;
@@ -67,7 +49,7 @@ main {
 }
 
 header {
-    position: sticky;     
+    position: sticky;    
     top: 0;               
     z-index: 1030;        
     display: flex;
@@ -84,44 +66,19 @@ footer {
     height: 10vh;
     display: flex;
     align-items: center;
-    justify-content: space-between; /* CAMBIADO: Distribuye los 3 bloques equitativamente a lo ancho */
-    padding: 0 50px;                 /* AGREGADO: Mismo padding que tu header para que todo quede perfectamente alineado */
+    justify-content: space-between;
+    padding: 0 50px;
     background-color: var(--bg-footer);
     color: var(--text-footer);
     z-index: 1020;       
     transition: background-color 0.3s;
 }
 
-/* Evita que los márgenes por defecto del h3 rompan el centrado vertical del footer */
 footer h3 {
     margin: 0;
-    font-size: 1rem; /* Ajusta el tamaño para que sea sutil y deje el protagonismo al contenido principal */
+    font-size: 1rem;
 }
 
-body.dark-mode input.form-control {
-    background-color: #2b3035;
-    color: #ffffff;
-    border-color: #495057;
-}
-body.dark-mode input.form-control::placeholder {
-    color: #adb5bd;
-}
-
-/* =========================================
-   3. SISTEMA DE APAGADO Y ENCENDIDO DE PANTALLAS
-   ========================================= */
-.pantalla {
-    display: none !important; 
-}
-
-.pantalla.activa {
-    display: flex !important; 
-    flex-grow: 1;             
-}
-
-/* =========================================
-   4. MENÚ LATERAL PEGADO (STICKY ASIDE)
-   ========================================= */
 aside {
     position: sticky;         
     top: 10vh;                
@@ -130,42 +87,107 @@ aside {
     overflow-y: auto;         
 }
 
-/* =========================================
-   5. GRILLA Y TARJETAS DE PRODUCTOS
-   ========================================= */
-.productos-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+/* ==========================================================================
+   3. CLASES (Componentes y Layouts)
+   ========================================================================== */
+.fuente-marca {
+    font-family: 'Metal-Slug-Latino-Regular', sans-serif;
+    display: inline-block;
+    padding: 0 5px;
+    background: linear-gradient(to bottom, #ffaa00 20%, #ff0000 80%);
+    -webkit-background-clip: text;       
+    -webkit-text-fill-color: transparent; 
+    -webkit-text-stroke: 1px #000; 
 }
 
+/* Control de pantallas */
+.pantalla {
+    display: none !important; 
+}
+
+.pantalla.activa {
+    display: flex !important; 
+    flex-grow: 1;              
+}
+
+/* Grid de Productos y Catálogo */
+.productos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+/* Tarjeta */
 .producto-card {
     background: var(--bg-card);
     border: 1px solid var(--border-card);
     color: var(--text-body);
     border-radius: 8px;
     padding: 15px;
+
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
-    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
-}
-
-.producto-img {
-    width: 90%;              
-    height: 90%;            
-    object-fit: cover;
-    border-radius: 4px;
-    margin-bottom: 10px;
-}
-
-.selector-cantidad {
-    display: flex;
     justify-content: space-between;
-    align-items: center;
+
+    text-align: center;
+
+    height: 560px;
+
+    transition: background-color .3s,
+                border-color .3s,
+                color .3s,
+                transform .2s,
+                box-shadow .2s;
+}
+
+.producto-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 18px rgba(0,0,0,.20);
+}
+
+/* Imagen */
+.producto-img {
     width: 100%;
+    height: 230px;
+
+    object-fit: contain;
+
+    background: #fff;
+
+    border-radius: 8px;
+
+    padding: 10px;
+
+    margin-bottom: 15px;
+
+    flex-shrink: 0;
+}
+
+/* Nombre */
+.producto-card h4 {
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 10px;
+}
+
+/* Descripción */
+.producto-card p {
+    min-height: 50px;
+}
+
+/* Selector */
+.selector-cantidad {
+    width: 100%;
+    margin-top: auto;
+}
+
+/* Botón */
+.producto-card .btn {
+    width: 100%;
 }
 
 .btn-cantidad {
@@ -176,14 +198,47 @@ aside {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
-body.dark-mode .btn-cantidad {
-    background-color: #495057;
-    border-color: #6c757d;
-    color: #ffffff;
+
+/* Ventanas emergentes (Modales) */
+.modal-content {
+    background-color: var(--bg-body);
+    color: var(--text-body);
+    transition: background-color 0.3s, color 0.3s;
 }
 
+.modal-body {
+    color: var(--text-body);
+}
 
-/* Estilos específicos para aislar el ticket y que siempre sea blanco */
+.btn-close {
+    filter: var(--btn-close-filter, none);
+}
+
+/* Componente Carrito Popup */
+.contenedor-carrito-popup {
+    position: fixed;
+    top: 60px;
+    right: 100px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+}
+
+.globo-agregado {
+    background-color: #30cf58;
+    color: #1f1e1e;
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+    font-size: 0.95rem;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    animation: fadeInUp 0.3s ease;
+}
+
+/* Componente Ticket de Compra */
 .ticket-contenedor {
     background-color: #ffffff !important;
     color: #212529 !important;
@@ -195,7 +250,6 @@ body.dark-mode .btn-cantidad {
     position: relative;
 }
 
-/* Simulación de cortes circulares de ticket físico de la imagen de referencia */
 .ticket-contenedor::before, .ticket-contenedor::after {
     content: '';
     position: absolute;
@@ -214,7 +268,6 @@ body.dark-mode .btn-cantidad {
     margin: 20px 0;
 }
 
-/* Código de barras simulado con CSS interactivo */
 .codigo-barras-simulado {
     height: 45px;
     background: linear-gradient(90deg, 
@@ -229,7 +282,7 @@ body.dark-mode .btn-cantidad {
     opacity: 0.85;
 }
 
-/* Forzar colores de texto internos del ticket para que no se alteren con el dark-mode global */
+/* Forzar textos del ticket siempre claros (estilo papel) */
 .ticket-contenedor h2, 
 .ticket-contenedor p, 
 .ticket-contenedor td, 
@@ -238,40 +291,78 @@ body.dark-mode .btn-cantidad {
     color: #212529 !important;
 }
 
-/* =========================================================================
-   NOTIFICACIONES FLOTANTES DEL CARRITO
-   ========================================================================= */
-
-/* Ubicación del contenedor en la pantalla */
-.contenedor-carrito-popup {
-    position: fixed;
-    top: 60px;
-    right: 100px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
+/* Contenedor con scroll para la tabla de ventas */
+.tabla-scroll-contenedor {
+    max-height: 55vh; /* Ajusta este alto a tu gusto (ocupa el 55% de la pantalla) */
+    overflow-y: auto;
+    border-bottom: 1px solid var(--border-card);
 }
 
-/* Diseño base del globo */
-.globo-agregado {
-    background-color: #30cf58; /* Verde Bootstrap */
-    color: #1f1e1e;
-    padding: 12px 24px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    font-weight: bold;
-    font-size: 0.95rem;
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    animation: fadeInUp 0.3s ease;
+/* Clavar los encabezados arriba para que no desaparezcan al hacer scroll */
+.tabla-scroll-contenedor thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: #212529; /* Color oscuro idéntico a tu thead */
+    box-shadow: inset 0 -1px 0 var(--bs-table-border-color); /* Mantiene la línea divisoria */
+}
+
+.fondo-pantalla {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../resources/img/background.png'); /* Ruta a tu imagen */
+    background-size: cover;       /* Fuerza a la imagen a cubrir TODA la pantalla sin deformarse */
+    background-position: center;  /* Centra la imagen horizontal y verticalmente */
+    background-repeat: no-repeat; /* Evita que la imagen se duplique como mosaico */
 }
 
 
+/* ==========================================================================
+   4. MODIFICADORES ESPECÍFICOS DE MODO OSCURO
+   ========================================================================== */
+body.dark-mode .btn-close {
+    --btn-close-filter: invert(1) grayscale(100%) brightness(200%);
+}
 
-/* =========================================
-   6. RESPONSIVE (Celulares)
-   ========================================= */
+body.dark-mode .btn-cantidad {
+    background-color: #495057;
+    border-color: #6c757d;
+    color: #ffffff;
+}
+
+/* SOLUCIÓN CORREGIDA PARA INPUTS Y FORMULARIOS */
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background-color: #2b3035;
+    color: #ffffff;
+    border-color: #495057;
+}
+
+body.dark-mode .form-control::placeholder {
+    color: #adb5bd;
+}
+
+/* SOLUCIÓN CORREGIDA PARA LAS TARJETAS DE BOOTSTRAP (.card) */
+body.dark-mode .card {
+    background-color: var(--bg-card);
+    border-color: var(--border-card);
+    color: var(--text-body);
+}
+
+body.dark-mode .table-dark-custom {
+    color: var(--text-body);
+    --bs-table-bg: #212529; /* Fondo gris oscuro para el cuerpo de la tabla */
+    --bs-table-hover-bg: #2c3034; /* Color al pasar el mouse por encima */
+    --bs-table-hover-color: #ffffff;
+    --bs-table-border-color: #373b3e;
+}
+
+/* Forzar que las celdas de las filas mantengan el color de texto correcto */
+body.dark-mode .table-dark-custom td {
+    color: var(--text-body);
+}
+
+/* ==========================================================================
+   5. RESPONSIVE / MEDIA QUERIES (Siempre al final)
+   ========================================================================== */
 @media (max-width: 768px) {
     .productos-grid {
         grid-template-columns: 1fr;
@@ -285,28 +376,7 @@ body.dark-mode .btn-cantidad {
         height: auto;
     }
     footer {
-        justify-content: center; /* En móviles vuelve al centro porque los laterales se ocultan con d-none */
+        justify-content: center; 
         padding: 0 20px;
     }
-}
-
-/* Corregir colores del modal en modo claro y oscuro */
-.modal-content {
-    background-color: var(--bg-body); /* Usa el fondo definido en tu :root */
-    color: var(--text-body);          /* Usa el color de texto definido en tu :root */
-    transition: background-color 0.3s, color 0.3s;
-}
-
-/* Forzar que el mensaje dentro del body también use las variables */
-.modal-body {
-    color: var(--text-body);
-}
-
-/* Opcional: Ajustar el botón de cerrar si se ve mal */
-.btn-close {
-    filter: var(--btn-close-filter, none);
-}
-
-body.dark-mode .btn-close {
-    --btn-close-filter: invert(1) grayscale(100%) brightness(200%);
 }

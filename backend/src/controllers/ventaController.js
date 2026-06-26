@@ -1,50 +1,58 @@
-const { Venta, Producto } = require("../models/index");
+const {
+    buscarVentasDB,
+    buscarVentasPanelDB,
+    crearVentaDB
+} = require("../services/venta.service");
 
-// POST: http://localhost:3000/api/ventas/crear
+// 🌐 1. OPERACIONES DE LA API (RESPUESTAS JSON)
+
+const getVentas = async (req, res) => {
+    try {
+        const ventas = await buscarVentasDB();
+        res.json(ventas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener los datos' });
+    }
+};
+
 const crearVenta = async (req, res) => {
     try {
         const nombreCliente = req.body.nombre_cliente;
         const precioTotal = parseFloat(req.body.precio_total);
         const productos = req.body.productos;
 
-        if (!productos || productos.length === 0) {
-            return res.status(400).json({ error: 'La venta debe contener productos.' });
-        }
-
-        // Guarda la cabecera en la tabla 'ventas'
-        const venta = await Venta.create({
-            nombre_cliente: nombreCliente || 'Cliente Anónimo',
-            precio_total: precioTotal
+        // Delegamos toda la lógica de inserciones y relaciones al servicio
+        const nuevaVenta = await crearVentaDB({
+            nombre_cliente: nombreCliente,
+            precio_total: precioTotal,
+            productos: productos
         });
 
-        // Bucle for...of síncrono para Sequelize
-        for (const producto of productos) {
-            await venta.addProducto(producto.id, {
-                through: { cantidad: producto.cantidad }
-            });
-        }
-
-        res.status(201).json(venta);
+        res.json(nuevaVenta);
     } catch (error) {
-        console.error("Error al registrar la venta:", error);
+        console.error(error);
         res.status(500).json({ error: 'Error al registrar la venta' });
     }
 };
 
-// GET: http://localhost:3000/api/ventas
-const getVentas = async (req, res) => {
+// 🖥️ 2. OPERACIONES DE RENDERIZADO (VISTAS EJS)
+
+const mostrarVentasPanel = async (req, res) => {
     try {
-        const ventas = await Venta.findAll({
-            include: {
-                model: Producto,
-                through: { attributes: ['cantidad'] }
-            }
-        });
-        res.json(ventas);
+        // El servicio hace el JOIN de MySQL y nos da la lista limpia
+        const ventasYProductos = await buscarVentasPanelDB();
+        
+        // El controlador dibuja la plantilla ventas.ejs
+        res.render('ventas', { ventas: ventasYProductos });
     } catch (error) {
-        console.error("Error al obtener las ventas:", error);
-        res.status(500).json({ error: 'Error al obtener los datos' });
+        console.error("Error al renderizar el panel de finanzas:", error);
+        res.status(500).send('Error al cargar los datos en la plantilla.');
     }
 };
 
-module.exports = { crearVenta, getVentas };
+module.exports = { 
+    crearVenta, 
+    getVentas, 
+    mostrarVentasPanel 
+};
