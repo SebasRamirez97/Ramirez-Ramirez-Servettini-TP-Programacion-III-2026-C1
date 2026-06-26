@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             localStorage.setItem('nombreCliente', nombreCliente.value.trim());
             location.href = "categorias.html";
+            localStorage.removeItem("carrito"); 
         });
     }
 
@@ -80,7 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (btnVolverCategorias) {
-        btnVolverCategorias.addEventListener('click', () => { location.href = "categorias.html"; });
+        btnVolverCategorias.addEventListener('click', () => { 
+            location.href = "categorias.html"; 
+            
+        });
     }
 
     if (btnCarrito) {
@@ -141,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const urlImagen = `http://localhost:3000/resources/${nombreCarpeta}/${producto.imagen}`;
             const img = document.createElement('img');
-            img.src = `${urlImagen}?v=${Date.now()}`;
+            img.src = urlImagen;
             img.classList.add('producto-img');
 
             const h4 = document.createElement('h4');

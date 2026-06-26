@@ -1,6 +1,3 @@
-/* ==========================================================================
-   1. FUENTES Y VARIABLES (Configuración Inicial)
-   ========================================================================== */
 @font-face {
     font-family: 'Metal-Slug-Latino-Regular';
     src: url('fuentes/Metal-Slug-Latino-Regular.otf') format('opentype');
@@ -19,7 +16,6 @@
     --text-footer: #ffffff;
 }
 
-/* Variables mutadas para Modo Oscuro */
 body.dark-mode {
     --bg-body: #121212;
     --text-body: #f8f9fa;
@@ -29,9 +25,6 @@ body.dark-mode {
     --bg-footer: #0d0d0d;
 }
 
-/* ==========================================================================
-   2. ESTILOS GENERALES (Etiquetas HTML directas)
-   ========================================================================== */
 body {
     display: flex;
     flex-direction: column;
@@ -48,30 +41,46 @@ main {
     flex-direction: column;
 }
 
-header {
-    position: sticky;    
-    top: 0;               
-    z-index: 1030;        
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 50px;
-    background-color: var(--bg-header);
-    color: var(--text-header);
-    height: 10vh;       
-    transition: background-color 0.3s;
+header{
+    position:sticky;
+    top:0;
+    z-index:1030;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:15px;
+
+    padding:15px 40px;
+
+    min-height:80px;
+
+    background:var(--bg-header);
+
+    color:var(--text-header);
+
+    transition:.3s;
 }
 
-footer {
-    height: 10vh;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 50px;
-    background-color: var(--bg-footer);
-    color: var(--text-footer);
-    z-index: 1020;       
-    transition: background-color 0.3s;
+footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:15px;
+
+    padding:20px 40px;
+
+    background:var(--bg-footer);
+
+    color:var(--text-footer);
+
+    transition:.3s;
 }
 
 footer h3 {
@@ -87,9 +96,6 @@ aside {
     overflow-y: auto;         
 }
 
-/* ==========================================================================
-   3. CLASES (Componentes y Layouts)
-   ========================================================================== */
 .fuente-marca {
     font-family: 'Metal-Slug-Latino-Regular', sans-serif;
     display: inline-block;
@@ -100,7 +106,6 @@ aside {
     -webkit-text-stroke: 1px #000; 
 }
 
-/* Control de pantallas */
 .pantalla {
     display: none !important; 
 }
@@ -110,15 +115,13 @@ aside {
     flex-grow: 1;              
 }
 
-/* Grid de Productos y Catálogo */
 .productos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
     align-items: start;
 }
 
-/* Tarjeta */
 .producto-card {
     background: var(--bg-card);
     border: 1px solid var(--border-card);
@@ -128,66 +131,50 @@ aside {
 
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
 
     text-align: center;
 
-    height: 560px;
+    min-height: 530px;
 
-    transition: background-color .3s,
-                border-color .3s,
-                color .3s,
-                transform .2s,
-                box-shadow .2s;
+    transition:
+        background-color .3s,
+        border-color .3s,
+        color .3s,
+        transform .2s,
+        box-shadow .2s;
 }
 
-.producto-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 18px rgba(0,0,0,.20);
+.producto-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 8px 18px rgba(0,0,0,.2);
 }
 
-/* Imagen */
-.producto-img {
-    width: 100%;
-    height: 230px;
+.producto-img{
+    width:100%;
+    max-width:220px;
+    height:220px;
 
-    object-fit: contain;
+    object-fit:contain;
 
-    background: #fff;
+    background:white;
 
-    border-radius: 8px;
+    border-radius:8px;
 
-    padding: 10px;
+    padding:10px;
 
-    margin-bottom: 15px;
+    margin-bottom:15px;
 
-    flex-shrink: 0;
+    flex-shrink:0;
 }
 
-/* Nombre */
-.producto-card h4 {
-    min-height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-}
-
-/* Descripción */
-.producto-card p {
-    min-height: 50px;
-}
-
-/* Selector */
 .selector-cantidad {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
-    margin-top: auto;
-}
-
-/* Botón */
-.producto-card .btn {
-    width: 100%;
+    margin-bottom: 10px;
 }
 
 .btn-cantidad {
@@ -199,7 +186,6 @@ aside {
     border-radius: 4px;
 }
 
-/* Ventanas emergentes (Modales) */
 .modal-content {
     background-color: var(--bg-body);
     color: var(--text-body);
@@ -214,7 +200,6 @@ aside {
     filter: var(--btn-close-filter, none);
 }
 
-/* Componente Carrito Popup */
 .contenedor-carrito-popup {
     position: fixed;
     top: 60px;
@@ -238,7 +223,6 @@ aside {
     animation: fadeInUp 0.3s ease;
 }
 
-/* Componente Ticket de Compra */
 .ticket-contenedor {
     background-color: #ffffff !important;
     color: #212529 !important;
@@ -282,7 +266,6 @@ aside {
     opacity: 0.85;
 }
 
-/* Forzar textos del ticket siempre claros (estilo papel) */
 .ticket-contenedor h2, 
 .ticket-contenedor p, 
 .ticket-contenedor td, 
@@ -291,33 +274,27 @@ aside {
     color: #212529 !important;
 }
 
-/* Contenedor con scroll para la tabla de ventas */
 .tabla-scroll-contenedor {
-    max-height: 55vh; /* Ajusta este alto a tu gusto (ocupa el 55% de la pantalla) */
+    max-height: 55vh;
     overflow-y: auto;
     border-bottom: 1px solid var(--border-card);
 }
 
-/* Clavar los encabezados arriba para que no desaparezcan al hacer scroll */
 .tabla-scroll-contenedor thead th {
     position: sticky;
     top: 0;
     z-index: 2;
-    background-color: #212529; /* Color oscuro idéntico a tu thead */
-    box-shadow: inset 0 -1px 0 var(--bs-table-border-color); /* Mantiene la línea divisoria */
+    background-color: #212529;
+    box-shadow: inset 0 -1px 0 var(--bs-table-border-color);
 }
 
 .fondo-pantalla {
     background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../resources/img/background.png'); /* Ruta a tu imagen */
-    background-size: cover;       /* Fuerza a la imagen a cubrir TODA la pantalla sin deformarse */
-    background-position: center;  /* Centra la imagen horizontal y verticalmente */
-    background-repeat: no-repeat; /* Evita que la imagen se duplique como mosaico */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-
-/* ==========================================================================
-   4. MODIFICADORES ESPECÍFICOS DE MODO OSCURO
-   ========================================================================== */
 body.dark-mode .btn-close {
     --btn-close-filter: invert(1) grayscale(100%) brightness(200%);
 }
@@ -360,23 +337,92 @@ body.dark-mode .table-dark-custom td {
     color: var(--text-body);
 }
 
-/* ==========================================================================
-   5. RESPONSIVE / MEDIA QUERIES (Siempre al final)
-   ========================================================================== */
-@media (max-width: 768px) {
-    .productos-grid {
-        grid-template-columns: 1fr;
+/*==========================
+TABLET
+===========================*/
+
+@media (max-width:992px){
+
+    .productos-grid{
+        grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
     }
-    #pantalla-catalogo {
-        flex-direction: column !important; 
+
+    header,
+    footer{
+        padding:20px;
     }
-    aside {
-        position: static;  
-        width: 100% !important;
-        height: auto;
+
+}
+
+/*==========================
+CELULAR
+===========================*/
+
+@media (max-width:768px){
+
+    #pantalla-catalogo,
+    #pantalla-carrito-layout{
+        flex-direction:column !important;
     }
-    footer {
-        justify-content: center; 
-        padding: 0 20px;
+
+    aside{
+        position:static;
+        width:100% !important;
+        height:auto;
     }
+
+    header,
+    footer{
+        flex-direction:column;
+        justify-content:center;
+        text-align:center;
+    }
+
+    .productos-grid{
+        grid-template-columns:1fr;
+    }
+
+    .producto-card{
+        min-height:auto;
+    }
+
+    .producto-img{
+        height:180px;
+    }
+
+    .ticket-contenedor{
+        width:95%;
+        padding:20px;
+    }
+
+    .contenedor-carrito-popup{
+        right:15px;
+        left:15px;
+    }
+
+}
+
+/*==========================
+CELULAR PEQUEÑO
+===========================*/
+
+@media (max-width:480px){
+
+    header h1{
+        font-size:2rem;
+    }
+
+    .btn{
+        width:100%;
+    }
+
+    .selector-cantidad{
+        flex-wrap:wrap;
+        gap:10px;
+    }
+
+    .producto-img{
+        height:160px;
+    }
+
 }

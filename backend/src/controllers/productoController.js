@@ -7,13 +7,12 @@ const {
 } = require('../services/producto.service');
 
 const getProductos = async (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 6;
-        const offset = (page - 1) * limit;
-        
-        const esAdministrador = (req.query.admin === 'true');
-        const categoria = req.query.categoria;
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const offset = (page - 1) * limit;
+    const esAdministrador = (req.query.admin === 'true');
+    const categoria = req.query.categoria;
 
         let filtro = {};
         if (!esAdministrador) { filtro.activo = true; }
@@ -92,9 +91,9 @@ const actualizarProducto = async (req, res) => {
 };
 
 const cambiarEstadoProducto = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { activo } = req.body;
+  try {
+    const { id } = req.params;
+    const { activo } = req.body;
 
         const productoModificado = await cambiarEstadoProductoDB(id, activo);
         

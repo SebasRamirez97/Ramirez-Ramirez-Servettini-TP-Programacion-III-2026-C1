@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. CAPTURA DE ELEMENTOS EXCLUSIVOS DE ADMIN
     const emailAdmin = document.getElementById('input-email');
     const contraseñaAdmin = document.getElementById('input-contraseña');
     const btnIngresarAdmin = document.getElementById('btn-ingresar-admin');
@@ -8,12 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
     const btnTema = document.getElementById('btn-tema');      
 
+    const btnVerPassword = document.getElementById('btn-ver-password');
+
     const inputNombre = document.getElementById('nombre');
     const selectCategoria = document.getElementById('categoria');
     const inputPrecio = document.getElementById('precio');
     const inputImagen = document.getElementById('imagen');
 
-    // 2. SISTEMA DE TEMAS PARA EL PANEL
     const temaGuardado = localStorage.getItem('tema');
     if (temaGuardado === 'oscuro') {
         document.body.classList.add('dark-mode');
@@ -105,39 +105,62 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (btnVerPassword && contraseñaAdmin) {
+        btnVerPassword.addEventListener('mouseenter', () => {
+            contraseñaAdmin.type = 'text';
+        });
+        btnVerPassword.addEventListener('mouseleave', () => {
+            contraseñaAdmin.type = 'password';
+        });
+    }
+
     if (btnCerrarSesion) {
         btnCerrarSesion.addEventListener('click', () => {
             location.href = "/api/administradores/login";
         });
     }
 
-    // 4. LOGIC DEL DASHBOARD (EJS INTERACTIVO)
     if (window.location.pathname.includes('/administradores/dashboard')) {
         configurarBotonesDashboardEJS();
     }
 
     function configurarBotonesDashboardEJS() {
         const botonesEstado = document.querySelectorAll('.btn-cambiar-estado');
+        const modalEstado = new bootstrap.Modal(document.getElementById('modalEstado'));
+        const modalMsg = document.getElementById('modalEstadoMensaje');
+        const btnConfirmar = document.getElementById('btnConfirmarEstado');
+        
+        
         botonesEstado.forEach(btn => {
             btn.addEventListener('click', async () => {
+                
                 const id = btn.getAttribute('data-id');
                 const activo = btn.getAttribute('data-activo') === 'true';
-
-                try {
-                    const respuesta = await fetch(`http://localhost:3000/api/productos/${id}/estado`, {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ activo: !activo })
-                    });
-
-                    if (respuesta.ok) {
-                        window.location.reload();
-                    } else {
-                        alert("Error al cambiar el estado en el servidor.");
-                    }
-                } catch (error) {
-                    console.error("Error cambiando estado:", error);
+                if (activo) {
+                    modalMsg.textContent = "¿Está seguro de desactivar este producto?";
+                } else {
+                    modalMsg.textContent = "¿Está seguro de activar este producto?";
                 }
+                
+                btnConfirmar.onclick = async () => {
+                
+                    try {
+                        const respuesta = await fetch(`http://localhost:3000/api/productos/${id}/estado`, {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ activo: !activo })
+                        });
+
+                        if (respuesta.ok) {
+                            window.location.reload();
+                        } else {
+                            alert("Error al cambiar el estado en el servidor.");
+                        }
+                    }catch (error) {
+                        console.error("Error cambiando estado:", error);
+                    }
+                };
+                modalEstado.show();
             });
         });
 
@@ -218,7 +241,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const nuevoPrecio = celdaPrecio.querySelector('input').value.trim();
 
                     if (nuevoNombre === "" || nuevoPrecio === "") {
-                        alert("Por favor, completá todos los campos obligatorios.");
+                        const modalEdit = new bootstrap.Modal(document.getElementById('modalEdit'));
+                        const modalBodyEdit = document.querySelector("#modalEdit .modal-body");
+                        modalBodyEdit.textContent = "Por favor completa todos los campos"
+                        modalEdit.show();
                         return;
                     }
 
@@ -239,10 +265,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
 
                         if (respuesta.ok) {
-                            alert("¡Producto modificado con éxito!");
-                            window.location.reload();
+                            const modalEdit = new bootstrap.Modal(document.getElementById('modalEdit'));
+                            const modalBodyEdit = document.querySelector("#modalEdit .modal-body");
+                            const btnAceptarModalEdit = document.getElementById('btnAceptarModalEdit');
+                            modalBodyEdit.textContent = "Producto editado"
+                            modalEdit.show();
+                            if (btnAceptarModalEdit) {
+                                btnAceptarModalEdit.onclick = () => {
+                                window.location.reload();
+                                };
+                            }
+                        
                         } else {
-                            alert("Hubo un problema al intentar guardar las modificaciones.");
+                            const modalEdit = new bootstrap.Modal(document.getElementById('modalEdit'));
+                            const modalBodyEdit = document.querySelector("#modalEdit .modal-body");
+                            modalBodyEdit.textContent = "Hubo un problema al editar el producto"
+                            modalEdit.show();
+
                         }
                     } catch (error) {
                         console.error("Error guardando edición inline:", error);
@@ -252,7 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. FORMULARIO DE ALTA DE PRODUCTOS
     const formularioExiste = document.querySelector('form');
     if (formularioExiste) {
         configurarFormularioProducto();
@@ -280,10 +318,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (respuesta.ok) {
-                    alert('¡Producto guardado con éxito en el sistema!');
-                    window.location.href = '/api/administradores/dashboard';
+                    const modalFormulario = new bootstrap.Modal(document.getElementById('modalFormulario'));
+                    const modalBodyFormulario = document.querySelector("#modalFormulario .modal-body");
+                    const btnAceptarModalFormulario = document.getElementById("btnAceptarModalFormulario")
+                    modalBodyFormulario.textContent = "Producto guardado con exito"
+                    modalFormulario.show();
+                    if (btnAceptarModalFormulario) {
+                            btnAceptarModalFormulario.onclick = () => {
+                                window.location.href = "/api/administradores/dashboard";
+                            };
+                        }
+                    
+
                 } else {
-                    alert('El servidor rechazó el producto. Verificá los campos.');
+                    const modalFormulario = new bootstrap.Modal(document.getElementById('modalFormulario'));
+                    const modalBodyFormulario = document.querySelector("#modalFormulario .modal-body");
+                    modalBodyFormulario.textContent = "Error alcargar en el servidor, revisar los campos"
+                    modalFormulario.show();                    
                 }
             } catch (error) {
                 console.error('Error de conexión:', error);
@@ -291,7 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 6. EXPORTAR A EXCEL (PANEL DE VENTAS)
     const btnExportarExcel = document.getElementById('btn-exportar-excel');
     if (btnExportarExcel) {
         btnExportarExcel.addEventListener('click', () => {
