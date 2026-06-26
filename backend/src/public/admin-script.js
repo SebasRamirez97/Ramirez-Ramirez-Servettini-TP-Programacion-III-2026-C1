@@ -118,26 +118,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function configurarBotonesDashboardEJS() {
         const botonesEstado = document.querySelectorAll('.btn-cambiar-estado');
+        const modalEstado = new bootstrap.Modal(document.getElementById('modalEstado'));
+        const modalMsg = document.getElementById('modalEstadoMensaje');
+        const btnConfirmar = document.getElementById('btnConfirmarEstado');
+        
+        
         botonesEstado.forEach(btn => {
             btn.addEventListener('click', async () => {
+                
                 const id = btn.getAttribute('data-id');
                 const activo = btn.getAttribute('data-activo') === 'true';
-
-                try {
-                    const respuesta = await fetch(`http://localhost:3000/api/productos/${id}/estado`, {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ activo: !activo })
-                    });
-
-                    if (respuesta.ok) {
-                        window.location.reload();
-                    } else {
-                        alert("Error al cambiar el estado en el servidor.");
-                    }
-                } catch (error) {
-                    console.error("Error cambiando estado:", error);
+                if (activo) {
+                    modalMsg.textContent = "¿Está seguro de desactivar este producto?";
+                } else {
+                    modalMsg.textContent = "¿Está seguro de activar este producto?";
                 }
+                
+                btnConfirmar.onclick = async () => {
+                
+                    try {
+                        const respuesta = await fetch(`http://localhost:3000/api/productos/${id}/estado`, {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ activo: !activo })
+                        });
+
+                        if (respuesta.ok) {
+                            window.location.reload();
+                        } else {
+                            alert("Error al cambiar el estado en el servidor.");
+                        }
+                    }catch (error) {
+                        console.error("Error cambiando estado:", error);
+                    }
+                };
+                modalEstado.show();
             });
         });
 
@@ -244,14 +259,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (respuesta.ok) {
                             const modalEdit = new bootstrap.Modal(document.getElementById('modalEdit'));
                             const modalBodyEdit = document.querySelector("#modalEdit .modal-body");
+                            const btnAceptarModalEdit = document.getElementById('btnAceptarModalEdit');
                             modalBodyEdit.textContent = "Producto editado"
                             modalEdit.show();
-                            //window.location.reload();
+                            if (btnAceptarModalEdit) {
+                                btnAceptarModalEdit.onclick = () => {
+                                window.location.reload();
+                                };
+                            }
+                        
                         } else {
                             const modalEdit = new bootstrap.Modal(document.getElementById('modalEdit'));
                             const modalBodyEdit = document.querySelector("#modalEdit .modal-body");
                             modalBodyEdit.textContent = "Hubo un problema al editar el producto"
                             modalEdit.show();
+
                         }
                     } catch (error) {
                         console.error("Error guardando edición inline:", error);
@@ -291,8 +313,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (respuesta.ok) {
                     const modalFormulario = new bootstrap.Modal(document.getElementById('modalFormulario'));
                     const modalBodyFormulario = document.querySelector("#modalFormulario .modal-body");
+                    const btnAceptarModalFormulario = document.getElementById("btnAceptarModalFormulario")
                     modalBodyFormulario.textContent = "Producto guardado con exito"
                     modalFormulario.show();
+                    if (btnAceptarModalFormulario) {
+                            btnAceptarModalFormulario.onclick = () => {
+                                window.location.href = "/api/administradores/dashboard";
+                            };
+                        }
+                    
 
                 } else {
                     const modalFormulario = new bootstrap.Modal(document.getElementById('modalFormulario'));
