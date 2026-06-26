@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             localStorage.setItem('nombreCliente', nombreCliente.value.trim());
             location.href = "categorias.html";
+            localStorage.removeItem("carrito"); 
         });
     }
 
@@ -80,7 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (btnVolverCategorias) {
-        btnVolverCategorias.addEventListener('click', () => { location.href = "categorias.html"; });
+        btnVolverCategorias.addEventListener('click', () => { 
+            location.href = "categorias.html"; 
+            
+        });
     }
 
     if (btnCarrito) {
