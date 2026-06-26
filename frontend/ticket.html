@@ -1,30 +1,117 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ticket</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tenkiu - Autoservicio</title>
+        
+        <link rel="icon" href="../resources/logo.png" type="image/png" />
 
-<header>
-    <h1>TICKET DE COMPRA</h1>
-</header>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <script>
+            if (localStorage.getItem('tema') === 'oscuro') {
+                document.body.classList.add('dark-mode');
+            }
+        </script>
 
-<hr>
+        <header class="px-4 py-2">
+            <div class="d-flex align-items-center gap-3">
+                <img src="../resources/logo.png" alt="Logo Tenkiu" style="width: 45px; height: 45px; object-fit: contain;">
+                <div>
+                    <h1 class="m-0 fuente-marca gap-2">Tenkiu</h1>
+                </div>
+            </div>
+        </header>
 
-<main id="ticket">
+        <main class="justify-content-center align-items-center py-5 px-3">
+            
+            <div class="ticket-contenedor text-center">
+                
+                <div class="mb-3">
+                    <img src="../resources/img/thank-you-ticket.png" alt="Éxito" style="width: 90px;">
+                </div>
+                
+                <h2 class="fw-bold h4 mb-1">¡Tenkiu !</h2>
+                <p class="text-muted small mb-0">La factura de su compra está lista</p>
 
-</main>
+                <div class="linea-punteada"></div>
 
-<br>
+                <div class="text-start small">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Nro. de Operación:</span>
+                        <span class="fw-bold text-dark" id="ticket-operacion">0120034399434</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Cliente:</span>
+                        <span class="fw-bold text-dark" id="ticket-cliente">---</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-0">
+                        <span class="text-secondary">Fecha y Hora:</span>
+                        <span class="fw-bold text-dark" id="ticket-fecha">--/--/---- --:--</span>
+                    </div>
+                </div>
 
-<button onclick="window.location.href='articulos.json'">
-    Nueva Compra
-</button>
+                <div class="linea-punteada"></div>
 
-<script src="ticket.js"></script>
+                <table class="table table-borderless table-sm small text-start mb-0">
+                    <thead>
+                        <tr class="border-bottom">
+                            <th class="text-secondary fw-normal">Producto</th>
+                            <th class="text-secondary fw-normal text-center">Cant x Unit.</th>
+                            <th class="text-secondary fw-normal text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticket-productos-body">
+                        <tr>
+                            <td>Super Seta (Power Up)</td>
+                            <td class="text-center">2 x $10</td>
+                            <td class="text-end fw-medium">$20</td>
+                        </tr>
+                        <tr>
+                            <td>Kart Estándar (Vehículo)</td>
+                            <td class="text-center">1 x $15</td>
+                            <td class="text-end fw-medium">$15</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-</body>
+                <div class="linea-punteada"></div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="fw-bold text-dark m-0 fs-5">TOTAL</span>
+                    <span class="fw-bold text-dark fs-4" id="ticket-total">$35</span>
+                </div>
+
+                <div class="codigo-barras-simulado mx-auto w-75 mb-2"></div>
+                <small class="text-muted text-center d-block style='font-size: 0.75rem;'">TENKIU-AUTOSERVICIO</small>
+            </div>
+
+            <div class="mt-4 text-center d-flex justify-content-center gap-3 flex-wrap">
+                <button id="btn-descargar-pdf" type="button" class="btn btn-outline-primary btn-lg px-4 rounded-pill shadow-sm fw-bold">
+                    Descargar Ticket (PDF)
+                </button>
+                <button id="btn-volver-inicio" type="button" class="btn btn-danger btn-lg px-4 rounded-pill shadow-sm fw-bold">
+                    Volver a comprar
+                </button>
+            </div>
+
+        </main>
+
+        <footer>
+            <h3>Todos los derechos reservados</h3>
+            <small class="text-secondary d-none d-sm-inline">UTN Avellaneda - Programación III</small>
+            <div class="d-flex align-items-center gap-4">
+                <span class="text-white-50 small d-none d-md-inline">
+                    <strong>Alumnos:</strong> Ramirez - Ramirez - Servettini
+                </span>
+            </div>
+        </footer>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+        <script src="script.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    </body>
 </html>

@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { getProductos } = require('../controllers/productoController');
+const { crearVenta , getVentas , mostrarVentasPanel} = require('../controllers/ventaController');
 
-router.get('/', getProductos);
+router.get('/panel', mostrarVentasPanel);
+router.get('/',getVentas);
+router.post('/crear', crearVenta);
 
 module.exports = router;

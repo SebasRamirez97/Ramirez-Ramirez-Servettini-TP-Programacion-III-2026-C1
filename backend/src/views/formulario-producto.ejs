@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenkiu - Gestionar Producto</title>
+
+    <link rel="icon" href="/logo.png" type="image/png" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/admin-styles.css">
+</head>
+<body>
+    <script>
+        if (localStorage.getItem('tema') === 'oscuro') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+
+    <header>
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <img src="/logo.png" alt="Logo" style="width: 40px; height: 40px;">
+                <h1 class="m-0 fuente-marca gap-2">Tenkiu - Formulario</h1>
+            </div>
+            <nav class="d-flex gap-3">
+                <button id="btn-tema" type="button" class="btn btn-dark" style="font-size: 1.2rem; padding: 6px 12px;">
+                    🌙
+                </button>
+                <a href="/api/administradores/login" class="btn btn-danger w-100 text-center">Cerrar Sesión</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container my-5" style="max-width: 600px;">
+        <div class="card shadow-sm p-4">
+            <h2 class="h3 mb-4 text-center">Formulario de Producto</h2>
+            
+            <form id="form-nuevo-producto" enctype="multipart/form-data">
+                
+                <div class="mb-3">
+                    <label for="nombre" class="form-label font-weight-bold">Nombre del Producto</label>
+                    <input type="text" class="form-control" id="nombre" placeholder="Ej: Slug Flyer" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="categoria" class="form-label">Tipo / Categoría</label>
+                    <select class="form-select" id="categoria" required>
+                        <option value="" disabled selected>Seleccione una opción</option>
+                        <option value="vehiculos">Vehículos</option>
+                        <option value="powerups">Power-ups</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="precio" class="form-label">Precio ($)</label>
+                    <input type="number" class="form-control" id="precio" placeholder="Ej: 125000" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="imagen" class="form-label">Imagen del Producto</label>
+                    <input type="file" class="form-control btn btn-primary" id="imagen" accept="image/*">
+                    <div class="form-text">Formatos permitidos: png, jpg, jpeg. Máx 2MB.</div>
+                </div>
+
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="/api/administradores/dashboard" class="btn btn-danger">Cancelar</a>
+                    <button type="submit" class="btn btn-outline-primary">Guardar Producto</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white-50 text-center py-3 mt-auto">
+        <div class="container">
+            <p class="m-0 small">UTN Avellaneda - Programación III</p>
+            <p class="m-0 small"><strong>Alumnos:</strong> Ramirez - Ramirez - Servettini</p>
+        </div>
+    </footer>
+
+     <div class="modal fade" id="modalFormulario" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Atención</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button id=btnAceptarModalFormulario type="button" class="btn btn-primary" data-bs-dismiss="modal" >Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin-script.js"></script>
+</body>
+</html>

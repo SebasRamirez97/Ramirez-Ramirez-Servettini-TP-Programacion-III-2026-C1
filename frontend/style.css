@@ -1,6 +1,10 @@
-/* =========================================
-   1. VARIABLES DE TEMA (CLARO / OSCURO)
-   ========================================= */
+@font-face {
+    font-family: 'Metal-Slug-Latino-Regular';
+    src: url('fuentes/Metal-Slug-Latino-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 :root {
     --bg-body: #ffffff;
     --text-body: #212529;
@@ -12,7 +16,6 @@
     --text-footer: #ffffff;
 }
 
-/* Variables que se activan al aplicar la clase dark-mode al body */
 body.dark-mode {
     --bg-body: #121212;
     --text-body: #f8f9fa;
@@ -22,9 +25,6 @@ body.dark-mode {
     --bg-footer: #0d0d0d;
 }
 
-/* =========================================
-   2. ESTRUCTURA GLOBAL Y HEADER
-   ========================================= */
 body {
     display: flex;
     flex-direction: column;
@@ -42,7 +42,7 @@ main {
 }
 
 header {
-    position: sticky;     
+    position: sticky;    
     top: 0;               
     z-index: 1030;        
     display: flex;
@@ -59,37 +59,19 @@ footer {
     height: 10vh;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 0 50px;
     background-color: var(--bg-footer);
     color: var(--text-footer);
     z-index: 1020;       
     transition: background-color 0.3s;
 }
 
-body.dark-mode input.form-control {
-    background-color: #2b3035;
-    color: #ffffff;
-    border-color: #495057;
-}
-body.dark-mode input.form-control::placeholder {
-    color: #adb5bd;
+footer h3 {
+    margin: 0;
+    font-size: 1rem;
 }
 
-/* =========================================
-   3. SISTEMA DE APAGADO Y ENCENDIDO DE PANTALLAS
-   ========================================= */
-.pantalla {
-    display: none !important; 
-}
-
-.pantalla.activa {
-    display: flex !important; 
-    flex-grow: 1;             
-}
-
-/* =========================================
-   4. MENÚ LATERAL PEGADO (STICKY ASIDE)
-   ========================================= */
 aside {
     position: sticky;         
     top: 10vh;                
@@ -98,9 +80,25 @@ aside {
     overflow-y: auto;         
 }
 
-/* =========================================
-   5. GRILLA Y TARJETAS DE PRODUCTOS
-   ========================================= */
+.fuente-marca {
+    font-family: 'Metal-Slug-Latino-Regular', sans-serif;
+    display: inline-block;
+    padding: 0 5px;
+    background: linear-gradient(to bottom, #ffaa00 20%, #ff0000 80%);
+    -webkit-background-clip: text;       
+    -webkit-text-fill-color: transparent; 
+    -webkit-text-stroke: 1px #000; 
+}
+
+.pantalla {
+    display: none !important; 
+}
+
+.pantalla.activa {
+    display: flex !important; 
+    flex-grow: 1;              
+}
+
 .productos-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -123,7 +121,7 @@ aside {
 .producto-img {
     width: 90%;              
     height: 90%;            
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 4px;
     margin-bottom: 10px;
 }
@@ -144,15 +142,161 @@ aside {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+
+.modal-content {
+    background-color: var(--bg-body);
+    color: var(--text-body);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.modal-body {
+    color: var(--text-body);
+}
+
+.btn-close {
+    filter: var(--btn-close-filter, none);
+}
+
+.contenedor-carrito-popup {
+    position: fixed;
+    top: 60px;
+    right: 100px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+}
+
+.globo-agregado {
+    background-color: #30cf58;
+    color: #1f1e1e;
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+    font-size: 0.95rem;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    animation: fadeInUp 0.3s ease;
+}
+
+.ticket-contenedor {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    max-width: 450px;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    position: relative;
+}
+
+.ticket-contenedor::before, .ticket-contenedor::after {
+    content: '';
+    position: absolute;
+    left: -10px;
+    width: 20px;
+    height: 20px;
+    background-color: var(--bg-body);
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+.ticket-contenedor::before { top: 35%; }
+.ticket-contenedor::after { bottom: 20%; }
+
+.linea-punteada {
+    border-top: 2px dashed #cccccc;
+    margin: 20px 0;
+}
+
+.codigo-barras-simulado {
+    height: 45px;
+    background: linear-gradient(90deg, 
+        #000 0%, #000 8%, transparent 8%, transparent 12%,
+        #000 12%, #000 22%, transparent 22%, transparent 26%,
+        #000 26%, #000 30%, transparent 30%, transparent 36%,
+        #000 36%, #000 48%, transparent 48%, transparent 52%,
+        #000 52%, #000 56%, transparent 56%, transparent 64%,
+        #000 64%, #000 76%, transparent 76%, transparent 80%,
+        #000 80%, #000 90%, transparent 90%, transparent 94%,
+        #000 94%, #000 100%);
+    opacity: 0.85;
+}
+
+.ticket-contenedor h2, 
+.ticket-contenedor p, 
+.ticket-contenedor td, 
+.ticket-contenedor th,
+.ticket-contenedor span {
+    color: #212529 !important;
+}
+
+.tabla-scroll-contenedor {
+    max-height: 55vh;
+    overflow-y: auto;
+    border-bottom: 1px solid var(--border-card);
+}
+
+.tabla-scroll-contenedor thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: #212529;
+    box-shadow: inset 0 -1px 0 var(--bs-table-border-color);
+}
+
+.fondo-pantalla {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../resources/img/background.png'); /* Ruta a tu imagen */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+body.dark-mode .btn-close {
+    --btn-close-filter: invert(1) grayscale(100%) brightness(200%);
+}
+
 body.dark-mode .btn-cantidad {
     background-color: #495057;
     border-color: #6c757d;
     color: #ffffff;
 }
 
-/* =========================================
-   6. RESPONSIVE (Celulares)
-   ========================================= */
+/* SOLUCIÓN CORREGIDA PARA INPUTS Y FORMULARIOS */
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background-color: #2b3035;
+    color: #ffffff;
+    border-color: #495057;
+}
+
+body.dark-mode .form-control::placeholder {
+    color: #adb5bd;
+}
+
+/* SOLUCIÓN CORREGIDA PARA LAS TARJETAS DE BOOTSTRAP (.card) */
+body.dark-mode .card {
+    background-color: var(--bg-card);
+    border-color: var(--border-card);
+    color: var(--text-body);
+}
+
+body.dark-mode .table-dark-custom {
+    color: var(--text-body);
+    --bs-table-bg: #212529; /* Fondo gris oscuro para el cuerpo de la tabla */
+    --bs-table-hover-bg: #2c3034; /* Color al pasar el mouse por encima */
+    --bs-table-hover-color: #ffffff;
+    --bs-table-border-color: #373b3e;
+}
+
+/* Forzar que las celdas de las filas mantengan el color de texto correcto */
+body.dark-mode .table-dark-custom td {
+    color: var(--text-body);
+}
+
+/* ==========================================================================
+   5. RESPONSIVE / MEDIA QUERIES (Siempre al final)
+   ========================================================================== */
 @media (max-width: 768px) {
     .productos-grid {
         grid-template-columns: 1fr;
@@ -164,5 +308,9 @@ body.dark-mode .btn-cantidad {
         position: static;  
         width: 100% !important;
         height: auto;
+    }
+    footer {
+        justify-content: center; 
+        padding: 0 20px;
     }
 }
