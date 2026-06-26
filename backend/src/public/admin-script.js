@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
     const btnTema = document.getElementById('btn-tema');      
 
+    const btnVerPassword = document.getElementById('btn-ver-password');
+
     const inputNombre = document.getElementById('nombre');
     const selectCategoria = document.getElementById('categoria');
     const inputPrecio = document.getElementById('precio');
@@ -102,6 +104,18 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error('Error en el acceso rápido:', error);
             }
+        });
+    }
+
+    if (btnVerPassword && contraseñaAdmin) {
+        // Cuando el mouse ENTRA al ojito, cambiamos el tipo a 'text'
+        btnVerPassword.addEventListener('mouseenter', () => {
+            contraseñaAdmin.type = 'text';
+        });
+
+        // Cuando el mouse SALE del ojito, volvemos a ocultarla como 'password'
+        btnVerPassword.addEventListener('mouseleave', () => {
+            contraseñaAdmin.type = 'password';
         });
     }
 
