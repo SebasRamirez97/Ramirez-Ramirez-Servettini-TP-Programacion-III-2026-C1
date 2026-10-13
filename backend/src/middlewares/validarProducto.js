@@ -1,26 +1,21 @@
 const { z } = require("zod");
 
-// 🛡️ MIDDLEWARE PARA CREAR PRODUCTO
 function validarCrearProducto(req, res, next) {
     try {
-        // 1. Definimos el esquema con tus mensajes personalizados
         const esquemaCrear = z.object({
             precio: z.coerce.number({ message: "El precio debe ser un número" }).positive({ message: "El precio debe ser un número positivo" }),
             imagen: z.string({ message: "La imagen es obligatoria y debe ser un texto" })
         });
 
-        // 2. Capturamos los datos (manejando si viene o no el archivo de Multer)
         const datosAValidar = {
             precio: req.body.precio,
             imagen: req.file ? req.file.filename : undefined
         };
 
-        // 3. Validamos
         esquemaCrear.parse(datosAValidar);
         
-        next(); // Si todo está bien, pasa al controlador
+        next();
     } catch (error) {
-        // Al estilo de tu parcial: capturamos el error de Zod y respondemos 400
         res.status(400).json({ 
             error: "Datos inválidos", 
             detalles: error.errors ? error.errors.map(e => e.message) : error.message 
@@ -28,10 +23,8 @@ function validarCrearProducto(req, res, next) {
     }
 }
 
-// 🛡️ MIDDLEWARE PARA EDITAR PRODUCTO
 function validarEditarProducto(req, res, next) {
     try {
-        // En la edición usamos .optional() por si no modifican ese campo
         const esquemaEditar = z.object({
             precio: z.coerce.number({ message: "El precio debe ser un número" }).positive({ message: "El precio editado debe ser positivo" }).optional(),
             imagen: z.string({ message: "La imagen debe ser un texto" }).optional()

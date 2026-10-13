@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. CAPTURA DE ELEMENTOS EXCLUSIVOS DE ADMIN
     const emailAdmin = document.getElementById('input-email');
     const contraseñaAdmin = document.getElementById('input-contraseña');
     const btnIngresarAdmin = document.getElementById('btn-ingresar-admin');
@@ -8,12 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
     const btnTema = document.getElementById('btn-tema');      
 
+    const btnVerPassword = document.getElementById('btn-ver-password');
+
     const inputNombre = document.getElementById('nombre');
     const selectCategoria = document.getElementById('categoria');
     const inputPrecio = document.getElementById('precio');
     const inputImagen = document.getElementById('imagen');
 
-    // 2. SISTEMA DE TEMAS PARA EL PANEL
     const temaGuardado = localStorage.getItem('tema');
     if (temaGuardado === 'oscuro') {
         document.body.classList.add('dark-mode');
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (respuesta.ok && data.administradores && data.administradores.length > 0) {
                     let primerAdmin = data.administradores[0]; 
                     emailAdmin.value = primerAdmin.email;
-                    contraseñaAdmin.value = 'coso1234'; 
+                    contraseñaAdmin.value = '1234567890'; 
                     btnIngresarAdmin.click();
                 } else {
                     alert('No se encontraron administradores registrados en el sistema.');
@@ -105,13 +105,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (btnVerPassword && contraseñaAdmin) {
+        btnVerPassword.addEventListener('mouseenter', () => {
+            contraseñaAdmin.type = 'text';
+        });
+        btnVerPassword.addEventListener('mouseleave', () => {
+            contraseñaAdmin.type = 'password';
+        });
+    }
+
     if (btnCerrarSesion) {
         btnCerrarSesion.addEventListener('click', () => {
             location.href = "/api/administradores/login";
         });
     }
 
-    // 4. LOGIC DEL DASHBOARD (EJS INTERACTIVO)
     if (window.location.pathname.includes('/administradores/dashboard')) {
         configurarBotonesDashboardEJS();
     }
@@ -283,7 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. FORMULARIO DE ALTA DE PRODUCTOS
     const formularioExiste = document.querySelector('form');
     if (formularioExiste) {
         configurarFormularioProducto();
@@ -335,7 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 6. EXPORTAR A EXCEL (PANEL DE VENTAS)
     const btnExportarExcel = document.getElementById('btn-exportar-excel');
     if (btnExportarExcel) {
         btnExportarExcel.addEventListener('click', () => {

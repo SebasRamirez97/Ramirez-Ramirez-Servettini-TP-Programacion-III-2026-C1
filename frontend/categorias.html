@@ -32,18 +32,22 @@
         </header>
 
 
-        <main>
-           <section id="pantalla-categorias" class="d-flex flex-column align-items-center justify-content-center gap-4" style="min-height: 80vh;">
-                <div class="d-flex gap-5">
-                    <button id="btn-cat-powerups" type="button" class="btn btn-warning" style="width: 250px; height: 150px;">
-                        <span class="fuente-marca" style="font-size: 2.8rem;">Power Ups</span>
+        <main class="container-fluid px-3">
+            <section id="pantalla-categorias" class="d-flex flex-column align-items-center justify-content-center gap-4" style="min-height: 80vh;">
+                
+                <div class="d-flex flex-column flex-md-row gap-3 gap-md-5 w-100 justify-content-center align-items-center px-2">
+                    
+                    <button id="btn-cat-powerups" type="button" class="btn btn-warning w-100" style="max-width: 300px; height: 150px;">
+                        <span class="fuente-marca d-block text-truncate" style="font-size: calc(1.8rem + 1vw);">Power Ups</span>
                     </button>
                     
-                    <button id="btn-cat-vehiculos" type="button" class="btn btn-primary" style="width: 250px; height: 150px;">
-                        <span class="fuente-marca" style="font-size: 2.8rem;">Vehículos</span>
+                    <button id="btn-cat-vehiculos" type="button" class="btn btn-primary w-100" style="max-width: 300px; height: 150px;">
+                        <span class="fuente-marca d-block text-truncate" style="font-size: calc(1.8rem + 1vw);">Vehículos</span>
                     </button>
+                    
                 </div>
-                <button id="btn-volver-inicio" type="button" class="btn btn-danger mt-5">Volver al Inicio</button>
+                
+                <button id="btn-volver-inicio" type="button" class="btn btn-danger mt-4 px-4 py-2">Volver al Inicio</button>
             </section>
         </main>
 
