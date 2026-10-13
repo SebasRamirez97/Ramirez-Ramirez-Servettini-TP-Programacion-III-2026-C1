@@ -9,7 +9,17 @@ const ventaRoutes = require('./src/routes/venta.routes');
 
 const app = express();
 
-app.use(cors({origin: 'http://127.0.0.1:5500' }));
+
+const Sentry = require("@sentry/node");
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN, // Se conectará de forma segura con la variable de entorno de Render
+  tracesSampleRate: 1.0,
+});
+
+// CORRECCIÓN 1: Permitir solicitudes desde cualquier origen o agregar el de tu frontend en producción
+app.use(cors()); // O puedes dejarlo abierto con cors() para pruebas, o configurarlo dinámicamente
+
 app.use(express.json());
 app.use(express.static('./src/public'));
 app.use(express.static('../frontend'));
@@ -34,4 +44,6 @@ sequelize.sync({ force: false })
   .then(() => console.log('Tablas sincronizadas'))
   .catch(err => console.error('Error al sincronizar:', err));
 
-app.listen(3000, () => console.log('Servidor corriendo en http://localhost:3000'));
+// CORRECCIÓN 2: Usar process.env.PORT que provee Render (con respaldo al 3000 para desarrollo local)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
