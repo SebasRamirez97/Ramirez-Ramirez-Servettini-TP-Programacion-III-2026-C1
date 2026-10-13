@@ -8,15 +8,12 @@ const administradorRoutes = require('./src/routes/administrador.routes');
 const ventaRoutes = require('./src/routes/venta.routes');
 
 const app = express();
-
-
 const Sentry = require("@sentry/node");
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN, // Se conectará de forma segura con la variable de entorno de Render
   tracesSampleRate: 1.0,
 });
-
 // CORRECCIÓN 1: Permitir solicitudes desde cualquier origen o agregar el de tu frontend en producción
 app.use(cors()); // O puedes dejarlo abierto con cors() para pruebas, o configurarlo dinámicamente
 
